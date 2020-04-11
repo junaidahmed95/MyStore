@@ -8,12 +8,80 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:361078201507:android:3ffa6383eac8f5a0b8b316",
+        "android_client_info": {
+          "package_name": "com.example.conerowner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361078201507-m8sn2pi5tsnpfntf3ii9pamu0fm7c1gv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.conerowner",
+            "certificate_hash": "ee80177aad439b745ed264c0b65d4771397cc750"
+          }
+        },
+        {
+          "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "361078201507-kj3qjijdps47kn3vf1felptlamn7tmts.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "abc.CornerStore"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:361078201507:android:de4106e994242032b8b316",
         "android_client_info": {
           "package_name": "com.example.mystore"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "361078201507-0hqp6sk1qhm9e38blueug57hf9t353us.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mystore",
+            "certificate_hash": "13e6c592fdd307209aba1139af90bc228fb4ff45"
+          }
+        },
+        {
+          "client_id": "361078201507-5vbnf0vdda06quvmr2kme6mf1op171r7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mystore",
+            "certificate_hash": "0f2f787e73b7f76ca86711139a2b5e4ad4eb5336"
+          }
+        },
+        {
+          "client_id": "361078201507-94cn64du7ffjsj1k1bn5lkurrr73b1h5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mystore",
+            "certificate_hash": "4fd4ca9a874d057e802be1f9030939960814758d"
+          }
+        },
         {
           "client_id": "361078201507-9ca87iognui4ks75bokpa2vtq2ccc27s.apps.googleusercontent.com",
           "client_type": 1,
@@ -46,6 +114,73 @@
             {
               "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "361078201507-kj3qjijdps47kn3vf1felptlamn7tmts.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "abc.CornerStore"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361078201507:android:1a973fa057c260eab8b316",
+        "android_client_info": {
+          "package_name": "com.example.storeowner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361078201507-m2u1vf8kko3demcp9u1jhuutf3vgaoep.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.storeowner",
+            "certificate_hash": "13e6c592fdd307209aba1139af90bc228fb4ff45"
+          }
+        },
+        {
+          "client_id": "361078201507-lpvh0o2jq2mkbfjtbtfuduktghsjeobq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.storeowner",
+            "certificate_hash": "0f2f787e73b7f76ca86711139a2b5e4ad4eb5336"
+          }
+        },
+        {
+          "client_id": "361078201507-tff0eg52kl9vb84slbtnrgla95ej94ls.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.storeowner",
+            "certificate_hash": "ee80177aad439b745ed264c0b65d4771397cc750"
+          }
+        },
+        {
+          "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "361078201507-kj3qjijdps47kn3vf1felptlamn7tmts.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "abc.CornerStore"
+              }
             }
           ]
         }
