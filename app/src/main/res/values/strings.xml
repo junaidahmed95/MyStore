@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Corner Store</string>
+    <string name="title_activity_main">My Corner Store</string>
+    <string name="title_home">Home</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_cart">Cart</string>
+    <string name="title_account">Account</string>
+    <string name="file_limit_size_upload_format"> files must be less than %sMB</string>
+    <string name="title_activity_map">Map</string>
+    <string name="detailText"><u>Full Details</u></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
