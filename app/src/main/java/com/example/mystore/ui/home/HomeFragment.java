@@ -93,6 +93,7 @@ public class HomeFragment extends Fragment {
     private FusedLocationProviderClient mFusedLocationClient;
     int PERMISSION_ID = 44;
     private GridView grd_str;
+    private String test;
     private AllStoreAdapter allStoreAdapter;
     private List<AllStore> storeList;
     private ProgressDialog mProgressDialog;
@@ -107,6 +108,7 @@ public class HomeFragment extends Fragment {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         grd_str = root.findViewById(R.id.gd1);
+        //ye rha hai umair
         storeList = new ArrayList<>();
         CheckLocationPermission();
         mProgressDialog = new ProgressDialog(getContext());
