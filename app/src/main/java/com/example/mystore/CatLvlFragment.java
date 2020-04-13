@@ -30,6 +30,7 @@ import java.util.Map;
 
 
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.SubCatActivity.list;
 import static com.example.mystore.SubCatActivity.mProgressDialog;
 import static com.example.mystore.SubCatActivity.mtabs;
@@ -45,7 +46,7 @@ public class CatLvlFragment extends Fragment {
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/product";
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     private String JSON_URL = "";
-
+public static CatLvlAdapter catLvlAdapter;
     private JsonArrayRequest request;
     private List<CatLvlItemList> originalList;
     private RequestQueue requestQueue;
@@ -138,9 +139,10 @@ public class CatLvlFragment extends Fragment {
                             originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(), prolist.get(i).getProductid(), prolist.get(i).getP_img()));
                         }
                     }
-                    CatLvlAdapter catLvlAdapter = new CatLvlAdapter(originalList, getActivity());
+                    catLvlAdapter = new CatLvlAdapter(originalList, getActivity());
                     mgridView.setAdapter(catLvlAdapter);
                     catLvlAdapter.notifyDataSetChanged();
+
                     mProgressDialog.dismiss();
                 }
 
@@ -158,6 +160,15 @@ public class CatLvlFragment extends Fragment {
             Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_LONG).show();
 
         }
+
+
+
+
+//        if(checklist!=null){
+//            if(checklist.size()>0){
+//                UpdateCart();
+//            }
+//        }
 
     }
 }

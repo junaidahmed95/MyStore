@@ -118,26 +118,25 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 try {
+
+                    for (int a = 0; a<checklist.size(); a++){
+                        if (checklist.get(a).equals(cartList.get(pos).getProductid())) {
+                            cartList.remove(pos);
+                            notifyItemRemoved(pos);
+                            notifyItemRangeChanged(pos, cartList.size());
+                            //int l = checklist.indexOf(cartList.get(pos).getP_name());
+                            checklist.remove(a);
+                            // selectedProducts.remove(l);
+
+                        }
+                    }
+
                     String[] splitit = mTxtView_TotalPrice.getText().toString().split("/");
                     int outPrice = Integer.parseInt(splitit[0]);
                     mTotalPrice = outPrice-Integer.parseInt(cartList.get(pos).getP_price());
                     mTxtView_TotalPrice.setText(""+mTotalPrice+"/-");
                     setupBadge(--MainActivity.mCartItemCount);
 
-
-                  for (int a = 0; a<checklist.size(); a++){
-                      if (checklist.get(a).equals(cartList.get(pos).getP_name())) {
-
-
-                          cartList.remove(pos);
-                          notifyItemRemoved(pos);
-                          notifyItemRangeChanged(pos, cartList.size());
-                          //int l = checklist.indexOf(cartList.get(pos).getP_name());
-                          checklist.remove(a);
-                         // selectedProducts.remove(l);
-
-                      }
-                  }
 
                     if(cartList.size() == 0){
                         mcardview2.setVisibility(View.GONE);

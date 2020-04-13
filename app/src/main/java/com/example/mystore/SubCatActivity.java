@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+import static com.example.mystore.CatLvlFragment.catLvlAdapter;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MainActivity.mCartItemCount;
 import static com.example.mystore.MainActivity.textCartItemCount;
@@ -225,6 +226,11 @@ public class SubCatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(catLvlAdapter!=null){
+            catLvlAdapter.notifyDataSetChanged();
+        }
+
+
     }
 
     private void CheckForCart() {

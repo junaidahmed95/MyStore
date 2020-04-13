@@ -57,7 +57,7 @@ public class CatLvlAdapter extends BaseAdapter {
     private List<CatLvlItemList> wishlist;
     private List<String> getfavtlist;
     public static boolean quantityflag = false;
-     Button mbtn_add_cart;
+
     List<CatLvlItemList> cartlist = new ArrayList<>();
     int pri;
    public static List<CatLvlItemList> favlist = new ArrayList<>();
@@ -99,7 +99,7 @@ public class CatLvlAdapter extends BaseAdapter {
         TextView t1 = convertView.findViewById(R.id.product_category);
         TextView t2 = convertView.findViewById(R.id.product_price);
         final ImageView mwish = convertView.findViewById(R.id.wis);
-        mbtn_add_cart = convertView.findViewById(R.id.btn_add_cart);
+        final Button mbtn_add_cart = convertView.findViewById(R.id.btn_add_cart);
         final Button mbtn_remove_cart = convertView.findViewById(R.id.btn_remove_cart);
         //final LinearLayout mbtLayout = convertView.findViewById(R.id.btLayout);
         final Button mplusQty = convertView.findViewById(R.id.plusQty);
@@ -107,6 +107,8 @@ public class CatLvlAdapter extends BaseAdapter {
         final TextView mproQuantity = convertView.findViewById(R.id.proQuantity);
 
         final LinearLayout mSelected = convertView.findViewById(R.id.selectedLayout);
+
+
 
         Glide.with(context).load(list.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(i);
         t1.setText(list.get(position).getP_name());
@@ -257,9 +259,7 @@ public class CatLvlAdapter extends BaseAdapter {
             public void onClick(View v) {
                 mbtn_add_cart.setVisibility(View.GONE);
                 mbtn_remove_cart.setVisibility(View.VISIBLE);
-
-
-                checklist.add(list.get(position).getP_name());
+                checklist.add(list.get(position).getProductid());
 
 
 
@@ -343,10 +343,26 @@ public class CatLvlAdapter extends BaseAdapter {
 //            }
 //        });
 
+        try {
+            if(checklist!=null){
+                if(checklist.size()>0){
+                    if(checklist.contains(selectedProducts.get(position).getProductid())){
+                        mbtn_add_cart.setVisibility(View.GONE);
+                        mbtn_remove_cart.setVisibility(View.VISIBLE);
+                    }else {
+                        mbtn_remove_cart.setVisibility(View.GONE);
+                        mbtn_add_cart.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
 
+        }catch (Exception e){
+
+        }
         return convertView;
 
     }
+
 
 
 
