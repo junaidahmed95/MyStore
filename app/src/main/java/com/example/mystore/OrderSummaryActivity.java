@@ -255,8 +255,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
                                                                 String[] geprice = mTxtView_TotalPrice.getText().toString().split("/");
 
-
-                                                                Log.d("dgs", geprice[0]);
                                                                 for (int a = 0; a < selectedProducts.size(); a++) {
                                                                     hashMap.put("str_prc[" + a + "]", selectedProducts.get(a).getP_price());
                                                                     hashMap.put("ord_qty[" + a + "]", selectedProducts.get(a).getP_quantity());
