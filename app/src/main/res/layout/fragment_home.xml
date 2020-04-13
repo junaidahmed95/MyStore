@@ -6,10 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -45,45 +48,65 @@
         </androidx.cardview.widget.CardView>
 
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="Shop By Category"
+            android:text="Nearest Shop to you"
             android:textColor="@android:color/black" />
 
-        <ProgressBar
-            android:id="@+id/progressbar"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="115dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+        <androidx.cardview.widget.CardView
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/cat_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="16dp" />
-
-        <Button
+            android:id="@+id/cdv_dialog"
+            android:layout_width="350dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="150dp"
             android:visibility="gone"
-            android:id="@+id/btn"
-            android:text="try"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp">
 
-        </Button>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:background="@drawable/soory"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="We are sorry there is no store near to your home."
+                    android:textColor="@android:color/black"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
 
         <GridView
+
             android:id="@+id/gd1"
             android:layout_width="match_parent"
-            android:layout_height="1050dp"
+            android:layout_height="1080dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
             android:horizontalSpacing="8dp"
-            android:numColumns="3"
-            android:scrollbars="none" />
+            android:numColumns="2"
+            android:scrollbars="none"
+            android:verticalSpacing="8dp"
+            tools:ignore="MissingConstraints" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
