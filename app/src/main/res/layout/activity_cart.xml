@@ -86,7 +86,7 @@
                 android:background="@drawable/btn_shape"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
-                android:text="Checkout"
+                android:text="Confirm Order"
                 android:textColor="@android:color/white" />
 
             <View

@@ -4,6 +4,7 @@ import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,18 +16,23 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.example.mystore.Adapter.AllStoreAdapter;
 import com.example.mystore.MainActivity;
+import com.example.mystore.Model.AllStore;
 import com.example.mystore.OrderTrackActivity;
 import com.example.mystore.ProfileActivity;
 import com.example.mystore.R;
@@ -34,12 +40,15 @@ import com.example.mystore.VaultActivity;
 import com.example.mystore.Verification;
 import com.example.mystore.WishActivity;
 import com.example.mystore.ui.HistoryActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -52,6 +61,8 @@ public class AccountFragment extends Fragment {
     private TextView mName, mEmail;
     private ProgressBar mProgressBar;
     private RelativeLayout mVaultLayout, mwishlayout,mlayout_history,mlayout_history1;
+
+
 
 
 
