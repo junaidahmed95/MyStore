@@ -53,7 +53,7 @@ import static com.example.mystore.MainActivity.textCartItemCount;
 
 public class SubCatActivity extends AppCompatActivity {
 
-    String get_store = "https://chhatt.com/Cornstr/grocery/api/get/allstores";
+
     private String mJSON_URL = "";
     private String[] tabTitles;
     private JsonArrayRequest mrequest;
@@ -105,25 +105,6 @@ public class SubCatActivity extends AppCompatActivity {
         mfbcart = findViewById(R.id.fbcart);
         mtabs = findViewById(R.id.tabs);
         mviewpager = findViewById(R.id.viewpager);
-        msp_selectStore = findViewById(R.id.sp_selectStore);
-
-
-        getstore();
-
-        msp_selectStore.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mProgressDialog.show();
-                getstoreid(msp_selectStore.getSelectedItem().toString());
-                //parseJSON();
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
 
         mfbcart.setOnClickListener(new View.OnClickListener() {
@@ -137,55 +118,6 @@ public class SubCatActivity extends AppCompatActivity {
 
     }
 
-    private void getstore() {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, get_store,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            JSONArray stArray = obj.getJSONArray("Stores");
-                            for (int i = 0; i < stArray.length(); i++) {
-
-                                JSONObject jsonObject = stArray.getJSONObject(i);
-                                String storename = jsonObject.getString("str_name");
-                                String storeid = jsonObject.getString("id");
-                                String u_id = jsonObject.getString("u_id");
-                                String userImage = jsonObject.getString("user_thumb");
-                                store.add(storename);
-                                storelist.add(new ShowStores(storename, storeid, u_id, userImage));
-
-
-                            }
-
-                            ArrayAdapter<String> modeadapter = new ArrayAdapter<String>(SubCatActivity.this, android.R.layout.simple_spinner_item, store);
-                            modeadapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-                            msp_selectStore.setAdapter(modeadapter);
-                            modeadapter.notifyDataSetChanged();
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-
-        requestQueue.add(stringRequest);
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,6 +126,8 @@ public class SubCatActivity extends AppCompatActivity {
 
         final MenuItem menuItem = menu.findItem(R.id.menu_cart);
         View actionView = MenuItemCompat.getActionView(menuItem);
+
+        GetStoreData();
         if (checklist.size() == 0) {
             textCartItemCount = actionView.findViewById(R.id.cart_badge);
         }
@@ -300,8 +234,8 @@ public class SubCatActivity extends AppCompatActivity {
 //        }
     }
 
-    private void GetStoreData(String stID) {
-        mJSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + stID;
+    private void GetStoreData() {
+        mJSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + getIntent().getStringExtra("storeid");
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -369,7 +303,7 @@ public class SubCatActivity extends AppCompatActivity {
                 cornerownerid = storelist.get(a).getUid();
                 cornerownername = storelist.get(a).getStore_name();
                 cornerownerimage = storelist.get(a).getStore_image();
-                GetStoreData(store_id);
+                //GetStoreData(store_id);
                 return;
             }
         }

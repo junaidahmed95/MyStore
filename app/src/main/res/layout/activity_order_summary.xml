@@ -159,7 +159,7 @@
                 android:background="@drawable/btn_shape"
                 android:paddingLeft="6dp"
                 android:paddingRight="6dp"
-                android:text="Confirm Order"
+                android:text="CheckOut"
                 android:textColor="@android:color/white" />
 
             <View
