@@ -5,81 +5,100 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.mystore.AllProductsActivity;
 import com.example.mystore.Model.Category;
-import com.example.mystore.Model.Product;
 import com.example.mystore.R;
 import com.example.mystore.SubCatActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+
+
+
+import java.util.ArrayList;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
-
+public class CategoryAdapter extends BaseAdapter {
     private List<Category> productList;
+
+    private String getcatprod;
     private Context mContext;
+    private TextView categoryName;
+    private ImageView categoryImage;
+
 
     public CategoryAdapter(List<Category> productList, Context mContext) {
         this.productList = productList;
         this.mContext = mContext;
     }
 
-    @NonNull
-    @Override
-    public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.category_item, viewGroup, false);
-        return new ViewHolder(view);
-    }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder viewHolder, int i) {
-
-        viewHolder.setData(productList.get(i).getCatImage(), productList.get(i).getCatName());
-
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(mContext, SubCatActivity.class);
-                mContext.startActivity(intent);
-            }
-        });
-
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return productList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public Object getItem(int position) {
+        return null;
+    }
 
-        private ImageView categoryImage;
-        private TextView categoryName;
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            categoryImage = itemView.findViewById(R.id.category_image);
-            categoryName = itemView.findViewById(R.id.category_name);
-        }
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
-        private void setData(String image, String name) {
-            Glide.with(mContext).asBitmap().load(image).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(categoryImage);
+        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item, parent, false);
 
-            categoryName.setText(name);
-        }
+        CardView mcv_cat = convertView.findViewById(R.id.card_cardview);
+        categoryImage = convertView.findViewById(R.id.category_image);
+        categoryName = convertView.findViewById(R.id.category_name);
 
+
+        setData(productList.get(position).getCatImage(), productList.get(position).getCatName());
+
+        mcv_cat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(mContext, SubCatActivity.class);
+                mContext.startActivity(intent);
+
+
+            }
+        });
+
+
+        return convertView;
 
     }
 
-}
+    private void setData(String image, String name) {
+        Glide.with(mContext).asBitmap().load(image).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(categoryImage);
+        categoryName.setText(name);
+    }
 
+
+
+}
