@@ -17,16 +17,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mystore.AllStoresActivity;
 import com.example.mystore.Model.AllStore;
+import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
 
 import java.util.List;
 
 public class AllStoreAdapter extends BaseAdapter {
 
-    List<AllStore> storeList;
+    List<ShowStores> storeList;
+    public static String store_id = "", cornerownerid, cornerownername, cornerownerimage;
     Context mcontext;
 
-    public AllStoreAdapter(List<AllStore> storeList, Context mcontext) {
+    public AllStoreAdapter(List<ShowStores> storeList, Context mcontext) {
         this.storeList = storeList;
         this.mcontext = mcontext;
     }
@@ -59,22 +61,20 @@ public class AllStoreAdapter extends BaseAdapter {
         storecardId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                store_id = storeList.get(position).getId();
+                cornerownerid = storeList.get(position).getUid();
+                cornerownername = storeList.get(position).getStore_name();
+                cornerownerimage = storeList.get(position).getStore_image();
                 Intent intent = new Intent(mcontext, AllStoresActivity.class);
-                intent.putExtra("storeid", storeList.get(position).getStr_id());
+                intent.putExtra("storeid", storeList.get(position).getId());
                 mcontext.startActivity(intent);
             }
         });
 
-        Glide.with(mcontext).load(storeList.get(position).getImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mimg_store);
-        txt_storename.setText(storeList.get(position).getName());
+        Glide.with(mcontext).load(storeList.get(position).getStore_image()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mimg_store);
+        txt_storename.setText(storeList.get(position).getStore_name());
         txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
 
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mcontext, "" + storeList.get(position).getStr_id(), Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return convertView;
     }

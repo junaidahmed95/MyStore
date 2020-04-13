@@ -34,7 +34,6 @@ import static com.example.mystore.SubCatActivity.list;
 import static com.example.mystore.SubCatActivity.mProgressDialog;
 import static com.example.mystore.SubCatActivity.mtabs;
 import static com.example.mystore.SubCatActivity.prolist;
-import static com.example.mystore.SubCatActivity.store_id;
 
 /**
  * A simple {@link Fragment} subclass.

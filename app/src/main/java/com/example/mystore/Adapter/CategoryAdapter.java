@@ -43,10 +43,12 @@ public class CategoryAdapter extends BaseAdapter {
     private Context mContext;
     private TextView categoryName;
     private ImageView categoryImage;
+    private String std;
 
 
-    public CategoryAdapter(List<Category> productList, Context mContext) {
+    public CategoryAdapter(List<Category> productList, Context mContext,String std) {
         this.productList = productList;
+        this.std=std;
         this.mContext = mContext;
     }
 
@@ -81,8 +83,8 @@ public class CategoryAdapter extends BaseAdapter {
         mcv_cat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(mContext, SubCatActivity.class);
+                intent.putExtra("storeid",std);
                 mContext.startActivity(intent);
 
 

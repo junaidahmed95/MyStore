@@ -65,17 +65,16 @@ public class AllStoresActivity extends AppCompatActivity {
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
 
-
-
     private List<Category> productList;
     ProgressBar mprogressbar;
+    private String stID;
     private GridView categoryRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_stores);
-
+stID = getIntent().getStringExtra("storeid");
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Categories");
         setSupportActionBar(toolbar);
@@ -111,7 +110,7 @@ public class AllStoresActivity extends AppCompatActivity {
                 }
 
 
-                CategoryAdapter categoryAdapter = new CategoryAdapter(productList, AllStoresActivity.this);
+                CategoryAdapter categoryAdapter = new CategoryAdapter(productList, AllStoresActivity.this,stID);
                 categoryRecyclerView.setAdapter(categoryAdapter);
                 categoryAdapter.notifyDataSetChanged();
 

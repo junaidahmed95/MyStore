@@ -2,8 +2,16 @@ package com.example.mystore.Model;
 
 public class ShowStores {
     String store_name;
-    String id;
+    String id,distance;
     String uid;
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
 
     public String getStore_image() {
         return store_image;
@@ -13,10 +21,11 @@ public class ShowStores {
         this.store_image = store_image;
     }
 
-    public ShowStores(String store_name, String id, String uid, String store_image) {
+    public ShowStores(String store_name, String id, String uid, String store_image,String distance) {
         this.store_name = store_name;
         this.id = id;
         this.uid = uid;
+        this.distance = distance;
         this.store_image = store_image;
     }
 

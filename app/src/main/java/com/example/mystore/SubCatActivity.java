@@ -76,7 +76,6 @@ public class SubCatActivity extends AppCompatActivity {
 
 
     private Boolean IsAdded = false;
-    public static String store_id = "", cornerownerid, cornerownername, cornerownerimage;
     public static List<CatLvlItemList> prolist;
     public static FloatingActionButton mfbcart;
     int no_of_categories = -1;
@@ -235,6 +234,8 @@ public class SubCatActivity extends AppCompatActivity {
     }
 
     private void GetStoreData() {
+
+
         mJSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + getIntent().getStringExtra("storeid");
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
@@ -291,25 +292,22 @@ public class SubCatActivity extends AppCompatActivity {
 
 
     }
-
-    private void getstoreid(String toString) {
-        store_id = "";
-        cornerownerid = "";
-        cornerownername = "";
-        cornerownerimage = "";
-        for (int a = 0; a < storelist.size(); a++) {
-            if (storelist.get(a).getStore_name().equals(toString)) {
-                store_id = storelist.get(a).getId();
-                cornerownerid = storelist.get(a).getUid();
-                cornerownername = storelist.get(a).getStore_name();
-                cornerownerimage = storelist.get(a).getStore_image();
-                //GetStoreData(store_id);
-                return;
-            }
-        }
-
-
-    }
+//
+//    private void getstoreid(String toString) {
+//
+//        for (int a = 0; a < storelist.size(); a++) {
+//            if (storelist.get(a).getStore_name().equals(toString)) {
+//                store_id = storelist.get(a).getId();
+//                cornerownerid = storelist.get(a).getUid();
+//                cornerownername = storelist.get(a).getStore_name();
+//                cornerownerimage = storelist.get(a).getStore_image();
+//                //GetStoreData(store_id);
+//                return;
+//            }
+//        }
+//
+//
+//    }
 
 
 }

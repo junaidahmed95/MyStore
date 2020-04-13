@@ -81,13 +81,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 import static com.example.mystore.Adapter.AddressAdapter.cusaddress;
+import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerid;
+import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerimage;
+import static com.example.mystore.Adapter.AllStoreAdapter.cornerownername;
+import static com.example.mystore.Adapter.AllStoreAdapter.store_id;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
 import static com.example.mystore.MessagingActivity.unreadListenr;
-import static com.example.mystore.SubCatActivity.cornerownerid;
-import static com.example.mystore.SubCatActivity.cornerownerimage;
-import static com.example.mystore.SubCatActivity.cornerownername;
-import static com.example.mystore.SubCatActivity.store_id;
 import static com.example.mystore.SubCatActivity.storelist;
 import static com.example.mystore.Verification.Your_Location;
 import static com.example.mystore.ui.cart.CartFragment.cartAdapter;

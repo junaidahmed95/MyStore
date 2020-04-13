@@ -47,6 +47,7 @@ import com.example.mystore.Model.AllStore;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
 import com.example.mystore.Model.Product;
+import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -81,6 +82,7 @@ public class HomeFragment extends Fragment {
    // ProgressBar mprogressbar;
     private RecyclerView categoryRecyclerView;
     private ScrollView mScrollView;
+
     public static String forWhat = "All";
     GridView gridView;
     List<GirdListView> list;
@@ -95,7 +97,7 @@ public class HomeFragment extends Fragment {
     private GridView grd_str;
     private String test;
     private AllStoreAdapter allStoreAdapter;
-    private List<AllStore> storeList;
+    private List<ShowStores> storeList;
     private ProgressDialog mProgressDialog;
 
 
@@ -202,9 +204,9 @@ public class HomeFragment extends Fragment {
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
-
+//"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.8183553&longitude=67.0740559", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -218,12 +220,13 @@ public class HomeFragment extends Fragment {
                         try {
                             jsonObject = response.getJSONObject(i);
 
+                            String userID = jsonObject.getString("u_id");
                             String storename = jsonObject.getString("str_name");
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
                             String store_image = jsonObject.getString("user_thumb");
-
-                            storeList.add(new AllStore(store_image, storename, distance, store_id));
+                            //String store_name, String id, String uid, String store_image
+                            storeList.add(new ShowStores(storename,store_id, userID, store_image,distance));
 
                         } catch (JSONException e) {
                             mProgressDialog.cancel();
