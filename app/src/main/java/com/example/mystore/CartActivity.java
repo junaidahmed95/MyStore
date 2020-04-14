@@ -34,6 +34,7 @@ public class CartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cart);
         mCartRecyclerView = findViewById(R.id.cartRecyclerView);
         mcheckBtn = findViewById(R.id.checkBtn);
+        //okay
         mTxtView_TotalPrice = findViewById(R.id.totalPrice);
         LinearLayoutManager layoutManager = new LinearLayoutManager(CartActivity.this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
