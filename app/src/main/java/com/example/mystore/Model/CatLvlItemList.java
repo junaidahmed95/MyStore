@@ -6,6 +6,7 @@ public class CatLvlItemList {
     String p_price;
     String p_quantity = "1";
     int pos;
+    private boolean isClicked = false;
     String actual_price;
     String lol;
     String catName;
@@ -23,6 +24,14 @@ public class CatLvlItemList {
 
     String p_img;
     int position;
+
+    public boolean isClicked() {
+        return isClicked;
+    }
+
+    public void setClicked(boolean clicked) {
+        isClicked = clicked;
+    }
 
     public CatLvlItemList(String p_name, String p_price, String productid, String p_img, String catName) {
         this.p_name = p_name;
