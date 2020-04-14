@@ -21,9 +21,9 @@
 
             <com.smarteist.autoimageslider.SliderView
                 android:id="@+id/imageSlider"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
+                android:visibility="gone"
                 app:sliderIndicatorGravity="center_horizontal|bottom"
                 app:sliderIndicatorMargin="15dp"
                 app:sliderIndicatorOrientation="horizontal"
@@ -34,9 +34,9 @@
 
             <ImageView
                 android:id="@+id/pImage"
-                android:scaleType="centerCrop"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"/>
+                android:layout_height="250dp"
+                android:scaleType="centerCrop" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/viewBar"
@@ -101,9 +101,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="5dp"
                         android:layout_marginTop="6dp"
                         android:layout_marginRight="10dp"
+                        android:layout_marginBottom="5dp"
                         android:textColor="@android:color/black" />
 
                     <RelativeLayout
@@ -586,20 +586,39 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/addToCart"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/white"
+            android:textAllCaps="false"
             android:drawableRight="@drawable/ic_shopping_cart_black_24dp"
             android:drawablePadding="8dp"
             android:drawableTint="#485f70"
             android:gravity="center"
             android:paddingRight="20dp"
-            android:text="ADD TO CART"
+            android:text="Add To Cart"
             android:textColor="#485f70"
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/removeToCart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:drawableRight="@drawable/ic_remove_shopping"
+            android:drawablePadding="8dp"
+            android:drawableTint="#485f70"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:paddingRight="20dp"
+            android:text="Remove"
+            android:visibility="gone"
+            android:textColor="#485f70"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/checkout"
@@ -608,6 +627,7 @@
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="CheckOut"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />

@@ -94,7 +94,7 @@ public class SubCatActivity extends AppCompatActivity {
         storelist = new ArrayList<>();
         dummyList = new ArrayList<>();
 
-        setupBadge(selectedProducts.size());
+        setupBadge();
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Grocery");
         //toolbar.setTitleMargin(0,0,5,0);
@@ -141,19 +141,15 @@ public class SubCatActivity extends AppCompatActivity {
         return true;
     }
 
-    public static void setupBadge(int mCartItemCount) {
+    public static void setupBadge() {
         if (selectedProducts.size() > 0) {
-            mCartItemCount = selectedProducts.size();
-            //Log.d("dfs", String.valueOf(MainActivity.mCartItemCount));
-
             if (mCartItemCount == 0) {
                 if (textCartItemCount.getVisibility() != View.GONE) {
                     textCartItemCount.setVisibility(View.GONE);
                 }
             } else {
-                textCartItemCount.setText("" + selectedProducts.size());
+                textCartItemCount.setText("" + mCartItemCount);
                 //textCartItemCount.setText(""+2);
-                Log.d("asd", textCartItemCount.getText().toString());
                 if (textCartItemCount.getVisibility() != View.VISIBLE) {
                     textCartItemCount.setVisibility(View.VISIBLE);
                 }

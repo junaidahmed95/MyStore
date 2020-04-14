@@ -24,6 +24,7 @@ import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
 import com.example.mystore.Model.Product;
 import com.example.mystore.R;
+import com.example.mystore.SubCatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -61,15 +62,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
 
-        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(),cartList.get(pos).getActual_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getP_price());
-    if (flag){
+        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getActual_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getP_price());
+        if (flag) {
 
-        mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
-        if (cartList.size() -1 == pos){
-            flag = false;
-            mTxtView_TotalPrice.setText(""+mTotalPrice+"/-");
+            mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
+            if (cartList.size() - 1 == pos) {
+                flag = false;
+                mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+            }
         }
-    }
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -78,15 +79,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 int q = Integer.parseInt(cartList.get(pos).getP_quantity());
                 q += 1;
                 viewHolder.mProQuantity.setText("" + q);
-                cartList.get(pos).setP_quantity(""+q);
+                cartList.get(pos).setP_quantity("" + q);
                 viewHolder.Mul();
                 mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
-                mTxtView_TotalPrice.setText(""+mTotalPrice+"/-");
+                mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
                 cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
-                selectedProducts.get(pos).setP_quantity(""+q);
+                selectedProducts.get(pos).setP_quantity("" + q);
                 quantityflag = true;
-               // quantityget = q;
-
+                // quantityget = q;
 
 
             }
@@ -100,12 +100,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     int q = Integer.parseInt(cartList.get(pos).getP_quantity());
                     q -= 1;
                     viewHolder.mProQuantity.setText("" + q);
-                    cartList.get(pos).setP_quantity(""+q);
+                    cartList.get(pos).setP_quantity("" + q);
                     viewHolder.Mul();
                     mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
-                    mTxtView_TotalPrice.setText(""+mTotalPrice+"/-");
+                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
                     cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
-                    selectedProducts.get(pos).setP_quantity(""+q);
+                    selectedProducts.get(pos).setP_quantity("" + q);
                     quantityflag = true;
 
 
@@ -118,33 +118,30 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 try {
-                    for (int a = 0; a<checklist.size(); a++){
-                        if (checklist.get(a).equals(cartList.get(pos).getProductid())) {
-                            cartList.remove(pos);
-                            notifyItemRemoved(pos);
-                            notifyItemRangeChanged(pos, cartList.size());
-                            //int l = checklist.indexOf(cartList.get(pos).getP_name());
-                            checklist.remove(a);
-                            // selectedProducts.remove(l);
-
-                        }
-                    }
-
+                    --MainActivity.mCartItemCount;
+                    setupBadge();
                     String[] splitit = mTxtView_TotalPrice.getText().toString().split("/");
                     int outPrice = Integer.parseInt(splitit[0]);
-                    mTotalPrice = outPrice-Integer.parseInt(cartList.get(pos).getP_price());
-                    mTxtView_TotalPrice.setText(""+mTotalPrice+"/-");
-                    setupBadge(--MainActivity.mCartItemCount);
+                    mTotalPrice = outPrice - Integer.parseInt(cartList.get(pos).getP_price());
+                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    int l = checklist.indexOf(cartList.get(pos).getProductid());
+                    checklist.remove(l);
+                    cartList.remove(pos);
+                    notifyItemRemoved(pos);
+                    notifyItemRangeChanged(pos, cartList.size());
 
-
-                    if(cartList.size() == 0){
+              //      selectedProducts.remove(l);
+                    if (cartList.size() == 0) {
                         mcardview2.setVisibility(View.GONE);
                         mcardview1.setVisibility(View.GONE);
-
-
-
                     }
-                }catch (Exception ex){
+
+
+
+
+
+                } catch (Exception ex) {
+                    Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -153,9 +150,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         });
 
     }
-
-
-
 
 
     @Override
@@ -170,7 +164,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         private Button mAddButton, mRemoveButton;
         private TextView mProName, mProPrice, mProQuantity, mProTotal;
         private FloatingActionButton mDeleFab;
-
 
 
         public ViewHolder(@NonNull View itemView) {

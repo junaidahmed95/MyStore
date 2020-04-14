@@ -46,6 +46,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.example.mystore.AllProductsActivity.mChatFab;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MainActivity.flagfroprice;
+import static com.example.mystore.MainActivity.mCartItemCount;
 import static com.example.mystore.SubCatActivity.mfbcart;
 import static com.example.mystore.SubCatActivity.setupBadge;
 
@@ -57,7 +58,7 @@ public class CatLvlAdapter extends BaseAdapter {
     private List<CatLvlItemList> wishlist;
     private List<String> getfavtlist;
     public static boolean quantityflag = false;
-
+    private int positionSelected = 0;
     List<CatLvlItemList> cartlist = new ArrayList<>();
     int pri;
    public static List<CatLvlItemList> favlist = new ArrayList<>();
@@ -114,6 +115,15 @@ public class CatLvlAdapter extends BaseAdapter {
         t1.setText(list.get(position).getP_name());
         t2.setText("" + list.get(position).getP_price());
 
+        if(checklist.contains(list.get(position).getProductid())){
+            mbtn_add_cart.setVisibility(View.GONE);
+            mbtn_remove_cart.setVisibility(View.VISIBLE);
+        }
+        else{
+            mbtn_remove_cart.setVisibility(View.GONE);
+            mbtn_add_cart.setVisibility(View.VISIBLE);
+        }
+
 //        for (int a=0; a<wishlist.size(); a++){
 //            if (wishlist.get(a).getProductid().equals(list.get(position).getProductid())){
 //                //Toast.makeText(context, "asdasdsad", Toast.LENGTH_SHORT).show();
@@ -140,6 +150,14 @@ public class CatLvlAdapter extends BaseAdapter {
 //            }
 //
 //        }
+
+if(list.get(position).isClicked()){
+    mbtn_add_cart.setVisibility(View.GONE);
+    mbtn_remove_cart.setVisibility(View.VISIBLE);
+}else {
+    mbtn_remove_cart.setVisibility(View.GONE);
+    mbtn_add_cart.setVisibility(View.VISIBLE);
+}
 
 
         mwish.setOnClickListener(new View.OnClickListener() {
@@ -202,6 +220,7 @@ public class CatLvlAdapter extends BaseAdapter {
 
                 Intent intent = new Intent(context, ProductDetailActivity.class);
                 intent.putExtra("image", list.get(position).getP_img());
+                intent.putExtra("pos", position);
                 intent.putExtra("name", list.get(position).getP_name());
                 intent.putExtra("price", list.get(position).getP_price());
                 context.startActivity(intent);
@@ -248,20 +267,23 @@ public class CatLvlAdapter extends BaseAdapter {
 //                quantityflag = false;
 //            }
 //        }
-        if (checklist.contains(list.get(position).getP_name())) {
-            mbtn_remove_cart.setVisibility(View.VISIBLE);
-        } else {
-            mbtn_remove_cart.setVisibility(View.GONE);
-        }
+
+
+
 
         mbtn_add_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                list.get(position).setClicked(true);
                 mbtn_add_cart.setVisibility(View.GONE);
                 mbtn_remove_cart.setVisibility(View.VISIBLE);
-                checklist.add(list.get(position).getProductid());
+                if (!checklist.contains(list.get(position).getProductid())){
+                    checklist.add(list.get(position).getProductid());
+                }
+
                 selectedProducts.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(),list.get(position).getP_quantity(), list.get(position).getP_img(),position,list.get(position).getP_price(),list.get(position).getProductid()));
-                setupBadge(selectedProducts.size());
+                ++mCartItemCount;
+                setupBadge();
 
                 //saveData();
             }
@@ -270,9 +292,11 @@ public class CatLvlAdapter extends BaseAdapter {
         mbtn_remove_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                list.get(position).setClicked(false);
                 mbtn_remove_cart.setVisibility(View.GONE);
                 mbtn_add_cart.setVisibility(View.VISIBLE);
-                setupBadge(--MainActivity.mCartItemCount);
+                --mCartItemCount;
+                setupBadge();
                 if (checklist.contains(list.get(position).getProductid())) {
                     int a = checklist.indexOf(list.get(position).getProductid());
                     checklist.remove(a);
@@ -280,6 +304,8 @@ public class CatLvlAdapter extends BaseAdapter {
                     notifyDataSetChanged();
 
                 }
+
+
             }
         });
 
@@ -338,22 +364,6 @@ public class CatLvlAdapter extends BaseAdapter {
 //            }
 //        });
 
-        try {
-            if(checklist!=null){
-                if(checklist.size()>0){
-                    if(checklist.contains(selectedProducts.get(position).getProductid())){
-                        mbtn_add_cart.setVisibility(View.GONE);
-                        mbtn_remove_cart.setVisibility(View.VISIBLE);
-                    }else {
-                        mbtn_remove_cart.setVisibility(View.GONE);
-                        mbtn_add_cart.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-
-        }catch (Exception e){
-
-        }
         return convertView;
 
     }
