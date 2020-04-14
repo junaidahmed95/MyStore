@@ -40,17 +40,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.example.mystore.Adapter.AllStoreAdapter.store_id;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MainActivity.textCartItemCount;
 
 public class SearchActivity extends AppCompatActivity {
     private ArrayList<CatLvlItemList> list;
-    private ArrayList<CatLvlItemList>prolist;
+    private ArrayList<CatLvlItemList> prolist;
     Toolbar toolbar;
     private Boolean IsAdded = false;
 
-    private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/storeprods";
+    private  String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+store_id;
+    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     EditText meditText;
 
     private JsonArrayRequest request;
@@ -66,19 +68,18 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         meditText = findViewById(R.id.edittext);
-   toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
 
         toolbar.setTitle("Search");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         list = new ArrayList<>();
+       // JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+getIntent().getStringExtra("storeid");
+
+
         createExampleList();
 
-        prolist =  new ArrayList<>();
-
-
-
-
+        prolist = new ArrayList<>();
 
 
     }
@@ -119,7 +120,6 @@ public class SearchActivity extends AppCompatActivity {
     }
 
 
-
     private void filter(String text) {
         ArrayList<CatLvlItemList> filteredList = new ArrayList<>();
 
@@ -131,7 +131,6 @@ public class SearchActivity extends AppCompatActivity {
 
         catLvlAdapter.filterList(filteredList);
     }
-
 
 
     private void createExampleList() {
@@ -147,10 +146,11 @@ public class SearchActivity extends AppCompatActivity {
                     try {
                         jsonObject = response.getJSONObject(i);
 
-                        String mTitle = jsonObject.getString("title");
-                        String mdes = jsonObject.getString("des");
-                        String mprice = jsonObject.getString("price");
-                        String mimage = jsonObject.getString("image");
+                        String mTitle = jsonObject.getString("product_name");
+                        String m_cat = jsonObject.getString("m_name");
+                        String sec_cat = jsonObject.getString("p_name");
+                        String mprice = jsonObject.getString("str_prc");
+                        String mimage = jsonObject.getString("product_image");
                         String store_id = jsonObject.getString("str_id");
                         String product_id = jsonObject.getString("p_id");
                         prolist.add(new CatLvlItemList(mTitle, mprice, mimage, store_id, product_id));
@@ -160,7 +160,7 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }
                 mRecyclerView = findViewById(R.id.recyclerView);
-              catLvlAdapter = new CatLvlAdapter(prolist, SearchActivity.this);
+                catLvlAdapter = new CatLvlAdapter(prolist, SearchActivity.this);
                 mRecyclerView.setAdapter(catLvlAdapter);
                 catLvlAdapter.notifyDataSetChanged();
 
@@ -197,7 +197,7 @@ public class SearchActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SearchActivity.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -218,7 +218,6 @@ public class SearchActivity extends AppCompatActivity {
 //        list.add(new SearchClass(R.drawable.audio, "Eight", "Line 2"));
 //        list.add(new SearchClass(R.drawable.attachment_ic, "Nine", "Line 2"));
     }
-
 
 
     private void CheckForCart() {

@@ -119,60 +119,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.bar_menu, menu);
-        return true;
 
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode){
-            case REQUEST_CODE_SPEECH_INPUT:{
 
 
-                    ArrayList<String> result =data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    //Toast.makeText(this, ""+result.get(0), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(this,SearchActivity.class);
-                    intent.putExtra("value",result.get(0));
-                    startActivity(intent);
 
-            }
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_search) {
-
-
-            Intent intent = new Intent(MainActivity.this,SearchActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.menu_mic) {
-
-            Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-            i.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say something");
-
-            try {
-                startActivityForResult(i,REQUEST_CODE_SPEECH_INPUT);
-
-            }catch (Exception e ){
-                Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-
-        }
-        return true;
-    }
 
 
 

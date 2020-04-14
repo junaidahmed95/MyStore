@@ -49,6 +49,7 @@ import com.example.mystore.Model.Category;
 import com.example.mystore.Model.Product;
 import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
+import com.example.mystore.SearchActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -92,6 +93,7 @@ public class HomeFragment extends Fragment {
 
 
 
+
     private FusedLocationProviderClient mFusedLocationClient;
     int PERMISSION_ID = 44;
     private GridView grd_str;
@@ -116,6 +118,9 @@ public class HomeFragment extends Fragment {
         mProgressDialog = new ProgressDialog(getContext());
         mProgressDialog.setMessage("Getting stores");
         mProgressDialog.setCancelable(false);
+
+
+
 
 
         mcdv_dialog  = root.findViewById(R.id.cdv_dialog);
@@ -204,9 +209,10 @@ public class HomeFragment extends Fragment {
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
+    String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
 //"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -227,6 +233,7 @@ public class HomeFragment extends Fragment {
                             String store_image = jsonObject.getString("user_thumb");
                             //String store_name, String id, String uid, String store_image
                             storeList.add(new ShowStores(storename,store_id, userID, store_image,distance));
+
 
                         } catch (JSONException e) {
                             mProgressDialog.cancel();
