@@ -260,9 +260,6 @@ public class CatLvlAdapter extends BaseAdapter {
                 mbtn_add_cart.setVisibility(View.GONE);
                 mbtn_remove_cart.setVisibility(View.VISIBLE);
                 checklist.add(list.get(position).getProductid());
-
-
-
                 selectedProducts.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(),list.get(position).getP_quantity(), list.get(position).getP_img(),position,list.get(position).getP_price(),list.get(position).getProductid()));
                 setupBadge(selectedProducts.size());
 
@@ -276,12 +273,10 @@ public class CatLvlAdapter extends BaseAdapter {
                 mbtn_remove_cart.setVisibility(View.GONE);
                 mbtn_add_cart.setVisibility(View.VISIBLE);
                 setupBadge(--MainActivity.mCartItemCount);
-                if (checklist.contains(list.get(position).getP_name())) {
-
-                    int a = checklist.indexOf(list.get(position).getP_name());
+                if (checklist.contains(list.get(position).getProductid())) {
+                    int a = checklist.indexOf(list.get(position).getProductid());
                     checklist.remove(a);
                     selectedProducts.remove(a);
-
                     notifyDataSetChanged();
 
                 }

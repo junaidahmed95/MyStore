@@ -118,7 +118,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 try {
-
                     for (int a = 0; a<checklist.size(); a++){
                         if (checklist.get(a).equals(cartList.get(pos).getProductid())) {
                             cartList.remove(pos);
