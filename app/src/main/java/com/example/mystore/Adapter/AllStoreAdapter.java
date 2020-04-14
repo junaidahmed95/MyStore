@@ -52,8 +52,7 @@ public class AllStoreAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.allstoreitem, parent, false);
-        LinearLayout mmainLayout = convertView.findViewById(R.id.mainLayout);
-        CardView storecardId = convertView.findViewById(R.id.storecardId);
+        CardView storecardId = convertView.findViewById(R.id.mainLayout);
         ImageView mimg_store = convertView.findViewById(R.id.img_store);
         TextView txt_storedistance = convertView.findViewById(R.id.txt_storedistance);
         TextView txt_storename = convertView.findViewById(R.id.txt_storename);
