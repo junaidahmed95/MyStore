@@ -102,71 +102,75 @@ public class HistoryActivity extends AppCompatActivity {
 
         // Initialize a new JsonArrayRequest instance
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        // Do something with response
-                        //mTextView.setText(response.toString());
+            @Override
+            public void onResponse(JSONArray response) {
+                // Do something with response
+                //mTextView.setText(response.toString());
 
-                        // Process the JSON
-                        try{
-                            // Loop through the array elements
-                            String storename = response.getJSONObject(1).getString("str_name");
+                // Process the JSON
+                try{
+                    // Loop through the array elements
+                    String storename = response.getJSONObject(1).getString("str_name");
 
-                            for(int i=0;i<response.length();i++){
-                                // Get current json object
-                                JSONObject student = response.getJSONObject(i);
-
-
-                                Iterator<String> key = student.keys();
-                                while (key.hasNext()) {
-
-                                    String key12 = (String) key.next();//karachi key
+                    for(int i=0;i<response.length();i++){
+                        // Get current json object
+                        JSONObject student = response.getJSONObject(i);
 
 
-                                    JSONArray jsonArray = (JSONArray) student.get(key12);
+                        Iterator<String> key = student.keys();
 
-                                    for (int j = 0; j < jsonArray.length(); j++) {
+                        // String key = student.keys().toString();
 
-                                        JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                                        String pname = jsonObject1.getString("sp_name");
-                                        String actprice = jsonObject1.getString("act_prc");
-                                        String address = jsonObject1.getString("new_address");
-                                        String proimage = jsonObject1.getString("sp_image");
-                                        String pqty = jsonObject1.getString("ord_qty");
-                                        String tprice = jsonObject1.getString("t_price");
-                                        String datetime = jsonObject1.getString("created_at");
-                                        String uid = jsonObject1.getString("user_id");
-                                        String tpprice = jsonObject1.getString("str_prc");
+                        while (key.hasNext()) {
+
+                            String key12 = (String) key.next();//karachi key
 
 
+                            JSONArray jsonArray = (JSONArray) student.get(key12);
 
+                            for (int j = 0; j < jsonArray.length(); j++) {
 
-
-                                        //String status = jsonObject1.getString("status");
-                                        //String size =""+  historylist.get(plus).getGetorderbykeylist().size();
-
-                                        products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
+                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                                String pname = jsonObject1.getString("sp_name");
+                                String actprice = jsonObject1.getString("act_prc");
+                                String address = jsonObject1.getString("new_address");
+                                String proimage = jsonObject1.getString("sp_image");
+                                String pqty = jsonObject1.getString("ord_qty");
+                                String tprice = jsonObject1.getString("t_price");
+                                String datetime = jsonObject1.getString("created_at");
+                                String uid = jsonObject1.getString("user_id");
+                                String tpprice = jsonObject1.getString("str_prc");
 
 
 
-                                    }
-
-                                    historylist.add(new OrderHistory(key12, new ArrayList<OrderHistory>(products_list)));
-                                    products_list.clear();
 
 
-                                }
+                                //String status = jsonObject1.getString("status");
+                                //String size =""+  historylist.get(plus).getGetorderbykeylist().size();
 
+                                products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
 
 
 
                             }
 
-                        }catch (JSONException e){
-                            e.printStackTrace();
+                            historylist.add(new OrderHistory(key12, new ArrayList<OrderHistory>(products_list)));
+                            products_list.clear();
+
+
                         }
+
+
                     }
-                },
+                    HistoryAdapter historyadp = new HistoryAdapter(historylist, HistoryActivity.this);
+                    mhis_recycler.setAdapter(historyadp);
+                    progressDialog.dismiss();
+
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        },
                 new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error){
