@@ -29,6 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import static com.example.mystore.Adapter.CatLvlAdapter.list;
 import static com.example.mystore.Adapter.CatLvlAdapter.quantityflag;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
@@ -37,18 +38,20 @@ import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
 import static com.example.mystore.CartActivity.mcardview2;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.SubCatActivity.setupBadge;
+import static com.example.mystore.ui.cart.CartFragment.mTxtView_Total;
 import static com.example.mystore.ui.cart.CartFragment.mcardview1;
 
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
-    private Boolean flag = true;
     private List<CatLvlItemList> cartList;
     private Context mContext;
+    private String fromWhere;
     private int mTotalPrice = 0;
 
-    public CartAdapter(List<CatLvlItemList> cartList, Context mContext) {
+    public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere) {
         this.cartList = cartList;
+        this.fromWhere = fromWhere;
         this.mContext = mContext;
     }
 
@@ -63,13 +66,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
 
         viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getActual_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getP_price());
-        if (flag) {
 
-            mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
-            if (cartList.size() - 1 == pos) {
-                flag = false;
+
+        mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
+        if (cartList.size() - 1 == pos) {
+            if (fromWhere.equals("activity")) {
                 mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+            } else {
+                mTxtView_Total.setText("" + mTotalPrice + "/-");
             }
+
         }
 
 
@@ -82,7 +88,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 cartList.get(pos).setP_quantity("" + q);
                 viewHolder.Mul();
                 mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
-                mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                if (fromWhere.equals("activity")) {
+                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                } else {
+                    mTxtView_Total.setText("" + mTotalPrice + "/-");
+                }
+
                 cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
                 selectedProducts.get(pos).setP_quantity("" + q);
                 quantityflag = true;
@@ -103,7 +114,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     cartList.get(pos).setP_quantity("" + q);
                     viewHolder.Mul();
                     mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
-                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    if (fromWhere.equals("activity")) {
+                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    } else {
+                        mTxtView_Total.setText("" + mTotalPrice + "/-");
+                    }
                     cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
                     selectedProducts.get(pos).setP_quantity("" + q);
                     quantityflag = true;
@@ -123,25 +138,33 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     String[] splitit = mTxtView_TotalPrice.getText().toString().split("/");
                     int outPrice = Integer.parseInt(splitit[0]);
                     mTotalPrice = outPrice - Integer.parseInt(cartList.get(pos).getP_price());
-                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    if (fromWhere.equals("activity")) {
+                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    } else {
+                        mTxtView_Total.setText("" + mTotalPrice + "/-");
+                    }
                     int l = checklist.indexOf(cartList.get(pos).getProductid());
                     checklist.remove(l);
                     cartList.remove(pos);
                     notifyItemRemoved(pos);
                     notifyItemRangeChanged(pos, cartList.size());
 
-              //      selectedProducts.remove(l);
+                    list.get(pos).setClicked(false);
+                    //      selectedProducts.remove(l);
                     if (cartList.size() == 0) {
-                        mcardview2.setVisibility(View.GONE);
-                        mcardview1.setVisibility(View.GONE);
+
+                        if (fromWhere.equals("activity")) {
+                            mcardview2.setVisibility(View.GONE);
+                        } else {
+                            mcardview1.setVisibility(View.GONE);
+                        }
+
+
                     }
 
 
-
-
-
                 } catch (Exception ex) {
-                    Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    //  Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
 

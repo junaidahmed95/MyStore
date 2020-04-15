@@ -42,7 +42,7 @@ public class CartActivity extends AppCompatActivity {
         mCartRecyclerView.setLayoutManager(layoutManager);
         mActionBarToolbar = findViewById(R.id.bar);
         mActionBarToolbar.setTitle("My Cart");
-        cartAdapter = new CartAdapter(selectedProducts, CartActivity.this);
+        cartAdapter = new CartAdapter(selectedProducts, CartActivity.this,"activity");
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         setSupportActionBar(mActionBarToolbar);

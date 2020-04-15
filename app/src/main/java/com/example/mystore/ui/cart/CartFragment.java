@@ -48,7 +48,7 @@ public class CartFragment extends Fragment {
 
     private RecyclerView mCartRecyclerView, mAddressRecyclerView;
     public static CartAdapter cartAdapter;
-    //public static TextView mTxtView_TotalPrice;
+    public static TextView mTxtView_Total;
     public static CardView mcardview1;
     private Button mcheckBtn;
     private BottomSheetDialog checkOutDialog;
@@ -58,7 +58,7 @@ public class CartFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_cart, container, false);
 
 
-       // mTxtView_TotalPrice = root.findViewById(R.id.totalPrice);
+       mTxtView_Total = root.findViewById(R.id.totalPrice);
         mCartRecyclerView = root.findViewById(R.id.cartRecyclerView);
         mcheckBtn = root.findViewById(R.id.checkBtn);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -66,7 +66,7 @@ public class CartFragment extends Fragment {
         mCartRecyclerView.setLayoutManager(layoutManager);
         mcardview1 = root.findViewById(R.id.cardVew1);
 
-        cartAdapter = new CartAdapter(selectedProducts, getActivity());
+        cartAdapter = new CartAdapter(selectedProducts, getActivity(),"fragment");
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         Bundle bundle = new Bundle();

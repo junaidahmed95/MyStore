@@ -102,6 +102,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private Button mconfirmorder_btn;
     private FloatingActionButton maddAddre;
     private Toolbar toolbar;
+    private ProgressDialog mProgressDialog;
     private JsonArrayRequest addressrequest;
     private RequestQueue addressrequestQueue;
     private static AddressAdapter addressAdapter;
@@ -121,6 +122,10 @@ public class OrderSummaryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_summary);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Getting addresses...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
         mconfirmorder_btn = findViewById(R.id.checkBtn);
         mtotalprice = findViewById(R.id.totalPrice);
         ConversionRef = FirebaseDatabase.getInstance().getReference().child("Chatlist");
@@ -165,15 +170,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
         parseAddressJSON();
 
 
-
-
         mconfirmorder_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
 
                                 progressDialog.show();
@@ -317,9 +320,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
                         .setNegativeButton("No", dialogClickListener).show();
 
 
-
-
-
             }
         });
 
@@ -366,12 +366,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
             }
         });
     }
+
     private void sendNotifiaction(final String username, final String message) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Users").child("Owners").child(cornerownerid);
         tokens.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     Data data = new Data(FirebaseAuth.getInstance().getUid(), R.mipmap.ic_launcher, username + ": " + message, message,
                             cornerownerid);
                     Sender sender = new Sender(data, dataSnapshot.child("token").getValue().toString());
@@ -430,10 +431,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
                 addressAdapter = new AddressAdapter(kuchbhe);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
+                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                mProgressDialog.cancel();
+                Toast.makeText(OrderSummaryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -452,16 +456,10 @@ public class OrderSummaryActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     public static void refresh(int deselect, int select) {
         addressAdapter.notifyItemChanged(deselect);
         addressAdapter.notifyItemChanged(select);
     }
-
-
 
 
 }

@@ -71,7 +71,8 @@ public class AllStoresActivity extends AppCompatActivity {
     private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/maincat";
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
-
+    private ProgressDialog mProgressDialog;
+    private List<String> backupList;
     private List<Category> productList;
     ProgressBar mprogressbar;
     private String stID;
@@ -88,12 +89,16 @@ public class AllStoresActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_stores);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Getting categories...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
         stID = getIntent().getStringExtra("storeid");
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Categories");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        backupList = new ArrayList<>();
 
 
         productList = new ArrayList<>();
@@ -105,7 +110,7 @@ public class AllStoresActivity extends AppCompatActivity {
     }
 
     private void parseJSON() {
-        request = new JsonArrayRequest(JSON_URL, new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -114,10 +119,14 @@ public class AllStoresActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         jsonObject = response.getJSONObject(i);
-
                         String catTitle = jsonObject.getString("m_name");
-                        String catimage = jsonObject.getString("thumbnail");
-                        productList.add(new Category(catimage, catTitle));
+                        String catimage = jsonObject.getString("product_image");
+                        if(!backupList.contains(jsonObject.getString("m_name"))){
+                            backupList.add(jsonObject.getString("m_name"));
+                            productList.add(new Category(catimage, catTitle));
+                        }
+
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -128,13 +137,16 @@ public class AllStoresActivity extends AppCompatActivity {
                 CategoryAdapter categoryAdapter = new CategoryAdapter(productList, AllStoresActivity.this, stID);
                 categoryRecyclerView.setAdapter(categoryAdapter);
                 categoryAdapter.notifyDataSetChanged();
-
-
+                if (productList.size() == 0) {
+                    Toast.makeText(AllStoresActivity.this, "This store does not have any category yet!", Toast.LENGTH_LONG).show();
+                }
+                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Toast.makeText(AllStoresActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                mProgressDialog.cancel();
             }
         });
 
@@ -143,6 +155,7 @@ public class AllStoresActivity extends AppCompatActivity {
         requestQueue.add(request);
 
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
