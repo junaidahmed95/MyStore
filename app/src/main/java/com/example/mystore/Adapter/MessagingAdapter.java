@@ -864,8 +864,18 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                         mappBar.setTitle("Order Detail");
                         final RecyclerView recyclerView = mView.findViewById(R.id.oorderdetail_gd);
                         TextView textView = mView.findViewById(R.id.totalitemprice);
+                        TextView txt_addresss = mView.findViewById(R.id.txt_addresss);
+                        TextView txt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
+                        TextView txt_total_qtys = mView.findViewById(R.id.txt_total_qtys);
 
-                        textView.setText("Total Price " + chat.getTotalPrice());
+
+
+                        textView.setText("" + chat.getTotalPrice());
+                        txt_addresss.setText("" + chat.getAddress());
+                        txt_totalproductss.setText(""+chat.getTotalProduct());
+                        txt_total_qtys.setText(""+chat.getOrderID());
+
+
 
 
                         FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);

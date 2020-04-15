@@ -209,10 +209,10 @@ public class HomeFragment extends Fragment {
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
-    String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
-//"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
+    //String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+//
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 

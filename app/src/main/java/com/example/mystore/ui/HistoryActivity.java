@@ -38,6 +38,7 @@ import com.example.mystore.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ServerValue;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,13 +55,13 @@ public class HistoryActivity extends AppCompatActivity {
 
     private StringRequest request;
     private RequestQueue requestQueue;
-    private final String JSON_URL =  "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=jAHDba6PiRNDzgT8QadpePR1eju1";
-   // private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=jAHDba6PiRNDzgT8QadpePR1eju1";
+     private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
     List<OrderHistory> products_list;
     private int qtyplus = 0;
-    private int plus =0;
+    private int plus = 0;
     private ProgressDialog progressDialog;
 
 
@@ -72,10 +73,10 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-       // progressDialog = new ProgressDialog(this);
-      //  progressDialog.setMessage("Please Wait...");
-      ///  progressDialog.setCancelable(false);
-       // progressDialog.show();
+        // progressDialog = new ProgressDialog(this);
+        //  progressDialog.setMessage("Please Wait...");
+        ///  progressDialog.setCancelable(false);
+        // progressDialog.show();
 
 
         toolbar = findViewById(R.id.bar);
@@ -108,72 +109,48 @@ public class HistoryActivity extends AppCompatActivity {
                 //mTextView.setText(response.toString());
 
                 // Process the JSON
-                try{
+                try {
                     // Loop through the array elements
                     String storename = response.getJSONObject(1).getString("str_name");
+                    JSONObject store = response.getJSONObject(0);
+                    Iterator<String> keys = store.keys();
 
-                    for(int i=0;i<response.length();i++){
-                        // Get current json object
-                        JSONObject student = response.getJSONObject(i);
+                    while (keys.hasNext()) {
+                        String key = (String) keys.next();
+                        JSONArray storeArray = (JSONArray) store.getJSONArray(key);
+                        for (int i = 0; i < storeArray.length(); i++) {
+                            JSONObject storeObject = storeArray.getJSONObject(i);
 
+                            String pname = storeObject.getString("sp_name");
+                            String actprice = storeObject.getString("act_prc");
+                            String address = storeObject.getString("new_address");
+                            String proimage = storeObject.getString("sp_image");
+                            String pqty = storeObject.getString("ord_qty");
+                            String tprice = storeObject.getString("t_price");
+                            String datetime = storeObject.getString("created_at");
+                            String uid = storeObject.getString("user_id");
+                            String tpprice = storeObject.getString("str_prc");
 
-                        Iterator<String> key = student.keys();
-
-                        // String key = student.keys().toString();
-
-                        while (key.hasNext()) {
-
-                            String key12 = (String) key.next();//karachi key
-
-
-                            JSONArray jsonArray = (JSONArray) student.get(key12);
-
-                            for (int j = 0; j < jsonArray.length(); j++) {
-
-                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                                String pname = jsonObject1.getString("sp_name");
-                                String actprice = jsonObject1.getString("act_prc");
-                                String address = jsonObject1.getString("new_address");
-                                String proimage = jsonObject1.getString("sp_image");
-                                String pqty = jsonObject1.getString("ord_qty");
-                                String tprice = jsonObject1.getString("t_price");
-                                String datetime = jsonObject1.getString("created_at");
-                                String uid = jsonObject1.getString("user_id");
-                                String tpprice = jsonObject1.getString("str_prc");
-
-
-
-
-
-                                //String status = jsonObject1.getString("status");
-                                //String size =""+  historylist.get(plus).getGetorderbykeylist().size();
-
-                                products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
-
-
-
-                            }
-
-                            historylist.add(new OrderHistory(key12, new ArrayList<OrderHistory>(products_list)));
-                            products_list.clear();
-
+                            products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
 
                         }
-
+                        historylist.add(new OrderHistory(key, new ArrayList<OrderHistory>(products_list)));
+                            products_list.clear();
 
                     }
+
                     HistoryAdapter historyadp = new HistoryAdapter(historylist, HistoryActivity.this);
                     mhis_recycler.setAdapter(historyadp);
-                    progressDialog.dismiss();
+                    historyadp.notifyDataSetChanged();
 
-                }catch (JSONException e){
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         },
-                new Response.ErrorListener(){
+                new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error){
+                    public void onErrorResponse(VolleyError error) {
                         // Do something when error occurred
 
                     }
@@ -183,8 +160,6 @@ public class HistoryActivity extends AppCompatActivity {
         // Add JsonArrayRequest to the RequestQueue
         requestQueue.add(jsonArrayRequest);
     }
-
-
 
 
     @Override
