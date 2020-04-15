@@ -33,7 +33,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
     private int tprice = 0;
 
 
-    public HistoryAdapter(List<OrderHistory> historylist, Context mContext ) {
+    public HistoryAdapter(List<OrderHistory> historylist, Context mContext) {
         this.historylist = historylist;
         list = new ArrayList<>();
         this.mContext = mContext;
@@ -44,10 +44,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
     @Override
     public Hisholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_history, parent, false);
+        list = new ArrayList<>();
 
         return new Hisholder(v);
     }
-
 
 
     @Override
@@ -55,18 +55,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
 
         //holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(o).getUaddress());
 
-     for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
-         holder.mtxt_totalproducts.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-         qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
-         holder.mtxt_day.setText(historylist.get(position).getGetorderbykeylist().get(a).getDay());
+        for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
+            holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
+            holder.mtxt_totalproducts.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
+            qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
+            holder.mtxt_day.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day());
+            holder.mtxt_price.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts());
 
 
-       }
+        }
 
 
-        holder.mtxt_qty.setText("Qty: "+qtycount);
-     qtycount = 0;
+        holder.mtxt_qty.setText("Total Qty: " + qtycount);
+        qtycount = 0;
 
 
 //        holder.mtxt_price.setText("Rs."+tprice);
@@ -76,17 +77,12 @@ holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get
 //
 
 
-
-
         //holder.mtxt_address.setText(historylist.get(position).getMtxt_address());
         //holder.mtxt_qty.setText("Qty: "+historylist.get(position).getQtyplus());
         //holder.mtxt_totalproducts.setText("Total Products: "+historylist.get(position).getMtxt_totalproducts());
         //holder.mtxt_day.setText(historylist.get(position).getMtxt_day());
-       // holder.mtxt_time.setText(historylist.get(position).getMtxt_time());
+        // holder.mtxt_time.setText(historylist.get(position).getMtxt_time());
         holder.marrow.setImageResource(R.drawable.ic_navigate_next_black_24dp);
-
-
-
 
 
         holder.mbtn_detailhistory.setOnClickListener(new View.OnClickListener() {
@@ -104,27 +100,18 @@ holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get
                 TextView mtxt_prices = mView.findViewById(R.id.totalitemprice);
 
 
-
                 for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
                     mtxt_addresss.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
                     mtxt_prices.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
                     qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
-                    if(!historylist.isEmpty()){
-                        list.add(new OrderHistory(list.get(position).getGetorderbykeylist().get(a).getMtxt_price(), list.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), list.get(position).getGetorderbykeylist().get(a).getAct_price(), list.get(position).getGetorderbykeylist().get(a).getImage(), list.get(position).getGetorderbykeylist().get(a).getTitle()));
-                    }
+                    list.add(new OrderHistory(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_price(), historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), historylist.get(position).getGetorderbykeylist().get(a).getAct_price(), historylist.get(position).getGetorderbykeylist().get(a).getImage(), historylist.get(position).getGetorderbykeylist().get(a).getTitle()));
 
                 }
+                mtxt_totalproductss.setText(""+ historylist.get(position).getGetorderbykeylist().size());
 
-                //mtxt_totalproductss.setText(historylist.get(position).getMtxt_totalproducts());
 
-
-mtxt_qtys.setText("Qty: "+qtycount);
+                mtxt_qtys.setText("Qty: "+qtycount);
                 qtycount = 0;
-
-
-
-
-
 
 
                 FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);
@@ -134,27 +121,18 @@ mtxt_qtys.setText("Qty: "+qtycount);
                 recyclerView.setLayoutManager(linearLayoutManager);
 
 
-      //     mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg"));
-//                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg"));
-//                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg"));
-//                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg"));
-
-                 //public OrderHistory(String pid, String qty, String price, String image, String title)
 
 
 
-
-
-
-               OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(list, mContext);
+                OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(new ArrayList<OrderHistory>(list), mContext);
                 recyclerView.setAdapter(orderAdapter);
+                notifyDataSetChanged();
                 list.clear();
 
 
 
                 orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
                 orderdetailSheetDialog.setContentView(mView);
-
                 orderdetailSheetDialog.show();
 
                 mfabClose.setOnClickListener(new View.OnClickListener() {
@@ -180,7 +158,6 @@ mtxt_qtys.setText("Qty: "+qtycount);
         TextView mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time;
         Button mbtn_detailhistory;
         ImageView marrow;
-
 
 
         public Hisholder(@NonNull View itemView) {

@@ -23,7 +23,7 @@ import java.util.List;
 public class OrderHistoryDetailAdapter extends RecyclerView.Adapter<OrderHistoryDetailAdapter.holder> {
 
     List<OrderHistory> OrderList;
-    List<OrderHistory> List;
+
     boolean check;
     Context context;
 
@@ -43,23 +43,16 @@ public class OrderHistoryDetailAdapter extends RecyclerView.Adapter<OrderHistory
     public void onBindViewHolder(@NonNull OrderHistoryDetailAdapter.holder holder, final int position) {
 
 
-        for (int a = 0; a < OrderList.get(position).getGetorderbykeylist().size(); a++) {
-
-            Glide.with(context).load(OrderList.get(position).getGetorderbykeylist().get(a).getImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
-            holder.mtxt_item_name.setText(OrderList.get(position).getGetorderbykeylist().get(a).getTitle());
-            holder.mtxt_item_price.setText("Rs." + OrderList.get(position).getGetorderbykeylist().get(a).getMtxt_price() + "/-");
-            holder.mtxt_item_quantity.setText("Qty:" + OrderList.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
-            holder.mtxt_item_quantity.setVisibility(View.VISIBLE);
-        }
 
 
 
 
-//            Glide.with(context).load(OrderList.get(position).getImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
-//            holder.mtxt_item_name.setText(OrderList.get(position).getTitle());
-//           holder.mtxt_item_price.setText("Rs." + OrderList.get(position).getMtxt_price() + "/-");
-//            holder.mtxt_item_quantity.setText("Qty:" + OrderList.get(position).getMtxt_qty());
-//            holder.mtxt_item_quantity.setVisibility(View.VISIBLE);
+
+            Glide.with(context).load(OrderList.get(position).getImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
+            holder.mtxt_item_name.setText(OrderList.get(position).getTitle());
+           holder.mtxt_item_price.setText("Rs." + OrderList.get(position).getMtxt_price() + "/-");
+            holder.mtxt_item_quantity.setText("Qty:" + OrderList.get(position).getMtxt_qty());
+
 
 
 
@@ -85,7 +78,6 @@ public class OrderHistoryDetailAdapter extends RecyclerView.Adapter<OrderHistory
 
     public class holder extends RecyclerView.ViewHolder {
         ImageView mitem_image;
-
         CardView mcdv_buttomsheet;
         TextView mtxt_item_name, mtxt_item_price, mtxt_item_quantity;
 
