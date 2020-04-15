@@ -85,6 +85,7 @@ public class CategoryAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SubCatActivity.class);
                 intent.putExtra("storeid",std);
+                intent.putExtra("catName",productList.get(position).getCatName());
                 mContext.startActivity(intent);
 
 

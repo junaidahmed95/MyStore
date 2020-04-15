@@ -80,6 +80,7 @@ public class SubCatActivity extends AppCompatActivity {
     public static List<CatLvlItemList> prolist;
     public static FloatingActionButton mfbcart;
     int no_of_categories = -1;
+    private String catName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,7 @@ public class SubCatActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Getting Products...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        catName = getIntent().getStringExtra("catName");
         list = new ArrayList<>();
         store = new ArrayList<>();
         storelist = new ArrayList<>();
@@ -248,15 +250,18 @@ public class SubCatActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         jsonObject = response.getJSONObject(i);
-                        if (!dummyList.contains(jsonObject.getString("p_name"))) {
-                            dummyList.add(jsonObject.getString("p_name"));
+                        if(jsonObject.getString("m_name").equals(catName)){
+                            if (!dummyList.contains(jsonObject.getString("p_name"))) {
+                                dummyList.add(jsonObject.getString("p_name"));
+                            }
+                            String mCat = jsonObject.getString("p_name");
+                            String mTitle = jsonObject.getString("product_name");
+                            String mprice = jsonObject.getString("str_prc");
+                            String mimage = jsonObject.getString("product_image");
+                            String product_id = jsonObject.getString("p_id");
+                            prolist.add(new CatLvlItemList(mTitle, mprice, product_id, mimage, mCat));
+
                         }
-                        String mCat = jsonObject.getString("p_name");
-                        String mTitle = jsonObject.getString("product_name");
-                        String mprice = jsonObject.getString("str_prc");
-                        String mimage = jsonObject.getString("product_image");
-                        String product_id = jsonObject.getString("p_id");
-                        prolist.add(new CatLvlItemList(mTitle, mprice, product_id, mimage, mCat));
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -278,7 +283,7 @@ public class SubCatActivity extends AppCompatActivity {
                 mviewpager.setAdapter(adapter);
                 mtabs.setupWithViewPager(mviewpager);
 
-
+                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
