@@ -34,6 +34,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.mystore.Adapter.CatLvlAdapter;
 import com.example.mystore.Model.CatLvlItemList;
+import com.example.mystore.Model.HelpingMethods;
 import com.example.mystore.Model.ShowStores;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -47,9 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
-import static com.example.mystore.CatLvlFragment.catLvlAdapter;
 import static com.example.mystore.MainActivity.checklist;
-import static com.example.mystore.MainActivity.mCartItemCount;
 import static com.example.mystore.MainActivity.textCartItemCount;
 
 public class SubCatActivity extends AppCompatActivity {
@@ -57,11 +56,11 @@ public class SubCatActivity extends AppCompatActivity {
 
     private String mJSON_URL = "";
     private String[] tabTitles;
+
     private JsonArrayRequest mrequest;
     public static ProgressDialog mProgressDialog;
     private List<String> dummyList;
     private RequestQueue mrequestQueue;
-
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     int position;
@@ -75,7 +74,7 @@ public class SubCatActivity extends AppCompatActivity {
     private Spinner msp_selectStore;
     private ProgressBar mProgressBar;
 
-
+    public static HelpingMethods helpingMethods;
     private Boolean IsAdded = false;
     public static List<CatLvlItemList> prolist;
     public static FloatingActionButton mfbcart;
@@ -95,8 +94,7 @@ public class SubCatActivity extends AppCompatActivity {
         store = new ArrayList<>();
         storelist = new ArrayList<>();
         dummyList = new ArrayList<>();
-
-        setupBadge();
+        helpingMethods = new HelpingMethods(SubCatActivity.this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Grocery");
         //toolbar.setTitleMargin(0,0,5,0);
@@ -108,7 +106,7 @@ public class SubCatActivity extends AppCompatActivity {
         mtabs = findViewById(R.id.tabs);
         mviewpager = findViewById(R.id.viewpager);
 
-
+        GetStoreData();
         mfbcart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,46 +127,43 @@ public class SubCatActivity extends AppCompatActivity {
         final MenuItem menuItem = menu.findItem(R.id.menu_cart);
         View actionView = MenuItemCompat.getActionView(menuItem);
 
-        GetStoreData();
-        if (checklist.size() == 0) {
-            textCartItemCount = actionView.findViewById(R.id.cart_badge);
-        }
+
+        textCartItemCount = actionView.findViewById(R.id.cart_badge);
         actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onOptionsItemSelected(menuItem);
             }
         });
-
+        setupBadge();
         return true;
     }
 
     public static void setupBadge() {
-        if (selectedProducts.size() > 0) {
-            if (mCartItemCount == 0) {
-                if (textCartItemCount.getVisibility() != View.GONE) {
-                    textCartItemCount.setVisibility(View.GONE);
-                }
-            } else {
-                textCartItemCount.setText("" + mCartItemCount);
-                //textCartItemCount.setText(""+2);
-                if (textCartItemCount.getVisibility() != View.VISIBLE) {
-                    textCartItemCount.setVisibility(View.VISIBLE);
-                }
-
+        if (helpingMethods.GetCartCount() == 0) {
+            if (textCartItemCount.getVisibility() != View.GONE) {
+                textCartItemCount.setVisibility(View.GONE);
             }
+        } else {
+            textCartItemCount.setText("" + helpingMethods.GetCartCount());
+            //textCartItemCount.setText(""+2);
+            if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                textCartItemCount.setVisibility(View.VISIBLE);
+            }
+
         }
+
     }
+
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            CheckForCart();
             finish();
         } else if (id == R.id.menu_cart) {
-            if (!textCartItemCount.getText().toString().equals("0") && checklist.size() > 0) {
+            if (helpingMethods.GetCartCount() > 0) {
                 Intent intent = new Intent(this, CartActivity.class);
                 startActivity(intent);
 
@@ -177,11 +172,8 @@ public class SubCatActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        CheckForCart();
-        super.onBackPressed();
-    }
+
+
 
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -221,25 +213,8 @@ public class SubCatActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(catLvlAdapter!=null){
-            catLvlAdapter.notifyDataSetChanged();
-        }
-
-
-    }
-
-    private void CheckForCart() {
-//        if (!IsAdded) {
-//            selectedProducts.clear();
-//        }
-    }
 
     private void GetStoreData() {
-
-
         mJSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + getIntent().getStringExtra("storeid");
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
@@ -250,7 +225,7 @@ public class SubCatActivity extends AppCompatActivity {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         jsonObject = response.getJSONObject(i);
-                        if(jsonObject.getString("m_name").equals(catName)){
+                        if (jsonObject.getString("m_name").equals(catName)) {
                             if (!dummyList.contains(jsonObject.getString("p_name"))) {
                                 dummyList.add(jsonObject.getString("p_name"));
                             }
@@ -299,22 +274,4 @@ public class SubCatActivity extends AppCompatActivity {
 
 
     }
-//
-//    private void getstoreid(String toString) {
-//
-//        for (int a = 0; a < storelist.size(); a++) {
-//            if (storelist.get(a).getStore_name().equals(toString)) {
-//                store_id = storelist.get(a).getId();
-//                cornerownerid = storelist.get(a).getUid();
-//                cornerownername = storelist.get(a).getStore_name();
-//                cornerownerimage = storelist.get(a).getStore_image();
-//                //GetStoreData(store_id);
-//                return;
-//            }
-//        }
-//
-//
-//    }
-
-
 }

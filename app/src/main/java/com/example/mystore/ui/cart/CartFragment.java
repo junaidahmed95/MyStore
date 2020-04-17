@@ -2,6 +2,7 @@ package com.example.mystore.ui.cart;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -28,7 +30,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mystore.Adapter.AddressAdapter;
 import com.example.mystore.Adapter.CartAdapter;
 import com.example.mystore.Adapter.SummaryAdapter;
+import com.example.mystore.CartActivity;
 import com.example.mystore.Model.Cart;
+import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.ConnectionDetector;
 import com.example.mystore.Model.OrderSummary;
 import com.example.mystore.OrderSummaryActivity;
@@ -37,41 +41,43 @@ import com.example.mystore.R;
 import com.example.mystore.videoView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 
 
 public class CartFragment extends Fragment {
 
     private RecyclerView mCartRecyclerView, mAddressRecyclerView;
-    public static CartAdapter cartAdapter;
     public static TextView mTxtView_Total;
     public static CardView mcardview1;
     private Button mcheckBtn;
-    private BottomSheetDialog checkOutDialog;
+    private List<CatLvlItemList> preferenceList;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_cart, container, false);
 
 
-       mTxtView_Total = root.findViewById(R.id.totalPrice);
+        mTxtView_Total = root.findViewById(R.id.totalPrice);
         mCartRecyclerView = root.findViewById(R.id.cartRecyclerView);
         mcheckBtn = root.findViewById(R.id.checkBtn);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         mCartRecyclerView.setLayoutManager(layoutManager);
         mcardview1 = root.findViewById(R.id.cardVew1);
-
-        cartAdapter = new CartAdapter(selectedProducts, getActivity(),"fragment");
+        GetCartData();
+        CartAdapter cartAdapter = new CartAdapter(preferenceList, getActivity(), "fragment");
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
-        Bundle bundle = new Bundle();
 
-        if (selectedProducts.size() == 0) {
+        if (preferenceList.size() == 0) {
             mcardview1.setVisibility(View.GONE);
 
         }
@@ -80,14 +86,33 @@ public class CartFragment extends Fragment {
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                startActivity(new Intent(getActivity(), OrderSummaryActivity.class));
+                Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
+                sumInt.putExtra("from", "fragement");
+                startActivity(sumInt);
             }
         });
 
 
         return root;
+    }
+
+    private void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Mycart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

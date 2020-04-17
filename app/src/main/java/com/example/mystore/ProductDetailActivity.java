@@ -19,6 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.mystore.Adapter.CatLvlAdapter;
 import com.example.mystore.Adapter.SliderAdapter;
 import com.example.mystore.Model.CatLvlItemList;
+import com.example.mystore.Model.HelpingMethods;
 import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
@@ -26,7 +27,6 @@ import com.smarteist.autoimageslider.SliderView;
 
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.MainActivity.checklist;
-import static com.example.mystore.MainActivity.mCartItemCount;
 import static com.example.mystore.SubCatActivity.setupBadge;
 import static com.example.mystore.ui.home.HomeFragment.forWhat;
 
@@ -36,6 +36,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private TextView mName, mprice;
     private ImageView mpImage;
     private Button mremoveToCart, maddToCart, mcheckout;
+    private HelpingMethods helpingMethods;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             mremoveToCart.setVisibility(View.GONE);
             maddToCart.setVisibility(View.VISIBLE);
         }
-
+        helpingMethods = new HelpingMethods(ProductDetailActivity.this);
         mcheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,7 +103,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                 CatLvlAdapter.list.get(position).setClicked(true);
                 checklist.add(CatLvlAdapter.list.get(position).getProductid());
                 selectedProducts.add(new CatLvlItemList(CatLvlAdapter.list.get(position).getP_name(), CatLvlAdapter.list.get(position).getP_price(), CatLvlAdapter.list.get(position).getP_quantity(), CatLvlAdapter.list.get(position).getP_img(), position, CatLvlAdapter.list.get(position).getP_price(), CatLvlAdapter.list.get(position).getProductid()));
-                ++mCartItemCount;
+                int finalCount = helpingMethods.GetCartCount() + 1;
+                helpingMethods.SaveCartCount(finalCount);
                 setupBadge();
 
 
@@ -115,7 +117,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                 mremoveToCart.setVisibility(View.GONE);
                 maddToCart.setVisibility(View.VISIBLE);
                 CatLvlAdapter.list.get(position).setClicked(false);
-                --mCartItemCount;
+                int finalCount = helpingMethods.GetCartCount() + 1;
+                helpingMethods.SaveCartCount(finalCount);
                 setupBadge();
                 if (checklist.contains(CatLvlAdapter.list.get(position).getProductid())) {
                     int a = checklist.indexOf(CatLvlAdapter.list.get(position).getProductid());

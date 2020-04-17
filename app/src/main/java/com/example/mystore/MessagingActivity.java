@@ -738,8 +738,6 @@ public class MessagingActivity extends AppCompatActivity implements View.OnClick
                 }if (userRef != null) {
                     userRef.removeEventListener(userDataListener);
                 } if (getIntent().getStringExtra("for") != null) {
-                    checklist.clear();
-                    selectedProducts.clear();
                     Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -2544,8 +2542,6 @@ public class MessagingActivity extends AppCompatActivity implements View.OnClick
         if (userRef != null) {
             userRef.removeEventListener(userDataListener);
         }if (getIntent().getStringExtra("for") != null) {
-            checklist.clear();
-            selectedProducts.clear();
             Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

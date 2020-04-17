@@ -56,7 +56,7 @@ public class HistoryActivity extends AppCompatActivity {
     private StringRequest request;
     private RequestQueue requestQueue;
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=jAHDba6PiRNDzgT8QadpePR1eju1";
-     private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
     List<OrderHistory> products_list;
@@ -73,10 +73,10 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        // progressDialog = new ProgressDialog(this);
-        //  progressDialog.setMessage("Please Wait...");
-        ///  progressDialog.setCancelable(false);
-        // progressDialog.show();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please Wait...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
 
         toolbar = findViewById(R.id.bar);
@@ -131,17 +131,18 @@ public class HistoryActivity extends AppCompatActivity {
                             String uid = storeObject.getString("user_id");
                             String tpprice = storeObject.getString("str_prc");
 
-                            products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
+                            products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null, tprice, tpprice));
 
                         }
                         historylist.add(new OrderHistory(key, new ArrayList<OrderHistory>(products_list)));
-                            products_list.clear();
+                        products_list.clear();
 
                     }
 
                     HistoryAdapter historyadp = new HistoryAdapter(historylist, HistoryActivity.this);
                     mhis_recycler.setAdapter(historyadp);
                     historyadp.notifyDataSetChanged();
+                    progressDialog.cancel();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -151,7 +152,8 @@ public class HistoryActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Do something when error occurred
+                        progressDialog.cancel();
+                        Toast.makeText(HistoryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
                     }
                 }

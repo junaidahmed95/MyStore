@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import com.example.mystore.Model.AppHelper;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Client;
 import com.example.mystore.Model.Data;
+import com.example.mystore.Model.HelpingMethods;
 import com.example.mystore.Model.MyResponce;
 import com.example.mystore.Model.OrderSummary;
 import com.example.mystore.Model.Product;
@@ -60,12 +62,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,13 +90,13 @@ import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerid;
 import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerimage;
 import static com.example.mystore.Adapter.AllStoreAdapter.cornerownername;
 import static com.example.mystore.Adapter.AllStoreAdapter.store_id;
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
+import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MessagingActivity.unreadListenr;
 import static com.example.mystore.SubCatActivity.storelist;
 import static com.example.mystore.Verification.Your_Location;
-import static com.example.mystore.ui.cart.CartFragment.cartAdapter;
 /*import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;*/
+import static com.example.mystore.ui.cart.CartFragment.mTxtView_Total;
 import static com.example.mystore.ui.cart.CartFragment.mcardview1;
 
 
@@ -102,7 +107,10 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private Button mconfirmorder_btn;
     private FloatingActionButton maddAddre;
     private Toolbar toolbar;
+    private List<String> mycheckList;
+    private HelpingMethods helpingMethods;
     private ProgressDialog mProgressDialog;
+    private List<CatLvlItemList> preferenceList;
     private JsonArrayRequest addressrequest;
     private RequestQueue addressrequestQueue;
     private static AddressAdapter addressAdapter;
@@ -126,14 +134,22 @@ public class OrderSummaryActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Getting addresses...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        helpingMethods = new HelpingMethods(OrderSummaryActivity.this);
         mconfirmorder_btn = findViewById(R.id.checkBtn);
         mtotalprice = findViewById(R.id.totalPrice);
         ConversionRef = FirebaseDatabase.getInstance().getReference().child("Chatlist");
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         Date d = new Date();
         dayString = sdf.format(d);
+        GetCartData();
+GetCheckData();
+        if (getIntent().getStringExtra("from").equals("activity")) {
+            mtotalprice.setText("" + mTxtView_TotalPrice.getText());
+        } else {
+            mtotalprice.setText("" + mTxtView_Total.getText());
+        }
 
-        mtotalprice.setText("" + mTxtView_TotalPrice.getText());
+
         toolbar = findViewById(R.id.appBar);
 
         toolbar.setTitle("Checkout");
@@ -160,11 +176,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         kuchbhe = new ArrayList<>();
 
-//                hashMap.put("address","Seher Commercial");
-//                hashMap.put("totalProduct",selectedProducts.size());
-//                hashMap.put("totalPrice","Rs."+mTxtView_TotalPrice.getText()+"/-");
-
-        SummaryAdapter summaryAdapter = new SummaryAdapter(selectedProducts, this);
+        SummaryAdapter summaryAdapter = new SummaryAdapter(preferenceList, this);
         msummaryRecyclerView.setAdapter(summaryAdapter);
 
         parseAddressJSON();
@@ -194,18 +206,18 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                 hashMap.put("chatid", id);
                                 hashMap.put("orderID", OrdrerID);
                                 hashMap.put("address", cusaddress);
-                                hashMap.put("totalProduct", selectedProducts.size());
+                                hashMap.put("totalProduct", preferenceList.size());
                                 hashMap.put("totalPrice", "Rs." + mTxtView_TotalPrice.getText());
                                 hashMap.put("sender", FirebaseAuth.getInstance().getUid());
                                 hashMap.put("delivery", "not available");
 
                                 final HashMap<String, Object> detailMap = new HashMap<>();
 
-                                for (int a = 0; a < selectedProducts.size(); a++) {
-                                    detailMap.put("pname" + a, selectedProducts.get(a).getP_name());
-                                    detailMap.put("pprice" + a, selectedProducts.get(a).getP_price());
-                                    detailMap.put("pqunatity" + a, selectedProducts.get(a).getP_quantity());
-                                    detailMap.put("pimage" + a, selectedProducts.get(a).getP_img());
+                                for (int a = 0; a < preferenceList.size(); a++) {
+                                    detailMap.put("pname" + a, preferenceList.get(a).getP_name());
+                                    detailMap.put("pprice" + a, preferenceList.get(a).getP_price());
+                                    detailMap.put("pqunatity" + a, preferenceList.get(a).getP_quantity());
+                                    detailMap.put("pimage" + a, preferenceList.get(a).getP_img());
                                 }
                                 detailMap.put("address", cusaddress);
                                 detailMap.put("totalProduct", "Rs." + mTxtView_TotalPrice.getText() + "/-");
@@ -225,8 +237,11 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
                                                             @Override
                                                             public void onResponse(String response) {
-                                                                Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
-                                                                progressDialog.dismiss();
+                                                                helpingMethods.SaveCartCount(0);
+                                                                mycheckList.clear();
+                                                                SaveCheckData();
+                                                                preferenceList.clear();
+                                                                SaveCartData();
                                                                 Intent mintent = new Intent(OrderSummaryActivity.this, MessagingActivity.class);
                                                                 mintent.putExtra("user_id", cornerownerid);
                                                                 mintent.putExtra("check", "one");
@@ -234,6 +249,8 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                                                 mintent.putExtra("uImage", cornerownerimage);
                                                                 mintent.putExtra("forward", "one");
                                                                 mintent.putExtra("for", "one");
+                                                                progressDialog.cancel();
+                                                                Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
                                                                 startActivity(mintent);
                                                                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
@@ -258,14 +275,14 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
                                                                 String[] geprice = mTxtView_TotalPrice.getText().toString().split("/");
 
-                                                                for (int a = 0; a < selectedProducts.size(); a++) {
-                                                                    hashMap.put("str_prc[" + a + "]", selectedProducts.get(a).getP_price());
-                                                                    hashMap.put("ord_qty[" + a + "]", selectedProducts.get(a).getP_quantity());
-                                                                    hashMap.put("sp_id[" + a + "]", selectedProducts.get(a).getProductid());
-                                                                    hashMap.put("sp_image[" + a + "]", selectedProducts.get(a).getP_img());
-                                                                    hashMap.put("act_prc[" + a + "]", selectedProducts.get(a).getActual_price());
+                                                                for (int a = 0; a < preferenceList.size(); a++) {
+                                                                    hashMap.put("str_prc[" + a + "]", preferenceList.get(a).getP_price());
+                                                                    hashMap.put("ord_qty[" + a + "]", preferenceList.get(a).getP_quantity());
+                                                                    hashMap.put("sp_id[" + a + "]", preferenceList.get(a).getProductid());
+                                                                    hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
+                                                                    hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
                                                                     hashMap.put("str_id", store_id);
-                                                                    hashMap.put("sp_name[" + a + "]", selectedProducts.get(a).getP_name());
+                                                                    hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
                                                                     hashMap.put("new_address", cusaddress);
                                                                     hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
                                                                     hashMap.put("t_price", geprice[0]);
@@ -461,5 +478,61 @@ public class OrderSummaryActivity extends AppCompatActivity {
         addressAdapter.notifyItemChanged(select);
     }
 
+    public void SaveCartData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(preferenceList);
+        editor.putString("cartlist", json);
+        editor.apply();
+    }
+
+    private void SaveCheckData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(mycheckList);
+        editor.putString("checklist", json);
+        editor.apply();
+    }
+
+
+    private void GetCheckData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("checklist", null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            mycheckList = gson.fromJson(json, type);
+
+            if (mycheckList == null) {
+                mycheckList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
 
 }

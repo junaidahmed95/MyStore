@@ -9,6 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.mystore.Adapter.CatLvlAdapter;
+import com.example.mystore.Adapter.PCatAdapter;
 import com.example.mystore.Model.CatLvlItemList;
 import com.google.android.material.tabs.TabLayout;
 
@@ -46,12 +49,13 @@ public class CatLvlFragment extends Fragment {
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/product";
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     private String JSON_URL = "";
-public static CatLvlAdapter catLvlAdapter;
+    private boolean isLoad = false;
     private JsonArrayRequest request;
     private List<CatLvlItemList> originalList;
     private RequestQueue requestQueue;
     private String mTitle;
-    private GridView mgridView;
+    private PCatAdapter proAdapter;
+    private RecyclerView mpRecyclerView;
 
 
     public CatLvlFragment() {
@@ -64,71 +68,21 @@ public static CatLvlAdapter catLvlAdapter;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat_lvl, container, false);
-        mgridView = view.findViewById(R.id.gridview);
+        mpRecyclerView = view.findViewById(R.id.pRecyclerView);
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
         originalList = new ArrayList<>();
-
-        //parseJSON();
-        //Toast.makeText(getActivity(), "This is your store id"+store_id, Toast.LENGTH_LONG).show();
 
         return view;
     }
-
-
-//    private void parseJSON() {
-//         JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+store_id;
-//        request = new JsonArrayRequest(JSON_URL, new Response.Listener<JSONArray>() {
-//            @Override
-//            public void onResponse(JSONArray response) {
-//
-//                JSONObject jsonObject = null;
-//
-//                for (int i = 0; i < response.length(); i++) {
-//                    try {
-//                        jsonObject = response.getJSONObject(i);
-//
-//                        mTitle = jsonObject.getString("product_name");
-//                        String mprice = jsonObject.getString("str_prc");
-//                        String mimage = jsonObject.getString("product_image");
-//                        store_id = jsonObject.getString("str_id");
-//                        String product_id =jsonObject.getString("p_id");
-//
-//
-//
-//
-//                        prolist.add(new CatLvlItemList(mTitle, mprice,product_id,mimage));
-//                        CatLvlAdapter catLvlAdapter = new CatLvlAdapter(prolist, getActivity());
-//                        mgridView.setAdapter(catLvlAdapter);
-//                        catLvlAdapter.notifyDataSetChanged();
-//                        mprogressbar.setVisibility(View.GONE);
-//
-//
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//
-//
-//
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//
-//            }
-//        });
-//
-//
-//        requestQueue = Volley.newRequestQueue(getActivity());
-//        requestQueue.add(request);
-//
-//
-//    }
-
     @Override
     public void onResume() {
         super.onResume();
+        if(isLoad){
+            mpRecyclerView.setAdapter(proAdapter);
+            proAdapter.notifyDataSetChanged();
+        }
+        isLoad = true;
+
         try {
             mtabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
@@ -139,10 +93,9 @@ public static CatLvlAdapter catLvlAdapter;
                             originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(), prolist.get(i).getProductid(), prolist.get(i).getP_img()));
                         }
                     }
-                    catLvlAdapter = new CatLvlAdapter(originalList, getActivity());
-                    mgridView.setAdapter(catLvlAdapter);
-                    catLvlAdapter.notifyDataSetChanged();
-
+                    proAdapter = new PCatAdapter(originalList, getActivity());
+                    mpRecyclerView.setAdapter(proAdapter);
+                    proAdapter.notifyDataSetChanged();
                     mProgressDialog.dismiss();
                 }
 
@@ -158,17 +111,8 @@ public static CatLvlAdapter catLvlAdapter;
             });
         } catch (Exception e) {
             Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_LONG).show();
-
         }
 
-
-
-
-//        if(checklist!=null){
-//            if(checklist.size()>0){
-//                UpdateCart();
-//            }
-//        }
 
     }
 }
