@@ -37,7 +37,7 @@ public class SummaryAdapter extends RecyclerView.Adapter<SummaryAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.mproName.setText(orderSummaryList.get(position).getP_name());
         holder.mproQty.setText(""+orderSummaryList.get(position).getP_quantity());
-        holder.mproTag.setText(""+orderSummaryList.get(position).getP_price());
+        holder.mproTag.setText(""+orderSummaryList.get(position).getActual_price());
 
     }
 

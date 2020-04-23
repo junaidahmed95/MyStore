@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mystore.Adapter.CartAdapter;
 import com.example.mystore.Model.CatLvlItemList;
+import com.example.mystore.Model.ConnectionDetector;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -37,6 +38,7 @@ public class CartActivity extends AppCompatActivity {
     private Button mcheckBtn;
     private List<CatLvlItemList> preferenceList;
     Toolbar mActionBarToolbar;
+    private String cat_Name, store_ID,ownerID,ownerImage,ownerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,11 @@ public class CartActivity extends AppCompatActivity {
         mCartRecyclerView = findViewById(R.id.cartRecyclerView);
         mcheckBtn = findViewById(R.id.checkBtn);
 
+        cat_Name = getIntent().getStringExtra("catName");
+        store_ID = getIntent().getStringExtra("StID");
+        ownerName = getIntent().getStringExtra("stname");
+        ownerImage = getIntent().getStringExtra("ownerImage");
+        ownerID = getIntent().getStringExtra("ownerID");
         mTxtView_TotalPrice = findViewById(R.id.totalPrice);
         LinearLayoutManager layoutManager = new LinearLayoutManager(CartActivity.this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -69,21 +76,48 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
+                if(connectionDetector.isConnected()){
+                    Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
+                    sumInt.putExtra("from","activity");
+                    sumInt.putExtra("totalP",mTxtView_TotalPrice.getText().toString());
+                    sumInt.putExtra("storeid", store_ID);
+                    sumInt.putExtra("stname",ownerName);
+                    sumInt.putExtra("ownerID",ownerID);
+                    sumInt.putExtra("ownerImage",ownerImage);
+                    startActivity(sumInt);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }else {
+                    Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                }
 
-                Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
-                sumInt.putExtra("from","activity");
-                startActivity(sumInt);
+
+
             }
         });
     }
 
+    private void GoBack() {
+        Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
+        intent.putExtra("storeid", store_ID);
+        intent.putExtra("catName", cat_Name);
+        intent.putExtra("stname",ownerName);
+        intent.putExtra("ownerID",ownerID);
+        intent.putExtra("ownerImage",ownerImage);
+        startActivity(intent);
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        GoBack();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-
+GoBack();
             finish();
         }
 
@@ -107,6 +141,13 @@ public class CartActivity extends AppCompatActivity {
             Toast.makeText(CartActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
+
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
     }
 

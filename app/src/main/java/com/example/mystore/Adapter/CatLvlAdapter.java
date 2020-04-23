@@ -167,7 +167,7 @@ public class CatLvlAdapter extends BaseAdapter {
 
                 if (!favlist.contains(list.get(position).getP_name())) {
 //                    if(!wishlist.contains(list.get(position).getP_name())){
-                    favlist.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_img(), list.get(position).getProductid()));
+                    //favlist.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_img(), list.get(position).getProductid(),list.get(position).getStoreId(),list.get(position).getStoreId()));
                     mwish.setImageResource(R.drawable.ic_favorite_black_24dp);
                     ImageViewCompat.setImageTintList(mwish,
                             ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorRed)));
@@ -279,10 +279,10 @@ public class CatLvlAdapter extends BaseAdapter {
                 if (!checklist.contains(list.get(position).getProductid())) {
                     checklist.add(list.get(position).getProductid());
                 }
-                int finalCount = helpingMethods.GetCartCount() + 1;
-                helpingMethods.SaveCartCount(finalCount);
+                int finalCount = helpingMethods.GetCartCount("") + 1;
+                helpingMethods.SaveCartCount(finalCount,"");
                 setupBadge();
-                preferenceList.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_quantity(), list.get(position).getP_img(), position, list.get(position).getP_price(), list.get(position).getProductid()));
+//                preferenceList.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_quantity(), list.get(position).getP_img(), position, list.get(position).getP_price(), list.get(position).getProductid(),list.get(position).getStoreId()));
                 SaveCartData();
                 //saveData();
             }
@@ -294,8 +294,8 @@ public class CatLvlAdapter extends BaseAdapter {
                 list.get(position).setClicked(false);
                 mbtn_remove_cart.setVisibility(View.GONE);
                 mbtn_add_cart.setVisibility(View.VISIBLE);
-                int finalCount = helpingMethods.GetCartCount() - 1;
-                helpingMethods.SaveCartCount(finalCount);
+                int finalCount = helpingMethods.GetCartCount("") - 1;
+                helpingMethods.SaveCartCount(finalCount,"");
                 setupBadge();
                 if (checklist.contains(list.get(position).getProductid())) {
                     int a = checklist.indexOf(list.get(position).getProductid());

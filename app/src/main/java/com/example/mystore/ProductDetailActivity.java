@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -20,23 +21,33 @@ import com.example.mystore.Adapter.CatLvlAdapter;
 import com.example.mystore.Adapter.SliderAdapter;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.HelpingMethods;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.smarteist.autoimageslider.IndicatorAnimations;
 import com.smarteist.autoimageslider.IndicatorView.draw.controller.DrawController;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.SubCatActivity.setupBadge;
-import static com.example.mystore.ui.home.HomeFragment.forWhat;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
     private SliderView sliderView;
+    private List<String> mycheckList;
+    private List<CatLvlItemList> preferenceList;
+    private String storeID;
+    private String spID;
     private TextView mName, mprice;
     private ImageView mpImage;
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
+    private int position;
+    private String pID, pImage, pPrice, pName, StID, catName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +62,24 @@ public class ProductDetailActivity extends AppCompatActivity {
         sliderView = findViewById(R.id.imageSlider);
         mpImage = findViewById(R.id.pImage);
         mcheckout = findViewById(R.id.checkout);
-        Glide.with(this).asBitmap().load(getIntent().getStringExtra("image")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mpImage);
+        storeID = getIntent().getStringExtra("sID");
+        spID = getIntent().getStringExtra("spID");
         mremoveToCart = findViewById(R.id.removeToCart);
         maddToCart = findViewById(R.id.addToCart);
-        final int position = getIntent().getIntExtra("pos", 0);
-        if (CatLvlAdapter.list.get(position).isClicked()) {
+        position = getIntent().getIntExtra("pos", 0);
+        pName = getIntent().getStringExtra("name");
+        pPrice = getIntent().getStringExtra("price");
+        pImage = getIntent().getStringExtra("image");
+        pID = getIntent().getStringExtra("pID");
+
+        StID = getIntent().getStringExtra("StID");
+        catName = getIntent().getStringExtra("catName");
+
+        Glide.with(this).asBitmap().load(pImage).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mpImage);
+        GetCartData();
+        GetCheckData();
+
+        if (mycheckList.contains(spID)) {
             maddToCart.setVisibility(View.GONE);
             mremoveToCart.setVisibility(View.VISIBLE);
         } else {
@@ -66,12 +90,13 @@ public class ProductDetailActivity extends AppCompatActivity {
         mcheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedProducts.size() > 0) {
+                if (mycheckList.size() > 0) {
                     Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(ProductDetailActivity.this, "Please add atleast one product.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProductDetailActivity.this, "Your cart is empty.", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 
@@ -91,22 +116,39 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         mprice = findViewById(R.id.p_price);
         mName = findViewById(R.id.p_name);
-        mName.setText(getIntent().getStringExtra("name"));
-        mprice.setText("Rs." + getIntent().getStringExtra("price") + "/-");
+        mName.setText(pName);
+        mprice.setText("Rs." + pPrice + "/-");
 
 
         maddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                maddToCart.setVisibility(View.GONE);
-                mremoveToCart.setVisibility(View.VISIBLE);
-                CatLvlAdapter.list.get(position).setClicked(true);
-                checklist.add(CatLvlAdapter.list.get(position).getProductid());
-                selectedProducts.add(new CatLvlItemList(CatLvlAdapter.list.get(position).getP_name(), CatLvlAdapter.list.get(position).getP_price(), CatLvlAdapter.list.get(position).getP_quantity(), CatLvlAdapter.list.get(position).getP_img(), position, CatLvlAdapter.list.get(position).getP_price(), CatLvlAdapter.list.get(position).getProductid()));
-                int finalCount = helpingMethods.GetCartCount() + 1;
-                helpingMethods.SaveCartCount(finalCount);
-                setupBadge();
+                if (!mycheckList.contains(spID)) {
+                    maddToCart.setVisibility(View.GONE);
+                    mremoveToCart.setVisibility(View.VISIBLE);
 
+                    int finalCount = helpingMethods.GetCartCount(storeID) + 1;
+                    helpingMethods.SaveCartCount(finalCount, storeID);
+                    setupBadge();
+
+                    if (helpingMethods.GetStoreID() == null) {
+                        helpingMethods.SaveStoreData(storeID, getIntent().getStringExtra("oName"), getIntent().getStringExtra("oImage"), getIntent().getStringExtra("oID"));
+                    }
+
+                    if (!helpingMethods.GetStoreID().equals(storeID)) {
+                        mycheckList.clear();
+                        SaveCheckData();
+                        preferenceList.clear();
+                        SaveCartData();
+                    }
+
+
+                    mycheckList.add(spID);
+                    SaveCheckData();
+                    //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
+                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID,pPrice,spID));
+                    SaveCartData();
+                }
 
             }
         });
@@ -114,30 +156,114 @@ public class ProductDetailActivity extends AppCompatActivity {
         mremoveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mremoveToCart.setVisibility(View.GONE);
-                maddToCart.setVisibility(View.VISIBLE);
-                CatLvlAdapter.list.get(position).setClicked(false);
-                int finalCount = helpingMethods.GetCartCount() + 1;
-                helpingMethods.SaveCartCount(finalCount);
-                setupBadge();
-                if (checklist.contains(CatLvlAdapter.list.get(position).getProductid())) {
-                    int a = checklist.indexOf(CatLvlAdapter.list.get(position).getProductid());
-                    checklist.remove(a);
-                    selectedProducts.remove(a);
-
+                if (mycheckList.contains(spID)) {
+                    mremoveToCart.setVisibility(View.GONE);
+                    maddToCart.setVisibility(View.VISIBLE);
+                    int finalCount = helpingMethods.GetCartCount(storeID) - 1;
+                    helpingMethods.SaveCartCount(finalCount, storeID);
+                    setupBadge();
+                    int a = mycheckList.indexOf(spID);
+                    mycheckList.remove(a);
+                    SaveCheckData();
+                    preferenceList.remove(a);
+                    SaveCartData();
                 }
+
 
             }
         });
+    }
+
+    private void SaveCheckData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(mycheckList);
+        editor.putString("checklist", json);
+        editor.apply();
+    }
+
+
+    private void GetCheckData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("checklist", null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            mycheckList = gson.fromJson(json, type);
+
+            if (mycheckList == null) {
+                mycheckList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+
+            Toast.makeText(ProductDetailActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        GoBack();
+    }
+
+    private void SaveCartData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(preferenceList);
+        editor.putString("cartlist", json);
+        editor.apply();
+    }
+
+
+    private void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+
+            Toast.makeText(ProductDetailActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            GoBack();
             finish();
         }
         return true;
+    }
+
+    private void GoBack() {
+        Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
+        intent.putExtra("storeid", StID);
+        intent.putExtra("catName", catName);
+        startActivity(intent);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
     }
 
 }

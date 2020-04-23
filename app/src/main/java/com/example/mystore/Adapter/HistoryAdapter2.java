@@ -97,10 +97,10 @@ public class HistoryAdapter2 extends RecyclerView.Adapter<HistoryAdapter2.Hishol
 
 
                 final List<CatLvlItemList> mCatLvlItemList = new ArrayList<>();
-                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg"));
-                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg"));
-                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg"));
-                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg"));
+                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg",""));
+                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg",""));
+                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND CHOCOLAY BISCUIT H/R", "13", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandChocolayBiscuitHR.jpg",""));
+                mCatLvlItemList.add(new CatLvlItemList("BAKERS LAND ROYAL TREAT BISCUIT T/P BOX 24PCS", "105", "1", "https://chhatt.com/Cornstr/grocery/public/prod/BakersLandRoyalTreatBiscuitTPBox24pcs.jpg",""));
                 OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(historylist.get(position).getProductslist(), mContext);
                 recyclerView.setAdapter(orderAdapter);
                 orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());

@@ -86,9 +86,17 @@ public class CartFragment extends Fragment {
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
-                sumInt.putExtra("from", "fragement");
-                startActivity(sumInt);
+                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                if(connectionDetector.isConnected()){
+                    Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
+                    sumInt.putExtra("from", "fragement");
+                    sumInt.putExtra("totalP",mTxtView_Total.getText().toString());
+                    startActivity(sumInt);
+                    getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }else {
+                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

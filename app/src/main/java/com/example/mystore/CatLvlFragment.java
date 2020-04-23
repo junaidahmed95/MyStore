@@ -31,11 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
-import static com.example.mystore.MainActivity.checklist;
-import static com.example.mystore.SubCatActivity.list;
-import static com.example.mystore.SubCatActivity.mProgressDialog;
+import static com.example.mystore.SubCatActivity.mloadingImage;
 import static com.example.mystore.SubCatActivity.mtabs;
 import static com.example.mystore.SubCatActivity.prolist;
 
@@ -49,17 +45,20 @@ public class CatLvlFragment extends Fragment {
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/product";
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     private String JSON_URL = "";
-    private boolean isLoad = false;
+    private boolean isOneTime;
     private JsonArrayRequest request;
     private List<CatLvlItemList> originalList;
     private RequestQueue requestQueue;
     private String mTitle;
-    private PCatAdapter proAdapter;
     private RecyclerView mpRecyclerView;
+    private String sID, ownerID, ownerImage, ownerName;
 
-
-    public CatLvlFragment() {
+    public CatLvlFragment(String sID, String ownerID, String ownerImage, String ownerName) {
         // Required empty public constructor
+        this.sID = sID;
+        this.ownerID = ownerID;
+        this.ownerName = ownerName;
+        this.ownerImage = ownerImage;
     }
 
 
@@ -69,20 +68,15 @@ public class CatLvlFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat_lvl, container, false);
         mpRecyclerView = view.findViewById(R.id.pRecyclerView);
-        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         originalList = new ArrayList<>();
 
         return view;
     }
+
     @Override
     public void onResume() {
         super.onResume();
-        if(isLoad){
-            mpRecyclerView.setAdapter(proAdapter);
-            proAdapter.notifyDataSetChanged();
-        }
-        isLoad = true;
-
         try {
             mtabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
@@ -90,27 +84,28 @@ public class CatLvlFragment extends Fragment {
                     originalList.clear();
                     for (int i = 0; i < prolist.size(); i++) {
                         if (prolist.get(i).getCatName().equals(tab.getText())) {
-                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(), prolist.get(i).getProductid(), prolist.get(i).getP_img()));
+                            //mTitle, mprice,mimage,product_id,str_id,mCat,sim_id
+                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price()));
                         }
                     }
-                    proAdapter = new PCatAdapter(originalList, getActivity());
+                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName);
                     mpRecyclerView.setAdapter(proAdapter);
                     proAdapter.notifyDataSetChanged();
-                    mProgressDialog.dismiss();
+                    mloadingImage.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onTabUnselected(TabLayout.Tab tab) {
-
                 }
 
                 @Override
                 public void onTabReselected(TabLayout.Tab tab) {
-
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_LONG).show();
+            mloadingImage.setVisibility(View.GONE);
+            Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
 
