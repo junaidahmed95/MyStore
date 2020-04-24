@@ -32,6 +32,7 @@ import com.example.mystore.Adapter.HistoryAdapter;
 import com.example.mystore.Adapter.HistoryAdapter2;
 import com.example.mystore.Adapter.OrderAdapter;
 import com.example.mystore.Model.CatLvlItemList;
+import com.example.mystore.Model.ConnectionDetector;
 import com.example.mystore.Model.OrderHistory;
 import com.example.mystore.Model.RequestHandlerSingleten;
 import com.example.mystore.R;
@@ -52,17 +53,18 @@ import java.util.List;
 import java.util.Locale;
 
 public class HistoryActivity extends AppCompatActivity {
-
+    private ProgressDialog mProgressDialog;
     private StringRequest request;
     private RequestQueue requestQueue;
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=jAHDba6PiRNDzgT8QadpePR1eju1";
-     private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
     List<OrderHistory> products_list;
     private int qtyplus = 0;
     private int plus = 0;
     private ProgressDialog progressDialog;
+    private int count = 0;
 
 
     Toolbar toolbar;
@@ -73,10 +75,10 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        // progressDialog = new ProgressDialog(this);
-        //  progressDialog.setMessage("Please Wait...");
-        ///  progressDialog.setCancelable(false);
-        // progressDialog.show();
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage("Please Wait...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
 
 
         toolbar = findViewById(R.id.bar);
@@ -93,7 +95,13 @@ public class HistoryActivity extends AppCompatActivity {
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
 
-        parseJSON();
+        ConnectionDetector connectionDetector = new ConnectionDetector(this);
+        if (connectionDetector.isConnected()) {
+            parseJSON();
+        } else {
+            mProgressDialog.cancel();
+            Toast.makeText(this, "Check your internet connection.", Toast.LENGTH_SHORT).show();
+        }
 
 
     }
@@ -105,14 +113,9 @@ public class HistoryActivity extends AppCompatActivity {
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                // Do something with response
-                //mTextView.setText(response.toString());
-
-                // Process the JSON
                 try {
-                    // Loop through the array elements
-                    String storename = response.getJSONObject(1).getString("str_name");
-                    JSONObject store = response.getJSONObject(0);
+                    JSONArray storename = response.getJSONArray(0);
+                    JSONObject store = response.getJSONObject(1);
                     Iterator<String> keys = store.keys();
 
                     while (keys.hasNext()) {
@@ -120,7 +123,9 @@ public class HistoryActivity extends AppCompatActivity {
                         JSONArray storeArray = (JSONArray) store.getJSONArray(key);
                         for (int i = 0; i < storeArray.length(); i++) {
                             JSONObject storeObject = storeArray.getJSONObject(i);
-
+                            JSONObject s = storename.getJSONObject(count);
+                            count++;
+                            String l = s.getString("str_name");
                             String pname = storeObject.getString("sp_name");
                             String actprice = storeObject.getString("act_prc");
                             String address = storeObject.getString("new_address");
@@ -131,27 +136,30 @@ public class HistoryActivity extends AppCompatActivity {
                             String uid = storeObject.getString("user_id");
                             String tpprice = storeObject.getString("str_prc");
 
-                            products_list.add(new OrderHistory(actprice, pqty, storename, datetime, proimage, pname, uid, address, null,tprice , tpprice));
+                            products_list.add(new OrderHistory(actprice, pqty, l, datetime, proimage, pname, uid, address, null, tprice, tpprice));
 
                         }
                         historylist.add(new OrderHistory(key, new ArrayList<OrderHistory>(products_list)));
-                            products_list.clear();
+                        products_list.clear();
 
+                        HistoryAdapter historyadp = new HistoryAdapter(historylist, HistoryActivity.this);
+                        mhis_recycler.setAdapter(historyadp);
+                        historyadp.notifyDataSetChanged();
+                        mProgressDialog.cancel();
                     }
 
-                    HistoryAdapter historyadp = new HistoryAdapter(historylist, HistoryActivity.this);
-                    mhis_recycler.setAdapter(historyadp);
-                    historyadp.notifyDataSetChanged();
 
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    mProgressDialog.cancel();
+                    Toast.makeText(HistoryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Do something when error occurred
+                        mProgressDialog.cancel();
+                        Toast.makeText(HistoryActivity.this, "Error", Toast.LENGTH_SHORT).show();
 
                     }
                 }

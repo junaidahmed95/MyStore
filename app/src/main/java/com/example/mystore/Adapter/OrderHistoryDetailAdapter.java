@@ -48,10 +48,10 @@ public class OrderHistoryDetailAdapter extends RecyclerView.Adapter<OrderHistory
 
 
 
-            Glide.with(context).load(OrderList.get(position).getImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
-            holder.mtxt_item_name.setText(OrderList.get(position).getTitle());
-           holder.mtxt_item_price.setText("Rs." + OrderList.get(position).getMtxt_price() + "/-");
-            holder.mtxt_item_quantity.setText("Qty:" + OrderList.get(position).getMtxt_qty());
+        Glide.with(context).load(OrderList.get(position).getImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
+        holder.mtxt_item_name.setText(OrderList.get(position).getTitle());
+        holder.mtxt_item_price.setText("Rs." + OrderList.get(position).getMtxt_price() + "/-");
+        holder.mtxt_item_quantity.setText("Qty:" + OrderList.get(position).getMtxt_qty());
 
 
 

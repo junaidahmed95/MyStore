@@ -9,6 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.mystore.Adapter.CatLvlAdapter;
+import com.example.mystore.Adapter.PCatAdapter;
 import com.example.mystore.Model.CatLvlItemList;
 import com.google.android.material.tabs.TabLayout;
 
@@ -28,11 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
-import static com.example.mystore.MainActivity.checklist;
-import static com.example.mystore.SubCatActivity.list;
-import static com.example.mystore.SubCatActivity.mProgressDialog;
+import static com.example.mystore.SubCatActivity.mloadingImage;
 import static com.example.mystore.SubCatActivity.mtabs;
 import static com.example.mystore.SubCatActivity.prolist;
 
@@ -46,16 +45,20 @@ public class CatLvlFragment extends Fragment {
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/product";
     //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     private String JSON_URL = "";
-public static CatLvlAdapter catLvlAdapter;
+    private boolean isOneTime;
     private JsonArrayRequest request;
     private List<CatLvlItemList> originalList;
     private RequestQueue requestQueue;
     private String mTitle;
-    private GridView mgridView;
+    private RecyclerView mpRecyclerView;
+    private String sID, ownerID, ownerImage, ownerName;
 
-
-    public CatLvlFragment() {
+    public CatLvlFragment(String sID, String ownerID, String ownerImage, String ownerName) {
         // Required empty public constructor
+        this.sID = sID;
+        this.ownerID = ownerID;
+        this.ownerName = ownerName;
+        this.ownerImage = ownerImage;
     }
 
 
@@ -64,67 +67,12 @@ public static CatLvlAdapter catLvlAdapter;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat_lvl, container, false);
-        mgridView = view.findViewById(R.id.gridview);
+        mpRecyclerView = view.findViewById(R.id.pRecyclerView);
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         originalList = new ArrayList<>();
-
-        //parseJSON();
-        //Toast.makeText(getActivity(), "This is your store id"+store_id, Toast.LENGTH_LONG).show();
 
         return view;
     }
-
-
-//    private void parseJSON() {
-//         JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+store_id;
-//        request = new JsonArrayRequest(JSON_URL, new Response.Listener<JSONArray>() {
-//            @Override
-//            public void onResponse(JSONArray response) {
-//
-//                JSONObject jsonObject = null;
-//
-//                for (int i = 0; i < response.length(); i++) {
-//                    try {
-//                        jsonObject = response.getJSONObject(i);
-//
-//                        mTitle = jsonObject.getString("product_name");
-//                        String mprice = jsonObject.getString("str_prc");
-//                        String mimage = jsonObject.getString("product_image");
-//                        store_id = jsonObject.getString("str_id");
-//                        String product_id =jsonObject.getString("p_id");
-//
-//
-//
-//
-//                        prolist.add(new CatLvlItemList(mTitle, mprice,product_id,mimage));
-//                        CatLvlAdapter catLvlAdapter = new CatLvlAdapter(prolist, getActivity());
-//                        mgridView.setAdapter(catLvlAdapter);
-//                        catLvlAdapter.notifyDataSetChanged();
-//                        mprogressbar.setVisibility(View.GONE);
-//
-//
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//
-//
-//
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//
-//            }
-//        });
-//
-//
-//        requestQueue = Volley.newRequestQueue(getActivity());
-//        requestQueue.add(request);
-//
-//
-//    }
 
     @Override
     public void onResume() {
@@ -136,39 +84,30 @@ public static CatLvlAdapter catLvlAdapter;
                     originalList.clear();
                     for (int i = 0; i < prolist.size(); i++) {
                         if (prolist.get(i).getCatName().equals(tab.getText())) {
-                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(), prolist.get(i).getProductid(), prolist.get(i).getP_img()));
+                            //mTitle, mprice,mimage,product_id,str_id,mCat,sim_id
+                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price()));
                         }
                     }
-                    catLvlAdapter = new CatLvlAdapter(originalList, getActivity());
-                    mgridView.setAdapter(catLvlAdapter);
-                    catLvlAdapter.notifyDataSetChanged();
-
-                    mProgressDialog.dismiss();
+                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName);
+                    mpRecyclerView.setAdapter(proAdapter);
+                    proAdapter.notifyDataSetChanged();
+                    mloadingImage.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onTabUnselected(TabLayout.Tab tab) {
-
                 }
 
                 @Override
                 public void onTabReselected(TabLayout.Tab tab) {
-
                 }
             });
         } catch (Exception e) {
-            Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_LONG).show();
-
+            mloadingImage.setVisibility(View.GONE);
+            Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-
-
-
-//        if(checklist!=null){
-//            if(checklist.size()>0){
-//                UpdateCart();
-//            }
-//        }
 
     }
 }

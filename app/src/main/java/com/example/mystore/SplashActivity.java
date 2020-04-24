@@ -32,9 +32,11 @@ public class SplashActivity extends AppCompatActivity {
                 } finally {
                     if(mUser!=null){
                         startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         finish();
                     }else {
                         startActivity(new Intent(SplashActivity.this, Verification.class));
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         finish();
                     }
 

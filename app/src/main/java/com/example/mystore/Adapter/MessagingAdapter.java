@@ -13,13 +13,17 @@ import android.location.Geocoder;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +39,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mystore.MessagingActivity;
@@ -47,6 +57,7 @@ import com.example.mystore.ViewImage;
 import com.example.mystore.videoView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,6 +68,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -858,64 +873,81 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.mbtn_order_detail.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        final ProgressDialog progressDialog = new ProgressDialog(mContext);
+                        progressDialog.setMessage("Please wait...");
+                        progressDialog.setCancelable(false);
                         View mView = LayoutInflater.from(mContext).inflate(R.layout.orderdetail_sheet, null);
                         Toolbar mappBar = mView.findViewById(R.id.appBar);
-
                         mappBar.setTitle("Order Detail");
                         final RecyclerView recyclerView = mView.findViewById(R.id.oorderdetail_gd);
                         TextView textView = mView.findViewById(R.id.totalitemprice);
                         TextView txt_addresss = mView.findViewById(R.id.txt_addresss);
                         TextView txt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
                         TextView txt_total_qtys = mView.findViewById(R.id.txt_total_qtys);
-
-
-
                         textView.setText("" + chat.getTotalPrice());
                         txt_addresss.setText("" + chat.getAddress());
-                        txt_totalproductss.setText(""+chat.getTotalProduct());
-                        txt_total_qtys.setText(""+chat.getOrderID());
-
-
-
-
+                        txt_totalproductss.setText("" + chat.getTotalProduct());
+                        txt_total_qtys.setText("" + chat.getOrderID());
                         FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);
-
                         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
                         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
                         recyclerView.setLayoutManager(linearLayoutManager);
-
-
                         final List<CatLvlItemList> mCatLvlItemList = new ArrayList<>();
 
-                        FirebaseDatabase.getInstance().getReference().child("OrderDetail").child(chat.getOrderID()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        String url = "https://chhatt.com/Cornstr/grocery/api/get/stores/orders?str_id=" + chat.getStoreID() + "&ord_id=" + chat.getOrderID();
+                        RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+                        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.exists()) {
-                                    for (int a = 0; a < dataSnapshot.getChildrenCount(); a++) {
-                                        if (dataSnapshot.child("pname" + a).exists() && dataSnapshot.child("pqunatity" + a).exists() && dataSnapshot.child("pprice" + a).exists()) {
-                                            mCatLvlItemList.add(new CatLvlItemList(dataSnapshot.child("pname" + a).getValue().toString(), dataSnapshot.child("pprice" + a).getValue().toString(), dataSnapshot.child("pqunatity" + a).getValue().toString(), dataSnapshot.child("pimage" + a).getValue().toString()));
+                            public void onResponse(JSONArray response) {
+                                try {
 
-                                        }
+                                    for (int i = 0; i < response.length(); i++) {
+                                        JSONObject storeObject = response.getJSONObject(i);
+
+                                        String pname = storeObject.getString("sp_name");
+                                        String actprice = storeObject.getString("act_prc");
+                                        String proimage = storeObject.getString("sp_image");
+                                        String pqty = storeObject.getString("ord_qty");
+
+
+                                        mCatLvlItemList.add(new CatLvlItemList(pname, actprice, pqty, proimage, chat.getStoreID()));
 
                                     }
                                     OrderAdapter orderAdapter = new OrderAdapter(mCatLvlItemList, mContext, true, false);
                                     recyclerView.setAdapter(orderAdapter);
+                                    notifyDataSetChanged();
+                                    progressDialog.cancel();
 
-
+                                } catch (JSONException e) {
+                                    orderdetailSheetDialog.cancel();
+                                    progressDialog.cancel();
+                                    Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
+                        },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        orderdetailSheetDialog.cancel();
+                                        progressDialog.cancel();
+                                        Toast.makeText(mContext, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+
+                                    }
+                                }
+                        );
+                        requestQueue.add(jsonArrayRequest);
 
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                        try {
+                            orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
+                            orderdetailSheetDialog.setContentView(mView);
+                            orderdetailSheetDialog.show();
+                            setupFullHeight(orderdetailSheetDialog);
+                            progressDialog.show();
+                        } catch (Exception e) {
 
-                            }
-                        });
+                        }
 
-                        orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
-                        orderdetailSheetDialog.setContentView(mView);
-
-                        orderdetailSheetDialog.show();
 
                         mfabClose.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -987,6 +1019,28 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
         }
 
 
+    }
+
+    private void setupFullHeight(BottomSheetDialog bottomSheetDialog) {
+        FrameLayout bottomSheet = (FrameLayout) bottomSheetDialog.findViewById(R.id.design_bottom_sheet);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        ViewGroup.LayoutParams layoutParams = bottomSheet.getLayoutParams();
+
+        int windowHeight = getWindowHeight();
+        if (layoutParams != null) {
+            layoutParams.height = windowHeight;
+        }
+        bottomSheet.setLayoutParams(layoutParams);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
+    private int getWindowHeight() {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        int pxWidth = displayMetrics.widthPixels;
+        float dpWidth = pxWidth / displayMetrics.density;
+        int pxHeight = displayMetrics.heightPixels;
+        float dpHeight = pxHeight / displayMetrics.density;
+        return pxHeight;
     }
 
     private void deletemessageforme(String chatid) {

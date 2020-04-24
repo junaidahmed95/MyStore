@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +25,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.example.mystore.Adapter.CatLvlAdapter;
+import com.example.mystore.MainActivity;
 import com.example.mystore.MessagingActivity;
 import com.example.mystore.R;
 import com.example.mystore.videoView;
@@ -31,11 +36,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class HelpingMethods {
 
     private Activity activity;
-    private String mNam, mImage, mEmail, mPhone;
 
     public HelpingMethods(Activity activity) {
         this.activity = activity;
@@ -46,91 +58,62 @@ public class HelpingMethods {
         sb.show();
     }
 
-    public void alertmututual(final String u_id, final Context context) {
+    public void saveuser(String name, String photo, String address,String phone) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("name", name);
+        editor.putString("photo", photo);
+        editor.putString("address", address);
+        editor.putString("phone", phone);
+        editor.apply();
+    }
 
-        final AlertDialog.Builder alertadd = new AlertDialog.Builder(activity);
-        LayoutInflater factory = LayoutInflater.from(activity);
-        final View view = factory.inflate(R.layout.profile_dialog, null);
-        final ImageView a = view.findViewById(R.id.dialog_imageview);
-        final TextView b = view.findViewById(R.id.usernamecatalog);
+    public void SaveCartCount(int mCount,String dBnAme){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(dBnAme, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("count",mCount);
+        editor.apply();
+    }
 
-        DatabaseReference userDb = FirebaseDatabase.getInstance().getReference().child("Users").child("Owners").child(u_id);
-        userDb.keepSynced(true);
-        userDb.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    mNam = dataSnapshot.child("full_name").getValue().toString();
-                    mImage = dataSnapshot.child("picture").getValue().toString();
-                    mPhone = dataSnapshot.child("phone").getValue().toString();
-                    b.setText(mNam);
-                    Glide.with(activity).asBitmap().load(mImage).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(a);
-                }
-            }
+    public int GetCartCount(String dBnAme) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(dBnAme, Context.MODE_PRIVATE);
+        int cartCount = sharedPreferences.getInt("count", 0);
+        return cartCount;
+    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+//For multiple stores use DBName as parameter take input store_ID and save in DBNAme
+    public void SaveStoreData(String sid,String sname,String simage,String suid){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sid",sid);
+        editor.putString("name",sname);
+        editor.putString("image",simage);
+        editor.putString("uid",suid);
+        editor.apply();
+    }
 
-            }
-        });
+    public String GetStoreID() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("sid", null);
+        return sid;
+    }
 
-        a.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, videoView.class);
-                intent.putExtra("image", mImage);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+    public String GetStoreName() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
+        String name = sharedPreferences.getString("name", null);
+        return name;
+    }
 
-            }
-        });
+    public String GetStoreImage() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
+        String image = sharedPreferences.getString("image", null);
+        return image;
+    }
 
-        //Picasso.with(mContext).load(user.getPhoto()).fit().into(a);
-        Button call, chat, info;
-        call = view.findViewById(R.id.callcatag);
-        chat = view.findViewById(R.id.chatcatag);
-        info = view.findViewById(R.id.infocatag);
-        alertadd.setView(view);
-        call.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri numberuri = Uri.parse("tel:" + "0" + mPhone);
-                Intent dial = new Intent(Intent.ACTION_DIAL);
-                dial.setData(numberuri);
-                activity.startActivity(dial);
-                ((Activity) context).finish();
-
-
-            }
-        });
-
-        info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent send = new Intent(activity, Userdetails.class);
-//                send.putExtra("user_id", u_id);
-//                send.putExtra("user", mNam);
-//                send.putExtra("photo", mImage);
-//                send.putExtra("email", mEmail);
-//                activity.startActivity(send);
-//                activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-            }
-        });
-
-        chat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent a = new Intent(activity, MessagingActivity.class);
-                a.putExtra("user_id", u_id);
-                //a.putExtra("sms",forward);
-                activity.startActivity(a);
-                ((Activity) context).finish();
-
-
-            }
-        });
-
-        alertadd.show();
+    public String GetStoreUID() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
+        String uiD = sharedPreferences.getString("uid", null);
+        return uiD;
     }
 
 }

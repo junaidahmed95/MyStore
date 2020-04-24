@@ -164,7 +164,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/order"
-                        android:text="My Vault"
+                        android:text="My Wallet"
                         android:textColor="@android:color/black" />
 
                     <ImageView
@@ -289,46 +289,6 @@
                     android:background="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:id="@+id/settin"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="13dp"
-                        android:layout_marginRight="16dp"
-                        android:tint="@color/colorPurple"
-                        app:srcCompat="@drawable/ic_settings_black_24dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/settin"
-                        android:text="Settings"
-                        android:textColor="@android:color/black" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="13dp"
-                        android:rotation="180"
-                        android:tint="@android:color/black"
-                        app:srcCompat="@drawable/ic_keyboard_arrow_left_black_24dp" />
-
-                </RelativeLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:background="#d6d6d6" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:background="?android:attr/selectableItemBackground">
-
-                    <ImageView
                         android:id="@+id/help"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -343,7 +303,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toRightOf="@+id/help"
-                        android:text="Help"
+                        android:text="Bringo Support"
                         android:textColor="@android:color/black" />
 
                     <ImageView

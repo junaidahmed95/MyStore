@@ -192,17 +192,19 @@ public class MessagingActivity extends AppCompatActivity implements View.OnClick
     private ValueEventListener userDataListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+if(dataSnapshot.exists()){
+    Long lastTime = Long.valueOf(dataSnapshot.child("status").getValue().toString());
 
 
-            Long lastTime = Long.valueOf(dataSnapshot.child("status").getValue().toString());
+    String Time = GetTimeAgo.getTimeAgo(lastTime, MessagingActivity.this);
+    if (lastTime == 0) {
+        LastSeen.setText("Online");
+    } else {
+        LastSeen.setText(Time);
+    }
 
+}
 
-            String Time = GetTimeAgo.getTimeAgo(lastTime, MessagingActivity.this);
-            if (lastTime == 0) {
-                LastSeen.setText("Online");
-            } else {
-                LastSeen.setText(Time);
-            }
 
         }
 
@@ -738,8 +740,6 @@ public class MessagingActivity extends AppCompatActivity implements View.OnClick
                 }if (userRef != null) {
                     userRef.removeEventListener(userDataListener);
                 } if (getIntent().getStringExtra("for") != null) {
-                    checklist.clear();
-                    selectedProducts.clear();
                     Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -2544,8 +2544,6 @@ public class MessagingActivity extends AppCompatActivity implements View.OnClick
         if (userRef != null) {
             userRef.removeEventListener(userDataListener);
         }if (getIntent().getStringExtra("for") != null) {
-            checklist.clear();
-            selectedProducts.clear();
             Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -2565,5 +2563,6 @@ finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
     }
+
 
 }

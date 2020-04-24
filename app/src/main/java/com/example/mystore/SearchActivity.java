@@ -40,7 +40,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.example.mystore.Adapter.AllStoreAdapter.store_id;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MainActivity.textCartItemCount;
@@ -51,8 +50,7 @@ public class SearchActivity extends AppCompatActivity {
     Toolbar toolbar;
     private Boolean IsAdded = false;
 
-    private  String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+store_id;
-    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
+
     EditText meditText;
 
     private JsonArrayRequest request;
@@ -136,7 +134,7 @@ public class SearchActivity extends AppCompatActivity {
     private void createExampleList() {
 
 
-        JsonArrayRequest request = new JsonArrayRequest(JSON_URL, new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 

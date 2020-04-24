@@ -376,4 +376,7 @@ public class MuImagesActivity extends AppCompatActivity implements BSImagePicker
         myviewPager.setAdapter(viewpagerAdapter);
         mSendTotatl.setText("" + mimagesList.size());
     }
+
+
+
 }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WishActivity extends AppCompatActivity {
-    private List<CatLvlItemList> wishlist;
+    private List<CatLvlItemList> myFavList;
     RecyclerView mwishrecyclerView;
     Toolbar mtoolbar;
 
@@ -32,31 +32,38 @@ public class WishActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish);
 
-        mwishrecyclerView = findViewById(R.id.wishrecyclerView );
+        mwishrecyclerView = findViewById(R.id.wishrecyclerView);
         mtoolbar = findViewById(R.id.appBar);
-
+        mtoolbar.setTitle("My Wishlist");
+        //toolbar.setTitleMargin(0,0,5,0);
+        setSupportActionBar(mtoolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        GetFavData();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mwishrecyclerView.setLayoutManager(linearLayoutManager);
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("list", null);
-        Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
-        }.getType();
-        wishlist = gson.fromJson(json, type);
+        OrderAdapter orderAdapter = new OrderAdapter(myFavList, this, false, true);
+        mwishrecyclerView.setAdapter(orderAdapter);
 
-        if (wishlist == null) {
-            wishlist = new ArrayList<>();
-        } else {
 
-            OrderAdapter orderAdapter = new OrderAdapter( wishlist, this,false,true);
-            mwishrecyclerView.setAdapter(orderAdapter);
-            setSupportActionBar(mtoolbar);
-            getSupportActionBar().setTitle("Wish List");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+    private void GetFavData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Myfav", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("favlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            myFavList = gson.fromJson(json, type);
 
+            if (myFavList == null) {
+                myFavList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(WishActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override

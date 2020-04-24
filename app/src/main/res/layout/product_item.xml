@@ -10,11 +10,13 @@
         android:id="@+id/horizontal_cardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="6dp"
         android:layout_marginTop="4dp"
+        android:layout_marginRight="6dp"
         android:layout_marginBottom="4dp"
         app:cardBackgroundColor="@android:color/white"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="2dp">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="5dp">
 
         <ImageView
             android:id="@+id/wis"
@@ -26,7 +28,6 @@
 
             android:tint="@android:color/darker_gray"
             app:srcCompat="@drawable/ic_like" />
-
 
 
         <RelativeLayout
@@ -42,8 +43,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:layout_marginTop="4dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_launcher_background" />
+                android:scaleType="fitCenter" />
 
             <LinearLayout
                 android:id="@+id/l_pkr"
@@ -95,6 +95,14 @@
 
             </LinearLayout>
 
+            <View
+                android:background="#D6D6D6"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_above="@+id/product_category"
+                android:layout_below="@+id/l_pkr"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"/>
 
             <LinearLayout
                 android:id="@+id/quantityLayout"
@@ -212,7 +220,6 @@
             </Button>
 
 
-
             <Button
 
                 android:id="@+id/btn_remove_cart"
@@ -230,6 +237,14 @@
 
             </Button>
 
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/spin_kit"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                app:SpinKit_Color="@color/colorAccent" />
 
         </RelativeLayout>
 

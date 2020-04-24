@@ -1,7 +1,9 @@
 package com.example.mystore.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +24,23 @@ import com.example.mystore.MainActivity;
 import com.example.mystore.Model.Cart;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
+import com.example.mystore.Model.HelpingMethods;
 import com.example.mystore.Model.Product;
 import com.example.mystore.R;
 import com.example.mystore.SubCatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.example.mystore.Adapter.CatLvlAdapter.list;
 import static com.example.mystore.Adapter.CatLvlAdapter.quantityflag;
 import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
 //import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;
 
@@ -46,37 +55,48 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private List<CatLvlItemList> cartList;
     private Context mContext;
+    private List<String> MecheckList;
+    private boolean flag = false;
+    private List<CatLvlItemList> preferenceList;
     private String fromWhere;
+    private boolean isUpdate;
+    private HelpingMethods helpingMethods;
     private int mTotalPrice = 0;
 
     public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere) {
         this.cartList = cartList;
         this.fromWhere = fromWhere;
         this.mContext = mContext;
+        GetCartData();
+        GetCheckData();
     }
 
     @NonNull
     @Override
     public CartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        Activity activity = (Activity) mContext;
+        helpingMethods = new HelpingMethods(activity);
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cart_item, viewGroup, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
+        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
 
-        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getActual_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getP_price());
-
-
-        mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
-        if (cartList.size() - 1 == pos) {
+        if (!flag){
+            mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
             if (fromWhere.equals("activity")) {
                 mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                mcardview2.setVisibility(View.VISIBLE);
             } else {
                 mTxtView_Total.setText("" + mTotalPrice + "/-");
+                mcardview1.setVisibility(View.VISIBLE);
             }
 
         }
+
+
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +106,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 q += 1;
                 viewHolder.mProQuantity.setText("" + q);
                 cartList.get(pos).setP_quantity("" + q);
+                preferenceList.get(pos).setP_quantity("" + q);
                 viewHolder.Mul();
+                cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+                preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+
                 mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
                 if (fromWhere.equals("activity")) {
                     mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
@@ -94,12 +118,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     mTxtView_Total.setText("" + mTotalPrice + "/-");
                 }
 
-                cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
-                selectedProducts.get(pos).setP_quantity("" + q);
-                quantityflag = true;
-                // quantityget = q;
-
-
+                SaveCartData();
             }
 
         });
@@ -112,18 +131,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     q -= 1;
                     viewHolder.mProQuantity.setText("" + q);
                     cartList.get(pos).setP_quantity("" + q);
+                    preferenceList.get(pos).setP_quantity("" + q);
                     viewHolder.Mul();
+                    cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+                    preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
                     if (fromWhere.equals("activity")) {
                         mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
                     } else {
                         mTxtView_Total.setText("" + mTotalPrice + "/-");
                     }
-                    cartList.get(pos).setP_price(viewHolder.mProTotal.getText().toString());
-                    selectedProducts.get(pos).setP_quantity("" + q);
-                    quantityflag = true;
 
-
+                    SaveCartData();
                 }
 
             }
@@ -133,26 +152,28 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 try {
-                    --MainActivity.mCartItemCount;
-                    setupBadge();
-                    String[] splitit = mTxtView_TotalPrice.getText().toString().split("/");
-                    int outPrice = Integer.parseInt(splitit[0]);
-                    mTotalPrice = outPrice - Integer.parseInt(cartList.get(pos).getP_price());
+                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
+                    int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
+                    helpingMethods.SaveCartCount(finalCount,cartList.get(pos).getStoreId());
                     if (fromWhere.equals("activity")) {
                         mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                        setupBadge();
                     } else {
                         mTxtView_Total.setText("" + mTotalPrice + "/-");
                     }
-                    int l = checklist.indexOf(cartList.get(pos).getProductid());
-                    checklist.remove(l);
+
+                    int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
+                    MecheckList.remove(a);
+                    SaveCheckData();
+                    preferenceList.remove(a);
+                    SaveCartData();
                     cartList.remove(pos);
                     notifyItemRemoved(pos);
                     notifyItemRangeChanged(pos, cartList.size());
+                    flag = true;
 
-                    list.get(pos).setClicked(false);
-                    //      selectedProducts.remove(l);
+
                     if (cartList.size() == 0) {
-
                         if (fromWhere.equals("activity")) {
                             mcardview2.setVisibility(View.GONE);
                         } else {
@@ -164,7 +185,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
 
                 } catch (Exception ex) {
-                    //  Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+                      Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -219,6 +240,65 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             mProTotal.setText("" + result);
         }
 
+    }
+
+    private void SaveCartData() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(preferenceList);
+        editor.putString("cartlist", json);
+        editor.apply();
+    }
+
+
+    private void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+
+
+
+        } catch (Exception e) {
+            Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void SaveCheckData() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(MecheckList);
+        editor.putString("checklist", json);
+        editor.apply();
+    }
+
+
+    private void GetCheckData() {
+        try {
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("checklist", null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            MecheckList = gson.fromJson(json, type);
+
+            if (MecheckList == null) {
+                MecheckList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

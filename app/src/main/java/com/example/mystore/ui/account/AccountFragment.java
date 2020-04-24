@@ -32,6 +32,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.mystore.Adapter.AllStoreAdapter;
 import com.example.mystore.MainActivity;
+import com.example.mystore.MessagingActivity;
 import com.example.mystore.Model.AllStore;
 import com.example.mystore.OrderTrackActivity;
 import com.example.mystore.ProfileActivity;
@@ -56,28 +57,44 @@ public class AccountFragment extends Fragment {
 
     private CircleImageView mProfile;
     private FirebaseAuth mAuth;
-    private CardView mLogOut, mProfileCard;
-    private String image, name;
+    private CardView mLogOut, mProfileCard, mSupportCard;
+    private String image, name, sName, sImage;
     private TextView mName, mEmail;
     private ProgressBar mProgressBar;
-    private RelativeLayout mVaultLayout, mwishlayout,mlayout_history,mlayout_history1;
-
-
-
-
+    private RelativeLayout mVaultLayout, mwishlayout, mlayout_history, mlayout_history1;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
 
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.account_fragment, container, false);
+        mSupportCard = root.findViewById(R.id.shLayout);
+        if(FirebaseAuth.getInstance().getUid().equals("BrwELMpWZEa057zF77OZdTx63k23")){
+            mSupportCard.setVisibility(View.GONE);
+        }else {
+            FirebaseDatabase.getInstance().getReference("Users").child("Owners").child("BrwELMpWZEa057zF77OZdTx63k23").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        sName = dataSnapshot.child("full_name").getValue().toString();
+                        sImage = dataSnapshot.child("picture").getValue().toString();
+                    }
+                }
 
-        mlayout_history1= root.findViewById(R.id.layout_history1);
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        mlayout_history1 = root.findViewById(R.id.layout_history1);
         mProfile = root.findViewById(R.id.userProfile);
         mEmail = root.findViewById(R.id.userEmail);
         mName = root.findViewById(R.id.userName);
         mProgressBar = root.findViewById(R.id.pBar);
         mLogOut = root.findViewById(R.id.logOutLayout);
+
         mVaultLayout = root.findViewById(R.id.vaultLayout);
         mProfileCard = root.findViewById(R.id.profileCard);
         mwishlayout = root.findViewById(R.id.wishlayout);
@@ -115,6 +132,7 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), OrderTrackActivity.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
         mlayout_history.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +141,7 @@ public class AccountFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), HistoryActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -131,7 +150,23 @@ public class AccountFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), WishActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
+            }
+        });
+
+
+        mSupportCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mintent = new Intent(getActivity(), MessagingActivity.class);
+                mintent.putExtra("user_id", "BrwELMpWZEa057zF77OZdTx63k23");
+                mintent.putExtra("uName", sName);
+                mintent.putExtra("uImage", sImage);
+                mintent.putExtra("check", "one");
+                mintent.putExtra("forward", "one");
+                startActivity(mintent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -142,6 +177,7 @@ public class AccountFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), Verification.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 getActivity().finish();
             }
         });
@@ -153,6 +189,7 @@ public class AccountFragment extends Fragment {
                 intent.putExtra("image", image);
                 intent.putExtra("name", name);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -161,6 +198,7 @@ public class AccountFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), ProfileActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 

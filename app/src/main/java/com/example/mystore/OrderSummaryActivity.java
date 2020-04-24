@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import com.example.mystore.Model.AppHelper;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Client;
 import com.example.mystore.Model.Data;
+import com.example.mystore.Model.HelpingMethods;
 import com.example.mystore.Model.MyResponce;
 import com.example.mystore.Model.OrderSummary;
 import com.example.mystore.Model.Product;
@@ -60,12 +62,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,18 +86,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 import static com.example.mystore.Adapter.AddressAdapter.cusaddress;
-import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerid;
-import static com.example.mystore.Adapter.AllStoreAdapter.cornerownerimage;
-import static com.example.mystore.Adapter.AllStoreAdapter.cornerownername;
-import static com.example.mystore.Adapter.AllStoreAdapter.store_id;
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
 import static com.example.mystore.MessagingActivity.unreadListenr;
-import static com.example.mystore.SubCatActivity.storelist;
-import static com.example.mystore.Verification.Your_Location;
-import static com.example.mystore.ui.cart.CartFragment.cartAdapter;
-/*import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;*/
-import static com.example.mystore.ui.cart.CartFragment.mcardview1;
+import static com.example.mystore.ui.cart.CartFragment.mTxtView_Total;
 
 
 public class OrderSummaryActivity extends AppCompatActivity {
@@ -102,7 +98,12 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private Button mconfirmorder_btn;
     private FloatingActionButton maddAddre;
     private Toolbar toolbar;
+    private String store_ID, ownerID, ownerImage, ownerName;
+    private List<String> mycheckList;
+    private String pTotalPrice;
+    private HelpingMethods helpingMethods;
     private ProgressDialog mProgressDialog;
+    private List<CatLvlItemList> preferenceList;
     private JsonArrayRequest addressrequest;
     private RequestQueue addressrequestQueue;
     private static AddressAdapter addressAdapter;
@@ -126,6 +127,16 @@ public class OrderSummaryActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Getting addresses...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        helpingMethods = new HelpingMethods(OrderSummaryActivity.this);
+        GetCartData();
+        GetCheckData();
+        pTotalPrice = getIntent().getStringExtra("totalP");
+        store_ID = helpingMethods.GetStoreID();
+        ownerName = helpingMethods.GetStoreName();
+        ownerImage = helpingMethods.GetStoreImage();
+        ownerID = helpingMethods.GetStoreUID();
+
+
         mconfirmorder_btn = findViewById(R.id.checkBtn);
         mtotalprice = findViewById(R.id.totalPrice);
         ConversionRef = FirebaseDatabase.getInstance().getReference().child("Chatlist");
@@ -133,7 +144,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
         Date d = new Date();
         dayString = sdf.format(d);
 
-        mtotalprice.setText("" + mTxtView_TotalPrice.getText());
+        if (getIntent().getStringExtra("from").equals("activity")) {
+            mtotalprice.setText("" + mTxtView_TotalPrice.getText());
+        } else {
+            mtotalprice.setText("" + mTxtView_Total.getText());
+        }
+
+
         toolbar = findViewById(R.id.appBar);
 
         toolbar.setTitle("Checkout");
@@ -160,11 +177,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         kuchbhe = new ArrayList<>();
 
-//                hashMap.put("address","Seher Commercial");
-//                hashMap.put("totalProduct",selectedProducts.size());
-//                hashMap.put("totalPrice","Rs."+mTxtView_TotalPrice.getText()+"/-");
-
-        SummaryAdapter summaryAdapter = new SummaryAdapter(selectedProducts, this);
+        SummaryAdapter summaryAdapter = new SummaryAdapter(preferenceList, this);
         msummaryRecyclerView.setAdapter(summaryAdapter);
 
         parseAddressJSON();
@@ -178,14 +191,12 @@ public class OrderSummaryActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
-
                                 progressDialog.show();
+
                                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                                 final String id = reference.child("Chats").push().getKey();
                                 final DatabaseReference orderreference = FirebaseDatabase.getInstance().getReference();
                                 OrdrerID = reference.child("OrderDetail").push().getKey();
-                                final DateFormat df = new SimpleDateFormat("HH:mm");
-                                final Calendar calobj = Calendar.getInstance();
                                 final HashMap<String, Object> hashMap = new HashMap<>();
                                 hashMap.put("message", "new order");
                                 hashMap.put("time", ServerValue.TIMESTAMP);
@@ -193,117 +204,113 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                 hashMap.put("type", "Order");
                                 hashMap.put("chatid", id);
                                 hashMap.put("orderID", OrdrerID);
+                                hashMap.put("storeID", store_ID);
                                 hashMap.put("address", cusaddress);
-                                hashMap.put("totalProduct", selectedProducts.size());
-                                hashMap.put("totalPrice", "Rs." + mTxtView_TotalPrice.getText());
+                                hashMap.put("totalProduct", preferenceList.size());
+                                hashMap.put("totalPrice", "Rs." + pTotalPrice);
                                 hashMap.put("sender", FirebaseAuth.getInstance().getUid());
                                 hashMap.put("delivery", "not available");
-
-                                final HashMap<String, Object> detailMap = new HashMap<>();
-
-                                for (int a = 0; a < selectedProducts.size(); a++) {
-                                    detailMap.put("pname" + a, selectedProducts.get(a).getP_name());
-                                    detailMap.put("pprice" + a, selectedProducts.get(a).getP_price());
-                                    detailMap.put("pqunatity" + a, selectedProducts.get(a).getP_quantity());
-                                    detailMap.put("pimage" + a, selectedProducts.get(a).getP_img());
-                                }
-                                detailMap.put("address", cusaddress);
-                                detailMap.put("totalProduct", "Rs." + mTxtView_TotalPrice.getText() + "/-");
-                                unreadReference = FirebaseDatabase.getInstance().getReference().child("Unread").child(FirebaseAuth.getInstance().getUid()).child(cornerownerid);
-                                reference.child("Chats").child(FirebaseAuth.getInstance().getUid() + cornerownerid).child(id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                String url = "https://chhatt.com/Cornstr/grocery/api/post/up_order";
+                                StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            orderreference.child("OrderDetail").child(OrdrerID).setValue(detailMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull final Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        UnreadMessage("\uD83D\uDCE6 New Order");
-                                                        sendNotifiaction(cornerownername, "\uD83D\uDCE6 New order has been arrived..");
-                                                        String url = "https://chhatt.com/Cornstr/grocery/api/post/up_order";
-                                                        StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                                    public void onResponse(String response) {
+                                        unreadReference = FirebaseDatabase.getInstance().getReference().child("Unread").child(FirebaseAuth.getInstance().getUid()).child(ownerID);
+                                        reference.child("Chats").child(FirebaseAuth.getInstance().getUid() + ownerID).child(id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    helpingMethods.SaveCartCount(0,store_ID);
+                                                    helpingMethods.SaveStoreData(null, null, null, null);
+                                                    mycheckList.clear();
+                                                    SaveCheckData();
+                                                    preferenceList.clear();
+                                                    SaveCartData();
+                                                    UnreadMessage("\uD83D\uDCE6 New Order");
+                                                    sendNotifiaction(ownerName, "\uD83D\uDCE6 New order has been arrived..");
+                                                    Intent mintent = new Intent(OrderSummaryActivity.this, MessagingActivity.class);
+                                                    mintent.putExtra("user_id", ownerID);
+                                                    mintent.putExtra("check", "one");
+                                                    mintent.putExtra("uName", ownerName);
+                                                    mintent.putExtra("uImage", ownerImage);
+                                                    mintent.putExtra("forward", "one");
+                                                    mintent.putExtra("for", "one");
+                                                    progressDialog.cancel();
+                                                    Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
+                                                    startActivity(mintent);
+                                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
-                                                            @Override
-                                                            public void onResponse(String response) {
-                                                                Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
-                                                                progressDialog.dismiss();
-                                                                Intent mintent = new Intent(OrderSummaryActivity.this, MessagingActivity.class);
-                                                                mintent.putExtra("user_id", cornerownerid);
-                                                                mintent.putExtra("check", "one");
-                                                                mintent.putExtra("uName", cornerownername);
-                                                                mintent.putExtra("uImage", cornerownerimage);
-                                                                mintent.putExtra("forward", "one");
-                                                                mintent.putExtra("for", "one");
-                                                                startActivity(mintent);
-                                                                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-
-                                                            }
-                                                        }, new Response.ErrorListener() {
-                                                            @Override
-                                                            public void onErrorResponse(VolleyError error) {
-                                                                Toast.makeText(OrderSummaryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                                                            }
-
-
-                                                        }
-
-
-                                                        ) {
-                                                            @Override
-                                                            protected Map<String, String> getParams() {
-                                                                Date date = new Date();
-                                                                SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-                                                                String tim = dateFormat.format(date).toUpperCase();
-                                                                HashMap hashMap = new HashMap<>();
-
-                                                                String[] geprice = mTxtView_TotalPrice.getText().toString().split("/");
-
-                                                                for (int a = 0; a < selectedProducts.size(); a++) {
-                                                                    hashMap.put("str_prc[" + a + "]", selectedProducts.get(a).getP_price());
-                                                                    hashMap.put("ord_qty[" + a + "]", selectedProducts.get(a).getP_quantity());
-                                                                    hashMap.put("sp_id[" + a + "]", selectedProducts.get(a).getProductid());
-                                                                    hashMap.put("sp_image[" + a + "]", selectedProducts.get(a).getP_img());
-                                                                    hashMap.put("act_prc[" + a + "]", selectedProducts.get(a).getActual_price());
-                                                                    hashMap.put("str_id", store_id);
-                                                                    hashMap.put("sp_name[" + a + "]", selectedProducts.get(a).getP_name());
-                                                                    hashMap.put("new_address", cusaddress);
-                                                                    hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
-                                                                    hashMap.put("t_price", geprice[0]);
-                                                                    hashMap.put("time", tim);
-                                                                    hashMap.put("ord_id", OrdrerID);
-                                                                    hashMap.put("day", dayString);
-
-
-                                                                }
-
-
-                                                                return hashMap;
-                                                            }
-
-                                                            ;
-
-                                                            {
-
-                                                            }
-                                                        };
-
-
-                                                        postdata.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                                                        RequestHandlerSingleten.getInstance(getBaseContext()).addToRequestQueue(postdata);
-
-                                                    } else {
-                                                        progressDialog.dismiss();
-                                                        Toast.makeText(OrderSummaryActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                    }
+                                                } else {
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(OrderSummaryActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
-                                            });
+                                            }
+                                        });
 
-                                        } else {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(OrderSummaryActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
+
+
+
+
+
+
                                     }
-                                });
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        progressDialog.cancel();
+                                        Toast.makeText(OrderSummaryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+
+
+                                }
+
+
+                                ) {
+                                    @Override
+                                    protected Map<String, String> getParams() {
+                                        Date date = new Date();
+                                        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                                        String tim = dateFormat.format(date).toUpperCase();
+                                        HashMap hashMap = new HashMap<>();
+
+
+
+                                        for (int a = 0; a < preferenceList.size(); a++) {
+                                            hashMap.put("str_prc[" + a + "]", preferenceList.get(a).getP_price());
+                                            hashMap.put("ord_qty[" + a + "]", preferenceList.get(a).getP_quantity());
+                                            hashMap.put("sp_id[" + a + "]", preferenceList.get(a).getProductid());
+                                            hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
+                                            hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
+                                            hashMap.put("str_id", store_ID);
+                                            hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
+                                            hashMap.put("new_address", cusaddress);
+                                            hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
+                                            hashMap.put("t_price", pTotalPrice);
+                                            hashMap.put("time", tim);
+                                            hashMap.put("ord_id", OrdrerID);
+                                            hashMap.put("day", dayString);
+
+
+                                        }
+
+
+                                        return hashMap;
+                                    }
+
+                                    ;
+
+                                    {
+
+                                    }
+                                };
+
+
+                                postdata.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                RequestHandlerSingleten.getInstance(getBaseContext()).addToRequestQueue(postdata);
+
+
+
+
+
 
 
                                 break;
@@ -332,23 +339,23 @@ public class OrderSummaryActivity extends AppCompatActivity {
         concMap.put("last", message);
         concMap.put("time", ServerValue.TIMESTAMP);
         concMap.put("unread", 1);
-        concMap.put("name", cornerownername.toLowerCase());
-        concMap.put("image", cornerownerimage);
+        concMap.put("name", ownerName.toLowerCase());
+        concMap.put("image", ownerImage);
         concMap.put("status", "sent");
         concMap.put("who", FirebaseAuth.getInstance().getUid());
 
         Map conc1Map = new HashMap<>();
         conc1Map.put("last", message);
         conc1Map.put("time", ServerValue.TIMESTAMP);
-        conc1Map.put("name", cornerownername.toLowerCase());
-        conc1Map.put("image", cornerownerimage);
+        conc1Map.put("name", ownerName.toLowerCase());
+        conc1Map.put("image", ownerImage);
         conc1Map.put("unread", 0);
         conc1Map.put("status", "sent");
         conc1Map.put("who", FirebaseAuth.getInstance().getUid());
 
         Map message1TextDetail = new HashMap<>();
-        message1TextDetail.put(FirebaseAuth.getInstance().getUid() + "/" + cornerownerid, conc1Map);
-        message1TextDetail.put(cornerownerid + "/" + FirebaseAuth.getInstance().getUid(), concMap);
+        message1TextDetail.put(FirebaseAuth.getInstance().getUid() + "/" + ownerID, conc1Map);
+        message1TextDetail.put(ownerID + "/" + FirebaseAuth.getInstance().getUid(), concMap);
 
         ConversionRef.updateChildren(message1TextDetail, new DatabaseReference.CompletionListener() {
             @Override
@@ -368,13 +375,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
     }
 
     private void sendNotifiaction(final String username, final String message) {
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Users").child("Owners").child(cornerownerid);
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Users").child("Owners").child(ownerID);
         tokens.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Data data = new Data(FirebaseAuth.getInstance().getUid(), R.mipmap.ic_launcher, username + ": " + message, message,
-                            cornerownerid);
+                            ownerID);
                     Sender sender = new Sender(data, dataSnapshot.child("token").getValue().toString());
 
                     apiService.sendNotification(sender)
@@ -461,5 +468,61 @@ public class OrderSummaryActivity extends AppCompatActivity {
         addressAdapter.notifyItemChanged(select);
     }
 
+    public void SaveCartData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(preferenceList);
+        editor.putString("cartlist", json);
+        editor.apply();
+    }
+
+    private void SaveCheckData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(mycheckList);
+        editor.putString("checklist", json);
+        editor.apply();
+    }
+
+
+    private void GetCheckData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("checklist", null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            mycheckList = gson.fromJson(json, type);
+
+            if (mycheckList == null) {
+                mycheckList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
 
 }

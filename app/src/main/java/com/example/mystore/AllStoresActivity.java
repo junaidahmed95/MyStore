@@ -28,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +45,9 @@ import com.example.mystore.Adapter.CategoryAdapter;
 import com.example.mystore.Model.AllStore;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
+import com.example.mystore.Model.ConnectionDetector;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -71,11 +75,13 @@ public class AllStoresActivity extends AppCompatActivity {
     private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/maincat";
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
+    private Button mretryBtn;
+    private ProgressBar mloadingImage;
     private ProgressDialog mProgressDialog;
     private List<String> backupList;
     private List<Category> productList;
     ProgressBar mprogressbar;
-    private String stID;
+    private String stID,ownerID,ownerImage,ownerName;
     private GridView categoryRecyclerView;
 
     public static boolean flagfroprice = true;
@@ -89,13 +95,20 @@ public class AllStoresActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_stores);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setMessage("Getting categories...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+
+        mloadingImage = findViewById(R.id.spin_kit);
+        Sprite doubleBounce = new CubeGrid();
+        mloadingImage.setIndeterminateDrawable(doubleBounce);
+        mretryBtn = findViewById(R.id.retryBtn);
+
+
+
         stID = getIntent().getStringExtra("storeid");
+        ownerName = getIntent().getStringExtra("stname");
+        ownerImage = getIntent().getStringExtra("ownerImage");
+        ownerID = getIntent().getStringExtra("ownerID");
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Categories");
+        toolbar.setTitle(ownerName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         backupList = new ArrayList<>();
@@ -106,14 +119,39 @@ public class AllStoresActivity extends AppCompatActivity {
         categoryRecyclerView = findViewById(R.id.cat_recyclerView);
 
 
-        parseJSON();
+
+
+        ConnectionDetector connectionDetector = new ConnectionDetector(AllStoresActivity.this);
+        if(connectionDetector.isConnected()){
+            parseJSON();
+        }else {
+            mloadingImage.setVisibility(View.GONE);
+            mretryBtn.setVisibility(View.VISIBLE);
+            Toast.makeText(AllStoresActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+        }
+
+        mretryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConnectionDetector connectionDetector = new ConnectionDetector(AllStoresActivity.this);
+                if(connectionDetector.isConnected()){
+                    mloadingImage.setVisibility(View.VISIBLE);
+                    mretryBtn.setVisibility(View.GONE);
+                    parseJSON();
+                }else {
+                    Toast.makeText(AllStoresActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
     }
 
     private void parseJSON() {
         request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-
                 JSONObject jsonObject = null;
 
                 for (int i = 0; i < response.length(); i++) {
@@ -129,24 +167,33 @@ public class AllStoresActivity extends AppCompatActivity {
 
 
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        mloadingImage.setVisibility(View.GONE);
+                        mretryBtn.setVisibility(View.VISIBLE);
+                        Toast.makeText(AllStoresActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AllStoresActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
 
-                CategoryAdapter categoryAdapter = new CategoryAdapter(productList, AllStoresActivity.this, stID);
+                CategoryAdapter categoryAdapter = new CategoryAdapter(productList, AllStoresActivity.this, stID,ownerID,ownerImage,ownerName);
                 categoryRecyclerView.setAdapter(categoryAdapter);
                 categoryAdapter.notifyDataSetChanged();
                 if (productList.size() == 0) {
                     Toast.makeText(AllStoresActivity.this, "This store does not have any category yet!", Toast.LENGTH_LONG).show();
                 }
-                mProgressDialog.cancel();
+                mloadingImage.setVisibility(View.GONE);
+                categoryRecyclerView.setVisibility(View.VISIBLE);
+
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                mloadingImage.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.VISIBLE);
                 Toast.makeText(AllStoresActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                mProgressDialog.cancel();
+                Toast.makeText(AllStoresActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+
+
             }
         });
 
@@ -169,6 +216,7 @@ public class AllStoresActivity extends AppCompatActivity {
                 //Toast.makeText(this, ""+result.get(0), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("value", result.get(0));
+                intent.putExtra("stID",stID);
                 startActivity(intent);
 
             }
@@ -230,4 +278,11 @@ public class AllStoresActivity extends AppCompatActivity {
 //        }
 //        return super.onOptionsItemSelected(menuItem);
 //    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
+    }
 }

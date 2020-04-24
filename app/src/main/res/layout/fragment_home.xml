@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:text="Nearest Shops to you"
+            android:text="Nearest businesses to you"
             android:textColor="@android:color/black" />
 
         <androidx.cardview.widget.CardView
@@ -91,6 +91,7 @@
         </androidx.cardview.widget.CardView>
 
         <GridView
+            android:visibility="gone"
             android:id="@+id/gd1"
             android:layout_width="match_parent"
             android:layout_height="1000dp"
@@ -102,6 +103,27 @@
             android:scrollbars="none"
             android:verticalSpacing="8dp"
             tools:ignore="MissingConstraints" />
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/spin_kit"
+            android:layout_marginTop="100dp"
+            style="@style/SpinKitView.Large.CubeGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:SpinKit_Color="@color/colorAccent" />
+
+        <Button
+            android:id="@+id/retryBtn"
+            android:layout_width="wrap_content"
+            android:text="Retry"
+            android:textColor="@color/white"
+            android:background="@drawable/btn_shape"
+            android:visibility="gone"
+            android:layout_marginTop="100dp"
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

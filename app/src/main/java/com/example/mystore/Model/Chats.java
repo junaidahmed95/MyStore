@@ -9,7 +9,7 @@ public class Chats {
     private Object timestamp;
     private MediaPlayer chatMediaPlayer;
     private boolean upload = true;
-    private String bath,bed,price,prop,unit,forWhat,status,delete,userprofile,getfreetext,orderID;
+    private String bath,bed,price,prop,unit,forWhat,status,delete,userprofile,getfreetext,orderID,storeID;
     private String phone,allimg,propertyname,locationltlng,location,propid;
     private boolean isPause;
     String address,totalPrice;
@@ -57,6 +57,14 @@ public class Chats {
 
     public Object getTimestamp() {
         return timestamp;
+    }
+
+    public String getStoreID() {
+        return storeID;
+    }
+
+    public void setStoreID(String storeID) {
+        this.storeID = storeID;
     }
 
     public void setTimestamp(Object timestamp) {

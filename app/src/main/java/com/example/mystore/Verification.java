@@ -163,7 +163,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private String get_user;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -293,19 +292,22 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             e.printStackTrace();
                                         }
                                         //junaid
+
                                         DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mAuth.getUid());
                                         HashMap<String, Object> hashMap = new HashMap<>();
                                         hashMap.put("name", mmusername.getText().toString().trim());
                                         hashMap.put("picture", userImage);
-                                        hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                        hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                                         hashMap.put("status", 0);
                                         hashMap.put("token", FirebaseInstanceId.getInstance().getToken());
                                         hashMap.put("address", mEdiText_address.getText().toString().trim());
                                         hashMap.put("search", mmusername.getText().toString().trim().toLowerCase());
+                                        final String finalUserImage = userImage;
                                         userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
+                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
                                                     Intent intent = new Intent(Verification.this, MainActivity.class);
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                     startActivity(intent);
@@ -378,7 +380,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                     HashMap<String, String> hashMap = new HashMap<>();
                                     hashMap.put("u_id", mAuth.getUid());
                                     hashMap.put("user_name", mmusername.getText().toString().trim());
-                                    hashMap.put("phone",mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                    hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                                     hashMap.put("lat", String.valueOf(Your_Location.latitude));
                                     hashMap.put("lng", String.valueOf(Your_Location.longitude));
                                     hashMap.put("address", mEdiText_address.getText().toString().trim());
@@ -574,7 +576,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             hashMap.put("name", user);
                             hashMap.put("picture", photo);
                             hashMap.put("email", email);
-                            hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                            hashMap.put("phone",mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                             hashMap.put("latlong", mylatlng);
                             hashMap.put("address", mEdiText_address.getText().toString().trim());
                             hashMap.put("status", 0);
@@ -601,25 +603,25 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void ResendCode() {
-        Toast.makeText(this, "Pending", Toast.LENGTH_SHORT).show();
-//        mResend_button.setVisibility(View.GONE);
-//        mbutton_verify.setVisibility(View.VISIBLE);
-//        new CountDownTimer(60000, 1000) {
-//
-//            public void onTick(long millisUntilFinished) {
-//                mTimer.setText("" + millisUntilFinished / 1000);
-//                mTimer.setVisibility(View.VISIBLE);
-//                mTimer.setAnimation(animBlink);
-//
-//            }
-//
-//            public void onFinish() {
-//                mTimer.setVisibility(View.GONE);
-//                mbutton_verify.setVisibility(View.GONE);
-//                mResend_button.setVisibility(View.VISIBLE);
-//            }
-//
-//        }.start();
+        //Toast.makeText(this, "Pending", Toast.LENGTH_SHORT).show();
+        mResend_button.setVisibility(View.GONE);
+        mbutton_verify.setVisibility(View.VISIBLE);
+        new CountDownTimer(60000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                mTimer.setText("" + millisUntilFinished / 1000);
+                mTimer.setVisibility(View.VISIBLE);
+                mTimer.setAnimation(animBlink);
+
+            }
+
+            public void onFinish() {
+                mTimer.setVisibility(View.GONE);
+                mbutton_verify.setVisibility(View.GONE);
+                mResend_button.setVisibility(View.VISIBLE);
+            }
+
+        }.start();
     }
 
     private void verifyPhoneNumberWithCode(String verificationId, String code) {
@@ -732,8 +734,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 //    }
 
 
-
-
     private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
 
         mAuth.signInWithCredential(phoneAuthCredential)
@@ -749,9 +749,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             if (ContextCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                 kamkicheez();
                             } else {
-                                 getPermisssion();
+                                getPermisssion();
                             }
-
 
 
                         } else {
@@ -904,13 +903,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }
         checkApi();
         verifyPhoneNumberWithCode(mVerificationId, code);
-        get_user = "https://chhatt.com/Cornstr/grocery/api/get/client/verified?mob="+mPhoneNumber.getText().toString().replaceAll(" ", "");
+
+        get_user = "https://chhatt.com/Cornstr/grocery/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
         parseJSON();
     }
 
 
     public void SendCode(View view) {
-        String phoneno = mPhoneNumber.getText().toString().replaceAll(" ", "");
+        String phoneno = mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
         if (phoneno.equals("")) {
             mProgressBar.setVisibility(View.GONE);
             mSendCode.setVisibility(View.VISIBLE);
@@ -977,6 +977,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(get_user, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+                JSONObject jsonObject = null;
                 if (response.isNull(0)) {
 
                     stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
@@ -992,21 +993,23 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     finish();
 
 
+                    for (int i = 0; i < response.length(); i++) {
                         try {
 
+                            jsonObject = response.getJSONObject(i);
 
+                            String u_name = jsonObject.getString("user_name");
+                            String u_address = jsonObject.getString("address");
+                            String u_image = jsonObject.getString("user_image");
+                            helpingMethods.saveuser(u_name,u_image,u_address,mPhoneNumber.getText().toString());
 
                         } catch (Exception e) {
 
                         }
+                    }
 
 
-
-                           // helpingMethods.saveuser(u_name, u_image, u_nic, u_address, u_email, u_businessntn, u_number, u_role, null);
-
-
-
-
+                    // helpingMethods.saveuser(u_name, u_image, u_nic, u_address, u_email, u_businessntn, u_number, u_role, null);
 
 
                 }
@@ -1021,6 +1024,35 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         RequestHandlerSingleten.getInstance(Verification.this).addToRequestQueue(jsonArrayRequest);
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+        if (mVerifyContainer.getVisibility() == View.VISIBLE) {
+            mPhoneContainer.setVisibility(View.VISIBLE);
+            mVerifyContainer.setVisibility(View.GONE);
+
+            proBbar.setVisibility(View.GONE);
+            icon.setVisibility(View.GONE);
+            codeText.setEnabled(true);
+            mbutton_verify.setEnabled(true);
+            codeText.setText("");
+            mTimer.setText("");
+
+
+        } else if (mSigninContainer.getVisibility() == View.VISIBLE) {
+            mPhoneContainer.setVisibility(View.VISIBLE);
+            mSigninContainer.setVisibility(View.GONE);
+
+            mbutton_verify.setEnabled(true);
+            proBbar.setVisibility(View.GONE);
+            icon.setVisibility(View.GONE);
+            codeText.setEnabled(true);
+
+            codeText.setText("");
+            mTimer.setText("");
+
+        }
+
+    }
 }
-
-

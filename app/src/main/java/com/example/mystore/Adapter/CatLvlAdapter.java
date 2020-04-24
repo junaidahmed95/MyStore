@@ -1,5 +1,6 @@
 package com.example.mystore.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +31,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.mystore.GirdListView;
 import com.example.mystore.MainActivity;
 import com.example.mystore.Model.CatLvlItemList;
+import com.example.mystore.Model.HelpingMethods;
 import com.example.mystore.Model.Product;
 import com.example.mystore.Model.ProductName;
 import com.example.mystore.ProductDetailActivity;
@@ -46,7 +48,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.example.mystore.AllProductsActivity.mChatFab;
 import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.MainActivity.flagfroprice;
-import static com.example.mystore.MainActivity.mCartItemCount;
 import static com.example.mystore.SubCatActivity.mfbcart;
 import static com.example.mystore.SubCatActivity.setupBadge;
 
@@ -56,23 +57,24 @@ public class CatLvlAdapter extends BaseAdapter {
     public static List<CatLvlItemList> selectedProducts = new ArrayList<>();
     public static List<CatLvlItemList> list;
     private List<CatLvlItemList> wishlist;
+    private List<CatLvlItemList> preferenceList;
     private List<String> getfavtlist;
+    private HelpingMethods helpingMethods;
     public static boolean quantityflag = false;
     private int positionSelected = 0;
     List<CatLvlItemList> cartlist = new ArrayList<>();
     int pri;
-   public static List<CatLvlItemList> favlist = new ArrayList<>();
-
+    public static List<CatLvlItemList> favlist = new ArrayList<>();
     Context context;
     Boolean favflag = true;
     static String selected = "no";
-
 
 
     public CatLvlAdapter(List<CatLvlItemList> list, Context context) {
         this.list = list;
         this.context = context;
         wisddata();
+        GetCartData();
     }
 
     @Override
@@ -92,8 +94,9 @@ public class CatLvlAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+        Activity activity = (Activity) context;
+        helpingMethods = new HelpingMethods(activity);
         convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_item, parent, false);
-
 
 
         ImageView i = convertView.findViewById(R.id.product_image);
@@ -110,16 +113,14 @@ public class CatLvlAdapter extends BaseAdapter {
         final LinearLayout mSelected = convertView.findViewById(R.id.selectedLayout);
 
 
-
         Glide.with(context).load(list.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(i);
         t1.setText(list.get(position).getP_name());
         t2.setText("" + list.get(position).getP_price());
 
-        if(checklist.contains(list.get(position).getProductid())){
+        if (checklist.contains(list.get(position).getProductid())) {
             mbtn_add_cart.setVisibility(View.GONE);
             mbtn_remove_cart.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             mbtn_remove_cart.setVisibility(View.GONE);
             mbtn_add_cart.setVisibility(View.VISIBLE);
         }
@@ -151,13 +152,13 @@ public class CatLvlAdapter extends BaseAdapter {
 //
 //        }
 
-if(list.get(position).isClicked()){
-    mbtn_add_cart.setVisibility(View.GONE);
-    mbtn_remove_cart.setVisibility(View.VISIBLE);
-}else {
-    mbtn_remove_cart.setVisibility(View.GONE);
-    mbtn_add_cart.setVisibility(View.VISIBLE);
-}
+        if (list.get(position).isClicked()) {
+            mbtn_add_cart.setVisibility(View.GONE);
+            mbtn_remove_cart.setVisibility(View.VISIBLE);
+        } else {
+            mbtn_remove_cart.setVisibility(View.GONE);
+            mbtn_add_cart.setVisibility(View.VISIBLE);
+        }
 
 
         mwish.setOnClickListener(new View.OnClickListener() {
@@ -166,11 +167,11 @@ if(list.get(position).isClicked()){
 
                 if (!favlist.contains(list.get(position).getP_name())) {
 //                    if(!wishlist.contains(list.get(position).getP_name())){
-                    favlist.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_img(), list.get(position).getProductid()));
+                    //favlist.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_img(), list.get(position).getProductid(),list.get(position).getStoreId(),list.get(position).getStoreId()));
                     mwish.setImageResource(R.drawable.ic_favorite_black_24dp);
                     ImageViewCompat.setImageTintList(mwish,
                             ColorStateList.valueOf(ContextCompat.getColor(context, R.color.colorRed)));
-                    saveData();
+                    //saveData();
                 }
 //                }
                 else {
@@ -269,22 +270,20 @@ if(list.get(position).isClicked()){
 //        }
 
 
-
-
         mbtn_add_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 list.get(position).setClicked(true);
                 mbtn_add_cart.setVisibility(View.GONE);
                 mbtn_remove_cart.setVisibility(View.VISIBLE);
-                if (!checklist.contains(list.get(position).getProductid())){
+                if (!checklist.contains(list.get(position).getProductid())) {
                     checklist.add(list.get(position).getProductid());
                 }
-
-                selectedProducts.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(),list.get(position).getP_quantity(), list.get(position).getP_img(),position,list.get(position).getP_price(),list.get(position).getProductid()));
-                ++mCartItemCount;
+                int finalCount = helpingMethods.GetCartCount("") + 1;
+                helpingMethods.SaveCartCount(finalCount,"");
                 setupBadge();
-
+//                preferenceList.add(new CatLvlItemList(list.get(position).getP_name(), list.get(position).getP_price(), list.get(position).getP_quantity(), list.get(position).getP_img(), position, list.get(position).getP_price(), list.get(position).getProductid(),list.get(position).getStoreId()));
+                SaveCartData();
                 //saveData();
             }
         });
@@ -295,12 +294,14 @@ if(list.get(position).isClicked()){
                 list.get(position).setClicked(false);
                 mbtn_remove_cart.setVisibility(View.GONE);
                 mbtn_add_cart.setVisibility(View.VISIBLE);
-                --mCartItemCount;
+                int finalCount = helpingMethods.GetCartCount("") - 1;
+                helpingMethods.SaveCartCount(finalCount,"");
                 setupBadge();
                 if (checklist.contains(list.get(position).getProductid())) {
                     int a = checklist.indexOf(list.get(position).getProductid());
                     checklist.remove(a);
-                    selectedProducts.remove(a);
+                    preferenceList.remove(a);
+                    SaveCartData();
                     notifyDataSetChanged();
 
                 }
@@ -368,23 +369,51 @@ if(list.get(position).isClicked()){
 
     }
 
-
-
-
     public void filterList(ArrayList<CatLvlItemList> filteredList) {
         list = filteredList;
         notifyDataSetChanged();
     }
 
-    private void saveData() {
+
+    public void SaveCartData() {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(favlist);
-        editor.putString("list", json);
+        String json = gson.toJson(preferenceList);
+        editor.putString("cartlist", json);
         editor.apply();
-        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
     }
+
+
+    public void GetCartData() {
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cartlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            preferenceList = gson.fromJson(json, type);
+
+            if (preferenceList == null) {
+                preferenceList = new ArrayList<>();
+            }
+        } catch (Exception e) {
+            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+
+//    private void saveData() {
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(favlist);
+//        editor.putString("list", json);
+//        editor.apply();
+//        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+//    }
 
 
     private void wisddata() {

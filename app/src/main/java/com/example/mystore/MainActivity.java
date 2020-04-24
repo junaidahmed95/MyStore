@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
     TextView mtxt_voice;
     public static boolean flagfroprice = true;
     public static TextView textCartItemCount;
-    public static int mCartItemCount = 0;
-
 
     public static List<CatLvlItemList> favlist = new ArrayList<>();
     public static List<String> checklist = new ArrayList<>();

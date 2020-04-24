@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.example.mystore.Adapter.AllStoreAdapter;
 import com.example.mystore.Adapter.CatLvlAdapter;
 import com.example.mystore.Adapter.CategoryAdapter;
@@ -46,10 +48,15 @@ import com.example.mystore.MainAdapter;
 import com.example.mystore.Model.AllStore;
 import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
+import com.example.mystore.Model.ConnectionDetector;
 import com.example.mystore.Model.Product;
 import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
 import com.example.mystore.SearchActivity;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.CubeGrid;
+import com.github.ybq.android.spinkit.style.RotatingCircle;
+import com.github.ybq.android.spinkit.style.RotatingPlane;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -85,7 +92,6 @@ public class HomeFragment extends Fragment {
     private ScrollView mScrollView;
 
     public static String forWhat = "All";
-    GridView gridView;
     List<GirdListView> list;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
@@ -98,9 +104,10 @@ public class HomeFragment extends Fragment {
     int PERMISSION_ID = 44;
     private GridView grd_str;
     private String test;
+    private ProgressBar mloadingImage;
     private AllStoreAdapter allStoreAdapter;
     private List<ShowStores> storeList;
-    private ProgressDialog mProgressDialog;
+    private Button mretryBtn;
 
 
 
@@ -108,20 +115,38 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-
+        mloadingImage = root.findViewById(R.id.spin_kit);
+        Sprite doubleBounce = new CubeGrid();
+        mloadingImage.setIndeterminateDrawable(doubleBounce);
+        mretryBtn = root.findViewById(R.id.retryBtn);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         grd_str = root.findViewById(R.id.gd1);
         //ye rha hai umair
+
         storeList = new ArrayList<>();
-        CheckLocationPermission();
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setMessage("Getting stores");
-        mProgressDialog.setCancelable(false);
+        ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+        if(connectionDetector.isConnected()){
+            CheckLocationPermission();
+        }else {
+            mloadingImage.setVisibility(View.GONE);
+            mretryBtn.setVisibility(View.VISIBLE);
+            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+        }
 
-
-
-
+        mretryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                if(connectionDetector.isConnected()){
+                    mloadingImage.setVisibility(View.VISIBLE);
+                    mretryBtn.setVisibility(View.GONE);
+                    CheckLocationPermission();
+                }else {
+                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         mcdv_dialog  = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
@@ -205,21 +230,21 @@ public class HomeFragment extends Fragment {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Location mLastLocation = locationResult.getLastLocation();
-            mProgressDialog.show();
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
     //String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
-                    mProgressDialog.cancel();
+                    mloadingImage.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.VISIBLE);
 
                 }else {
                     for (int i = 0; i < response.length(); i++) {
@@ -236,14 +261,17 @@ public class HomeFragment extends Fragment {
 
 
                         } catch (JSONException e) {
-                            mProgressDialog.cancel();
-                            //Toast.makeText(AllStoresActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            mloadingImage.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            mretryBtn.setVisibility(View.VISIBLE);
+                            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                         }
                     }
                     allStoreAdapter = new AllStoreAdapter(storeList, getActivity());
                     grd_str.setAdapter(allStoreAdapter);
                     allStoreAdapter.notifyDataSetChanged();
-                    mProgressDialog.cancel();
+                    mloadingImage.setVisibility(View.GONE);
+                    grd_str .setVisibility(View.VISIBLE);
                 }
 
 
@@ -253,8 +281,10 @@ public class HomeFragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mProgressDialog.cancel();
+                mloadingImage.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                mretryBtn.setVisibility(View.VISIBLE);
+                Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -277,7 +307,6 @@ public class HomeFragment extends Fragment {
                                     if (location == null) {
                                         requestNewLocationData();
                                     } else {
-                                        mProgressDialog.show();
                                         GetNearByStores(location.getLatitude(), location.getLongitude());
 
                                     }
