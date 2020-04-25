@@ -3,7 +3,16 @@ package com.example.mystore.Model;
 public class ShowStores {
     String store_name;
     String id,distance;
+    private String address;
     String uid;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public String getDistance() {
         return distance;
@@ -23,6 +32,15 @@ public class ShowStores {
 
     public ShowStores(String store_name, String id, String uid, String store_image,String distance) {
         this.store_name = store_name;
+        this.id = id;
+        this.uid = uid;
+        this.distance = distance;
+        this.store_image = store_image;
+    }
+
+    public ShowStores(String store_name, String id, String uid, String store_image,String distance,String address) {
+        this.store_name = store_name;
+        this.address=address;
         this.id = id;
         this.uid = uid;
         this.distance = distance;

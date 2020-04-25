@@ -31,7 +31,9 @@ import android.view.animation.ScaleAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -156,11 +158,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     static LatLng Your_Location = new LatLng(23.81, 90.41);
     private FloatingActionButton mfbpic;
     private CircleImageView musercrimage;
-    Uri imageuri;
-    Button mbutton_create;
-    EditText mmusername;
-    Bitmap bitmap = null;
+    private Uri imageuri;
+    private Button mbutton_create,login,signup;
+    private EditText mmusername;
+    private  Bitmap bitmap = null;
     private String get_user;
+    private PhoneAuthCredential credential;
+    private LinearLayout main_screen;
+    private RelativeLayout rely;
 
 
     @Override
@@ -187,6 +192,11 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
                             PorterDuff.Mode.MULTIPLY));
         }
+
+        login = findViewById(R.id.login);
+        signup = findViewById(R.id.signup);
+        main_screen = findViewById(R.id.main_screen);
+        rely = findViewById(R.id.rely);
         mmusername = findViewById(R.id.username);
         mbutton_create = findViewById(R.id.button_create);
         musercrimage = findViewById(R.id.usercrimage);
@@ -249,6 +259,22 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                main_screen.setVisibility(View.GONE);
+                rely.setVisibility(View.VISIBLE);
+            }
+        });
+
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                main_screen.setVisibility(View.GONE);
+                rely.setVisibility(View.VISIBLE);
+            }
+        });
 
 
         mfbpic.setOnClickListener(new View.OnClickListener() {
@@ -624,9 +650,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }.start();
     }
 
+    //kam
     private void verifyPhoneNumberWithCode(String verificationId, String code) {
         try {
-            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+            credential = PhoneAuthProvider.getCredential(verificationId, code);
             signInWithPhoneAuthCredential(credential);
         } catch (Exception e) {
             String error = e.getMessage();
@@ -980,6 +1007,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
 
+                    helpingMethods.saveuser(mAuth.getUid(),null,null,null);
                     stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
                     mSigninContainer.setVisibility(View.VISIBLE);
                     mVerifyContainer.setVisibility(View.GONE);

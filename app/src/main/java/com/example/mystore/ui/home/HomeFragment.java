@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -28,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,23 +39,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
-import com.example.mystore.Adapter.AllStoreAdapter;
-import com.example.mystore.Adapter.CatLvlAdapter;
-import com.example.mystore.Adapter.CategoryAdapter;
-import com.example.mystore.Adapter.ProductAdapter;
 import com.example.mystore.Adapter.SliderAdapter;
-import com.example.mystore.AllStoresActivity;
+import com.example.mystore.Adapter.StoresAdapter;
 import com.example.mystore.GirdListView;
-import com.example.mystore.MainAdapter;
-import com.example.mystore.Model.AllStore;
-import com.example.mystore.Model.CatLvlItemList;
 import com.example.mystore.Model.Category;
 import com.example.mystore.Model.ConnectionDetector;
-import com.example.mystore.Model.Product;
 import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
 import com.example.mystore.SearchActivity;
+import com.example.mystore.ViewAllStoresActivity;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.github.ybq.android.spinkit.style.RotatingCircle;
@@ -79,15 +74,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
     private SliderView sliderView;
     private List<Category> productList;
-   // ProgressBar mprogressbar;
+    // ProgressBar mprogressbar;
     private RecyclerView categoryRecyclerView;
     private ScrollView mScrollView;
 
@@ -98,18 +93,14 @@ public class HomeFragment extends Fragment {
     private CardView mcdv_dialog;
 
 
-
-
     private FusedLocationProviderClient mFusedLocationClient;
     int PERMISSION_ID = 44;
-    private GridView grd_str;
+    private RecyclerView grd_str;
     private String test;
     private ProgressBar mloadingImage;
-    private AllStoreAdapter allStoreAdapter;
-    private List<ShowStores> storeList;
-    private Button mretryBtn;
-
-
+    private StoresAdapter allStoreAdapter;
+    public static List<ShowStores> nearesStoresList;
+    private Button mretryBtn, mBtnViewAll;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -120,15 +111,18 @@ public class HomeFragment extends Fragment {
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = root.findViewById(R.id.retryBtn);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
+        mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        grd_str.setLayoutManager(layoutManager);
         //ye rha hai umair
 
-        storeList = new ArrayList<>();
+        nearesStoresList = new ArrayList<>();
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-        if(connectionDetector.isConnected()){
+        if (connectionDetector.isConnected()) {
             CheckLocationPermission();
-        }else {
+        } else {
             mloadingImage.setVisibility(View.GONE);
             mretryBtn.setVisibility(View.VISIBLE);
             Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
@@ -138,21 +132,20 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-                if(connectionDetector.isConnected()){
+                if (connectionDetector.isConnected()) {
                     mloadingImage.setVisibility(View.VISIBLE);
                     mretryBtn.setVisibility(View.GONE);
                     CheckLocationPermission();
-                }else {
+                } else {
                     Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        mcdv_dialog  = root.findViewById(R.id.cdv_dialog);
+        mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
         categoryRecyclerView = root.findViewById(R.id.cat_recyclerView);
         //mprogressbar = root.findViewById(R.id.progressbar);
-
 
 
         final SliderAdapter adapter = new SliderAdapter(getActivity());
@@ -173,25 +166,17 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
-
-
-
-
-//        gridView = root.findViewById(R.id.gd1);
-//        list = new ArrayList<>();
-//
-//        list.add(new GirdListView("2019 new autumn kids shoes","PKR 1,174.23","688 Sold",R.drawable.cocomo));
-//
-//
-//        gridView.setAdapter(new MainAdapter(list,getActivity()));
+        mBtnViewAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent allStoreIntent = new Intent(getActivity(), ViewAllStoresActivity.class);
+                getActivity().startActivity(allStoreIntent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
 
         return root;
     }
-
-
-
-
 
 
     private boolean checkPermissions() {
@@ -233,6 +218,7 @@ public class HomeFragment extends Fragment {
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
+
     //String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
 //
     private void GetNearByStores(double latitude, double longitude) {
@@ -246,35 +232,39 @@ public class HomeFragment extends Fragment {
                     mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
 
-                }else {
+                } else {
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
 
                             String userID = jsonObject.getString("u_id");
                             String storename = jsonObject.getString("str_name");
+                            String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
                             String store_image = jsonObject.getString("user_thumb");
                             //String store_name, String id, String uid, String store_image
-                            storeList.add(new ShowStores(storename,store_id, userID, store_image,distance));
+                            nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance,storeaddr));
 
 
                         } catch (JSONException e) {
                             mloadingImage.setVisibility(View.GONE);
-                            Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
                             Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    allStoreAdapter = new AllStoreAdapter(storeList, getActivity());
+                    allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(),false);
                     grd_str.setAdapter(allStoreAdapter);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                    grd_str .setVisibility(View.VISIBLE);
+                    grd_str.setVisibility(View.VISIBLE);
+
+                    if (nearesStoresList.size() > 6) {
+                        mBtnViewAll.setVisibility(View.VISIBLE);
+                    }
+
                 }
-
-
 
 
             }
@@ -297,25 +287,23 @@ public class HomeFragment extends Fragment {
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         if (checkPermissions()) {
-                if (isLocationEnabled()) {
-                   mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                            new OnCompleteListener<Location>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Location> task) {
-                                    Location location = task.getResult();
+            if (isLocationEnabled()) {
+                mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                        new OnCompleteListener<Location>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Location> task) {
+                                Location location = task.getResult();
 
-                                    if (location == null) {
-                                        requestNewLocationData();
-                                    } else {
-                                        GetNearByStores(location.getLatitude(), location.getLongitude());
+                                if (location == null) {
+                                    requestNewLocationData();
+                                } else {
+                                    GetNearByStores(location.getLatitude(), location.getLongitude());
 
-                                    }
                                 }
                             }
-                    );
-                }
-
-            else {
+                        }
+                );
+            } else {
                 Toast.makeText(getContext(), "Turn on location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 getActivity().startActivity(intent);
