@@ -68,7 +68,7 @@ public class CatLvlFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat_lvl, container, false);
         mpRecyclerView = view.findViewById(R.id.pRecyclerView);
-        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         originalList = new ArrayList<>();
 
         return view;

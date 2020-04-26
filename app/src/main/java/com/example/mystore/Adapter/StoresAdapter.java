@@ -7,15 +7,14 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -23,10 +22,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.example.mystore.AllStoresActivity;
-import com.example.mystore.Model.AllStore;
 import com.example.mystore.Model.ShowStores;
 import com.example.mystore.R;
+import com.example.mystore.StoreInfoActivity;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.Circle;
 
@@ -34,47 +32,35 @@ import java.util.List;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
-public class AllStoreAdapter extends BaseAdapter {
+public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder> {
 
-    List<ShowStores> storeList;
+
+    private List<ShowStores> storeList;
     private Sprite doubleBounce;
-    Context mcontext;
+    private Context mcontext;
+    private boolean displayAll;
     private Activity activity;
 
-    public AllStoreAdapter(List<ShowStores> storeList, Context mcontext) {
+    public StoresAdapter(List<ShowStores> storeList, Context mcontext,boolean displayAll) {
         this.storeList = storeList;
+        this.displayAll=displayAll;
         this.mcontext = mcontext;
         activity = (Activity)mcontext;
     }
 
+    @NonNull
     @Override
-    public int getCount() {
-        return storeList.size();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.allstoreitem, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.allstoreitem, parent, false);
-        CardView storecardId = convertView.findViewById(R.id.storecardId);
-        ImageView mimg_store = convertView.findViewById(R.id.img_store);
-        TextView txt_storedistance = convertView.findViewById(R.id.txt_storedistance);
-        TextView txt_storename = convertView.findViewById(R.id.txt_storename);
-
-        final ProgressBar progressBar = convertView.findViewById(R.id.spin_kit);
-        txt_storename.setText(storeList.get(position).getStore_name());
-        txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        holder.txt_storename.setText(storeList.get(position).getStore_name());
+        holder.txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
         doubleBounce = new Circle();
-        progressBar.setIndeterminateDrawable(doubleBounce);
+        holder.progressBar.setIndeterminateDrawable(doubleBounce);
         Glide.with(mcontext)
                 .load(storeList.get(position).getStore_image())
                 .apply(
@@ -90,29 +76,58 @@ public class AllStoreAdapter extends BaseAdapter {
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
                 .transition(withCrossFade())
-                .into(mimg_store);
+                .into(holder.mimg_store);
 
-        storecardId.setOnClickListener(new View.OnClickListener() {
+        holder.storecardId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mcontext, AllStoresActivity.class);
+                Intent intent = new Intent(mcontext, StoreInfoActivity.class);
                 intent.putExtra("storeid", storeList.get(position).getId());
                 intent.putExtra("stname",storeList.get(position).getStore_name());
                 intent.putExtra("ownerID",storeList.get(position).getUid());
+                intent.putExtra("address",storeList.get(position).getAddress());
                 intent.putExtra("ownerImage",storeList.get(position).getStore_image());
                 mcontext.startActivity(intent);
                 activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
+    }
+
+    @Override
+    public int getItemCount() {
+        if(displayAll){
+            return storeList.size();
+        }else {
+            if(storeList.size()>6){
+                return 6;
+            }else {
+                return storeList.size();
+            }
+        }
 
 
+    }
 
-        return convertView;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private ProgressBar progressBar;
+        private CardView storecardId;
+        private ImageView mimg_store;
+        private TextView txt_storedistance,txt_storename;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            storecardId = itemView.findViewById(R.id.storecardId);
+            mimg_store = itemView.findViewById(R.id.img_store);
+            txt_storedistance = itemView.findViewById(R.id.txt_storedistance);
+            txt_storename = itemView.findViewById(R.id.txt_storename);
+            progressBar = itemView.findViewById(R.id.spin_kit);
+        }
     }
 }

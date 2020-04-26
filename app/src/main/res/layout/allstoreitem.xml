@@ -2,11 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainLayout"
-    android:layout_width="match_parent"
+    android:layout_width="120dp"
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp"
     android:orientation="vertical">
-
 
     <androidx.cardview.widget.CardView
         android:id="@+id/storecardId"
@@ -16,7 +15,7 @@
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="13dp"
-        app:cardElevation="3dp">
+        app:cardElevation="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +24,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="120dp">
+                android:layout_height="80dp">
 
                 <ImageView
                     android:id="@+id/img_store"
@@ -45,9 +44,6 @@
 
             </RelativeLayout>
 
-
-
-
             <TextView
                 android:id="@+id/txt_storename"
                 android:layout_width="match_parent"
@@ -57,45 +53,67 @@
                 android:layout_marginTop="2dp"
                 android:layout_marginRight="4dp"
                 android:layout_marginBottom="2dp"
-                android:text="sdasddasdasdaasdasdasdasdasd"
-                android:textAlignment="center"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Store Name"
                 android:textColor="@android:color/black" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/dis_shape"
+                    android:paddingLeft="6dp"
+                    android:paddingTop="1dp"
+                    android:paddingRight="6dp"
+                    android:paddingBottom="1dp"
+                    android:text="47%"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/noOfRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="4.8"
+                    android:textColor="@android:color/black" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="2dp"
+                    android:layout_toLeftOf="@id/noOfRating"
+                    android:src="@drawable/star" />
+
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"
-                android:layout_margin="5dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="4dp"
                 android:background="#D6D6D6" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/txt_storedistance"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginBottom="4dp"
-                android:orientation="horizontal">
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="1dp"
+                android:maxLength="5"
+                android:text="0.006" />
 
-                <TextView
-                    android:id="@+id/txt_storedistance"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLength="5"
-                    android:text="0.006"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLength="5"
-                    android:text="KM"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black" />
-
-            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

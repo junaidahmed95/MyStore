@@ -40,18 +40,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewImage"></activity>
-        <activity android:name=".AllStoresActivity" />
-        <activity android:name=".OrderTrackActivity" />
+        <activity android:name=".StoreInfoActivity"></activity>
+        <activity android:name=".ViewAllStoresActivity" />
+        <activity
+            android:name=".BringoActivity"
+            android:label="@string/title_activity_bringo"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ViewImage" />
         <activity android:name=".SearchActivity" />
-        <activity android:name=".ui.HistoryActivity" />
-        <activity android:name=".WishActivity" />
         <activity android:name=".CartActivity" />
         <activity android:name=".SubCatActivity" />
         <activity android:name=".Sub_categories" />
         <activity android:name=".OrderSummaryActivity" />
         <activity android:name=".ProfileActivity" />
-        <activity android:name=".VaultActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

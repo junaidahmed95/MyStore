@@ -3,17 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.HistoryActivity">
+    android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/bar"
-        layout="@layout/toolbar"/>
 
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@+id/bar"
+
         android:id="@+id/his_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -46,7 +46,7 @@ import java.util.List;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 
-public class CategoryAdapter extends BaseAdapter {
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
     private List<Category> productList;
     private Sprite doubleBounce;
     private String getcatprod;
@@ -65,35 +65,17 @@ public class CategoryAdapter extends BaseAdapter {
         activity = (Activity)mContext;
     }
 
-
+    @NonNull
     @Override
-    public int getCount() {
-        return productList.size();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item, parent, false);
+        return new ViewHolder(convertView);
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-
-        convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item, parent, false);
-
-        CardView mcv_cat = convertView.findViewById(R.id.card_cardview);
-
-        ImageView categoryImage = convertView.findViewById(R.id.category_image);
-        TextView categoryName = convertView.findViewById(R.id.category_name);
-        final ProgressBar progressBar = convertView.findViewById(R.id.spin_kit);
-
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         doubleBounce = new Circle();
-        progressBar.setIndeterminateDrawable(doubleBounce);
+        holder.progressBar.setIndeterminateDrawable(doubleBounce);
         Glide.with(mContext)
                 .load(productList.get(position).getCatImage())
                 .apply(
@@ -109,17 +91,17 @@ public class CategoryAdapter extends BaseAdapter {
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
+                        holder.progressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
                 .transition(withCrossFade())
                 .apply(new RequestOptions().placeholder(R.drawable.placeholder))
-                .into(categoryImage);
-        categoryName.setText(productList.get(position).getCatName());
+                .into(holder.categoryImage);
+        holder.categoryName.setText(productList.get(position).getCatName());
 
 
-        mcv_cat.setOnClickListener(new View.OnClickListener() {
+        holder.mcv_cat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SubCatActivity.class);
@@ -133,11 +115,32 @@ public class CategoryAdapter extends BaseAdapter {
 
             }
         });
+    }
 
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
 
-        return convertView;
-
+    @Override
+    public int getItemCount() {
+        return productList.size();
     }
 
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private CardView mcv_cat;
+        private ImageView categoryImage;
+        private TextView categoryName;
+        private ProgressBar progressBar;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mcv_cat = itemView.findViewById(R.id.card_cardview);
+            categoryImage = itemView.findViewById(R.id.category_image);
+            categoryName = itemView.findViewById(R.id.category_name);
+            progressBar = itemView.findViewById(R.id.spin_kit);
+        }
+    }
 }
