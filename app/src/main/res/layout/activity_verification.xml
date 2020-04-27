@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/bgHeader"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="300dp"
             android:background="@drawable/background"
             android:elevation="5dp"
 
@@ -24,20 +24,18 @@
             />
 
         <LinearLayout
-
-            android:layout_below="@+id/bgHeader"
             android:id="@+id/main_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/bgHeader"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="10dp"
             android:orientation="vertical">
 
-
             <LinearLayout
                 android:id="@+id/ly_title"
-                android:layout_width="match_parent"
-                android:layout_height="270dp"
+                android:layout_width="250dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:background="@drawable/logo"
                 android:orientation="vertical">
@@ -54,7 +52,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="35dp"
                 android:orientation="vertical"
                 android:padding="25dp">
 
@@ -65,6 +62,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/btn_shape"
                     android:text="Sign Up"
+                    android:textAllCaps="false"
                     android:textColor="@color/white" />
 
 
@@ -73,9 +71,9 @@
                     android:layout_width="275dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/button_shape"
-                    android:backgroundTint="@color/white"
-                    android:text="Login"
+                    android:background="@drawable/btnwhite"
+                    android:text="Sign In"
+                    android:textAllCaps="false"
                     android:textColor="@color/colorRed" />
 
 
@@ -93,9 +91,9 @@
 
             <RelativeLayout
                 android:id="@+id/rely"
-                android:visibility="gone"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardVew1"
@@ -176,11 +174,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
+                            android:gravity="center_horizontal"
                             android:text="Please enter your phone number we will send you a verification code"
                             android:textAlignment="center"
                             android:textColor="@android:color/black"
-                            android:textSize="15sp"
-                            android:gravity="center_horizontal" />
+                            android:textSize="15sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -438,8 +436,8 @@
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="16dp"
-                        android:indeterminate="true"
                         android:backgroundTint="@color/colorRed"
+                        android:indeterminate="true"
                         android:indeterminateTintMode="src_atop"
                         android:visibility="gone" />
 
@@ -491,9 +489,9 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_marginTop="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:orientation="horizontal">
 
 
