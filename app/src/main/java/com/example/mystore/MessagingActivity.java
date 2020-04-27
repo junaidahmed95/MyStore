@@ -118,10 +118,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+
 import static com.example.mystore.Adapter.MessagingAdapter.checkflagforme;
 import static com.example.mystore.Adapter.MessagingAdapter.myplayer;
-import static com.example.mystore.MainActivity.checklist;
+
 
 
 public class MessagingActivity extends AppCompatActivity implements View.OnClickListener, BSImagePicker.OnMultiImageSelectedListener, BSImagePicker.ImageLoaderDelegate {
@@ -740,7 +740,7 @@ if(dataSnapshot.exists()){
                 }if (userRef != null) {
                     userRef.removeEventListener(userDataListener);
                 } if (getIntent().getStringExtra("for") != null) {
-                    Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
+                    Intent intent = new Intent(MessagingActivity.this, BringoActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -2544,7 +2544,7 @@ if(dataSnapshot.exists()){
         if (userRef != null) {
             userRef.removeEventListener(userDataListener);
         }if (getIntent().getStringExtra("for") != null) {
-            Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
+            Intent intent = new Intent(MessagingActivity.this, BringoActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }

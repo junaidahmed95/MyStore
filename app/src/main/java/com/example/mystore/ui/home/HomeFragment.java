@@ -119,14 +119,7 @@ public class HomeFragment extends Fragment {
         //ye rha hai umair
 
         nearesStoresList = new ArrayList<>();
-        ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-        if (connectionDetector.isConnected()) {
-            CheckLocationPermission();
-        } else {
-            mloadingImage.setVisibility(View.GONE);
-            mretryBtn.setVisibility(View.VISIBLE);
-            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
-        }
+
 
         mretryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,7 +137,7 @@ public class HomeFragment extends Fragment {
 
         mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
-        categoryRecyclerView = root.findViewById(R.id.cat_recyclerView);
+        categoryRecyclerView = root.findViewById(R.id.gd1);
         //mprogressbar = root.findViewById(R.id.progressbar);
 
 
@@ -187,6 +180,19 @@ public class HomeFragment extends Fragment {
         return false;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+        if (connectionDetector.isConnected()) {
+            CheckLocationPermission();
+        } else {
+            mloadingImage.setVisibility(View.GONE);
+            mretryBtn.setVisibility(View.VISIBLE);
+            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
@@ -220,6 +226,7 @@ public class HomeFragment extends Fragment {
     };
 
     //String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+    //"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
         request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {

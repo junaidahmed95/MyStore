@@ -40,12 +40,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".StoreInfoActivity"></activity>
-        <activity android:name=".ViewAllStoresActivity" />
         <activity
             android:name=".BringoActivity"
             android:label="@string/title_activity_bringo"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".StoreInfoActivity" />
+        <activity android:name=".ViewAllStoresActivity" />
         <activity android:name=".ViewImage" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".CartActivity" />
@@ -67,9 +67,7 @@
         <activity android:name=".MuImagesActivity" />
         <activity android:name=".videoView" />
         <activity android:name=".MessagingActivity" />
-        <activity android:name=".AllProductsActivity" />
         <activity android:name=".ProductDetailActivity" />
-        <activity android:name=".MainActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

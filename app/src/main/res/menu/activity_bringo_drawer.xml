@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="Home" />
+
+        <item
+            android:id="@+id/nav_cart"
+            android:icon="@drawable/ic_shopping_cart_black_24dp"
+            android:title="My Cart" />
+
+        <item
+            android:id="@+id/nav_wishlist"
+            android:icon="@drawable/ic_favorite_black_24dp"
+            android:title="My Wishlist" />
+
+        <item
+            android:id="@+id/nav_wallet"
+            android:icon="@drawable/ic_account_balance_wallet_black_24dp"
+            android:title="My Wallet" />
+
+        <item
+            android:id="@+id/nav_paymen"
+            android:icon="@drawable/ic_payment_black_24dp"
+            android:title="Payments" />
+
+        <item
+            android:id="@+id/nav_messager"
+            android:icon="@drawable/ic_chat_black_24dp"
+            android:title="Interactions/Messenger" />
+
+        <item
+            android:id="@+id/nav_order"
+            android:icon="@drawable/ic_business_center_black_24dp"
+            android:title="Current Order(s)" />
+
+        <item
+            android:id="@+id/nav_hist"
+            android:icon="@drawable/ic_history_black_24dp"
+            android:title="Order History" />
+
+        <item
+            android:id="@+id/nav_suppot"
+            android:icon="@drawable/ic_help_black_24dp"
+            android:title="Support" />
+
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Settings" />
+
+        <item
+            android:id="@+id/nav_contact"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Contact Us" />
+
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_contact_mail_black_24dp"
+            android:title="About Us" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_power_settings_new_black_24dp"
+            android:title="LogOut" />
+
+    </group>
+</menu>

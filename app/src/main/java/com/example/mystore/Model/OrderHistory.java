@@ -4,7 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderHistory {
-    String mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time, p_id, image, title;
+    String mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time, p_id, image, title,status,strimg;
+
+    public String getStrimg() {
+        return strimg;
+    }
+
+    public void setStrimg(String strimg) {
+        this.strimg = strimg;
+    }
+
     String id, userid, uaddress, day, orderid;
     int qtyplus;
 
@@ -14,7 +23,15 @@ public class OrderHistory {
         this.getorderbykeylist = getorderbykeylist;
     }
 
-    public OrderHistory(String mtxt_price, String mtxt_qty, String mtxt_totalproducts, String mtxt_day, String image, String title, String userid, String uaddress, String orderid, String ptotalprice, String act_price) {
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public OrderHistory(String mtxt_price, String mtxt_qty, String mtxt_totalproducts, String mtxt_day, String image, String title, String userid, String uaddress, String status, String ptotalprice, String act_price,String strimg) {
         this.mtxt_price = mtxt_price;
         this.mtxt_qty = mtxt_qty;
         this.mtxt_totalproducts = mtxt_totalproducts;
@@ -23,9 +40,10 @@ public class OrderHistory {
         this.title = title;
         this.userid = userid;
         this.uaddress = uaddress;
-        this.orderid = orderid;
+        this.status = status;
         this.ptotalprice = ptotalprice;
         this.act_price = act_price;
+        this.strimg = strimg;
     }
 
     String ptotalprice, act_price;

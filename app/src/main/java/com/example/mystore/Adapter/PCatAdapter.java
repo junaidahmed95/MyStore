@@ -35,6 +35,7 @@ import com.example.mystore.R;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.Circle;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -115,11 +116,11 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
         try {
             if (mycheckList.size() > 0) {
                 if (mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_add_cart.setVisibility(View.GONE);
-                    holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
+                    holder.mbtn_add_cart.hide();
+                    holder.mbtn_remove_cart.show();
                 } else {
-                    holder.mbtn_remove_cart.setVisibility(View.GONE);
-                    holder.mbtn_add_cart.setVisibility(View.VISIBLE);
+                    holder.mbtn_remove_cart.hide();
+                    holder.mbtn_add_cart.show();
                 }
             }
 
@@ -187,8 +188,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (!mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_add_cart.setVisibility(View.GONE);
-                    holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
+                    holder.mbtn_add_cart.hide();
+                    holder.mbtn_remove_cart.show();
                     int finalCount = helpingMethods.GetCartCount(proLists.get(position).getStoreId()) + 1;
                     helpingMethods.SaveCartCount(finalCount, proLists.get(position).getStoreId());
                     setupBadge();
@@ -219,8 +220,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_remove_cart.setVisibility(View.GONE);
-                    holder.mbtn_add_cart.setVisibility(View.VISIBLE);
+                    holder.mbtn_remove_cart.hide();
+                    holder.mbtn_add_cart.show();
                     int a = mycheckList.indexOf(proLists.get(position).getSimplePID());
                     mycheckList.remove(a);
                     SaveCheckData();
@@ -246,14 +247,15 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
         private ImageView pImage, pWish;
         ProgressBar progressBar;
-        private TextView pName, pPrice;
-        private Button mbtn_add_cart, mbtn_remove_cart;
+        private TextView pName, pPrice,pDesc;
+        private FloatingActionButton mbtn_add_cart, mbtn_remove_cart;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.spin_kit);
+            progressBar = itemView.findViewById(R.id.spin_kit);
             pImage = itemView.findViewById(R.id.product_image);
-            pName = itemView.findViewById(R.id.product_category);
+            pDesc = itemView.findViewById(R.id.product_desc);
+            pName = itemView.findViewById(R.id.product_title);
             pPrice = itemView.findViewById(R.id.product_price);
             pWish = itemView.findViewById(R.id.wis);
             mbtn_add_cart = itemView.findViewById(R.id.btn_add_cart);

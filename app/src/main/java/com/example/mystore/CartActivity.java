@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+
 
 public class CartActivity extends AppCompatActivity {
 
@@ -67,9 +67,7 @@ public class CartActivity extends AppCompatActivity {
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (selectedProducts.size() == 0) {
-            mcardview2.setVisibility(View.GONE);
-        }
+
 
 
         mcheckBtn.setOnClickListener(new View.OnClickListener() {

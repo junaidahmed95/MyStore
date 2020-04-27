@@ -334,7 +334,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
-                                                    Intent intent = new Intent(Verification.this, MainActivity.class);
+                                                    Intent intent = new Intent(Verification.this, BringoActivity.class);
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                     startActivity(intent);
                                                     finish();
@@ -612,7 +612,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        startActivity(new Intent(Verification.this, MainActivity.class));
+                                        startActivity(new Intent(Verification.this, BringoActivity.class));
                                     } else {
                                         mCreateAlertDialog.dismiss();
                                         helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
@@ -1015,7 +1015,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
 
                     mSigninContainer.setVisibility(View.GONE);
-                    Intent intent = new Intent(Verification.this, MainActivity.class);
+                    Intent intent = new Intent(Verification.this, BringoActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
