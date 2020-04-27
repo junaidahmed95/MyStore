@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -49,6 +51,8 @@ public class HistoryFragment extends Fragment {
     private int plus = 0;
     private ProgressDialog progressDialog;
     private int count = 0;
+    private Button mbtn_history, mbtn_pending;
+    private LinearLayout mly_buttons;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -64,6 +68,10 @@ public class HistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+
+        mbtn_history = mView.findViewById(R.id.btn_history);
+        mbtn_pending = mView.findViewById(R.id.btn_pending);
+        mly_buttons = mView.findViewById(R.id.ly_buttons);
         mhis_recycler = mView.findViewById(R.id.his_recycler);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -73,13 +81,34 @@ public class HistoryFragment extends Fragment {
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
 
-        ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-        if (connectionDetector.isConnected()) {
-            parseJSON();
-        } else {
-            mProgressDialog.cancel();
-            Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
-        }
+        final ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+
+
+        mbtn_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (connectionDetector.isConnected()) {
+                    parseJSON();
+                } else {
+                    mProgressDialog.cancel();
+                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                }
+                // mProgressDialog.show();
+                mbtn_history.setBackground(getResources().getDrawable(R.drawable.btnwhite));
+                mbtn_pending.setBackground(getResources().getDrawable(R.drawable.btngrey));
+            }
+        });
+
+        mbtn_pending.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mbtn_history.setBackground(getResources().getDrawable(R.drawable.btngrey));
+                mbtn_pending.setBackground(getResources().getDrawable(R.drawable.btnwhite));
+
+            }
+        });
+
 
 
         return mView;
@@ -93,18 +122,21 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onResponse(JSONArray response) {
                 try {
-                    JSONArray storename = response.getJSONArray(0);
-                    JSONObject store = response.getJSONObject(1);
-                    Iterator<String> keys = store.keys();
 
-                    while (keys.hasNext()) {
-                        String key = (String) keys.next();
-                        JSONArray storeArray = (JSONArray) store.getJSONArray(key);
-                        for (int i = 0; i < storeArray.length(); i++) {
-                            JSONObject storeObject = storeArray.getJSONObject(i);
-                            JSONObject s = storename.getJSONObject(count);
-                            count++;
-                            String l = s.getString("str_name");
+                    JSONArray storeOrders = response.getJSONArray(0);
+                    JSONObject storeOrdersDetail = response.getJSONObject(1);
+
+
+                    for (int i = 0; i < storeOrders.length(); i++) {
+                        JSONObject storeOrder = storeOrders.getJSONObject(i);
+                        String storeName = storeOrder.getString("str_name");
+                        String storeOrderId = storeOrder.getString("ord_id");
+                        String storeimg = storeOrder.getString("user_thumb");
+                        JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
+
+                        for (int j = 0; j < storeOrderDetails.length(); j++) {
+
+                            JSONObject storeObject = storeOrderDetails.getJSONObject(j);
                             String pname = storeObject.getString("sp_name");
                             String actprice = storeObject.getString("act_prc");
                             String address = storeObject.getString("new_address");
@@ -114,22 +146,20 @@ public class HistoryFragment extends Fragment {
                             String datetime = storeObject.getString("created_at");
                             String uid = storeObject.getString("user_id");
                             String tpprice = storeObject.getString("str_prc");
-
-                            products_list.add(new OrderHistory(actprice, pqty, l, datetime, proimage, pname, uid, address, null, tprice, tpprice));
+                            String status = storeObject.getString("status");
+                            products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice,storeimg));
 
                         }
-                        historylist.add(new OrderHistory(key, new ArrayList<OrderHistory>(products_list)));
-                        products_list.clear();
-
+                        historylist.add(new OrderHistory(storeOrderId, new ArrayList<OrderHistory>(products_list)));
                         HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
                         mhis_recycler.setAdapter(historyadp);
                         historyadp.notifyDataSetChanged();
-                        mProgressDialog.cancel();
+                        products_list.clear();
                     }
 
 
                 } catch (JSONException e) {
-                    mProgressDialog.cancel();
+
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -137,7 +167,7 @@ public class HistoryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        mProgressDialog.cancel();
+
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
 
                     }

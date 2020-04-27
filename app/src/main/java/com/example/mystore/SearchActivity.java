@@ -3,23 +3,19 @@ package com.example.mystore;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.RequestQueue;
@@ -27,22 +23,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.mystore.Adapter.CatLvlAdapter;
-import com.example.mystore.Adapter.SearchAdapter;
 import com.example.mystore.Model.CatLvlItemList;
-import com.example.mystore.Model.SearchClass;
-import com.google.android.gms.common.internal.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
-import static com.example.mystore.MainActivity.checklist;
-import static com.example.mystore.MainActivity.textCartItemCount;
+
+
+
 
 public class SearchActivity extends AppCompatActivity {
     private ArrayList<CatLvlItemList> list;
@@ -57,7 +48,7 @@ public class SearchActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private GridView mRecyclerView;
 
-    CatLvlAdapter catLvlAdapter;
+    //CatLvlAdapter catLvlAdapter;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -88,9 +79,9 @@ public class SearchActivity extends AppCompatActivity {
 
         final MenuItem menuItem = menu.findItem(R.id.menu_cart);
         View actionView = MenuItemCompat.getActionView(menuItem);
-        if (checklist.size() == 0) {
-            textCartItemCount = actionView.findViewById(R.id.cart_badge);
-        }
+       // if (checklist.size() == 0) {
+        //    textCartItemCount = actionView.findViewById(R.id.cart_badge);
+       // }
         actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,11 +99,11 @@ public class SearchActivity extends AppCompatActivity {
             CheckForCart();
             finish();
         } else if (id == R.id.menu_cart) {
-            if (!textCartItemCount.getText().toString().equals("0") && checklist.size() > 0) {
-                Intent intent = new Intent(this, CartActivity.class);
-                startActivity(intent);
-
-            }
+//            if (!textCartItemCount.getText().toString().equals("0") && checklist.size() > 0) {
+//                Intent intent = new Intent(this, CartActivity.class);
+//                startActivity(intent);
+//
+//            }
         }
         return true;
     }
@@ -127,7 +118,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
 
-        catLvlAdapter.filterList(filteredList);
+        //catLvlAdapter.filterList(filteredList);
     }
 
 
@@ -158,9 +149,9 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }
                 mRecyclerView = findViewById(R.id.recyclerView);
-                catLvlAdapter = new CatLvlAdapter(prolist, SearchActivity.this);
-                mRecyclerView.setAdapter(catLvlAdapter);
-                catLvlAdapter.notifyDataSetChanged();
+                //catLvlAdapter = new CatLvlAdapter(prolist, SearchActivity.this);
+               // mRecyclerView.setAdapter(catLvlAdapter);
+                //catLvlAdapter.notifyDataSetChanged();
 
                 meditText.setText(getIntent().getStringExtra("value"));
                 meditText.addTextChangedListener(new TextWatcher() {
@@ -220,7 +211,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void CheckForCart() {
         if (!IsAdded) {
-            selectedProducts.clear();
+           // selectedProducts.clear();
         }
     }
 

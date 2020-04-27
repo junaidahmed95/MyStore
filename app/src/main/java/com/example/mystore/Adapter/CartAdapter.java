@@ -2,14 +2,12 @@ package com.example.mystore.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,16 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.mystore.AllProductsActivity;
-import com.example.mystore.CartActivity;
-import com.example.mystore.MainActivity;
-import com.example.mystore.Model.Cart;
 import com.example.mystore.Model.CatLvlItemList;
-import com.example.mystore.Model.Category;
 import com.example.mystore.Model.HelpingMethods;
-import com.example.mystore.Model.Product;
 import com.example.mystore.R;
-import com.example.mystore.SubCatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,15 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.mystore.Adapter.CatLvlAdapter.list;
-import static com.example.mystore.Adapter.CatLvlAdapter.quantityflag;
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
 
 import static com.example.mystore.CartActivity.mTxtView_TotalPrice;
 //import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;
 
 import static com.example.mystore.CartActivity.mcardview2;
-import static com.example.mystore.MainActivity.checklist;
 import static com.example.mystore.SubCatActivity.setupBadge;
 import static com.example.mystore.ui.cart.CartFragment.mTxtView_Total;
 import static com.example.mystore.ui.cart.CartFragment.mcardview1;

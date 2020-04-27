@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,7 +46,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
     public Hisholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_history, parent, false);
         list = new ArrayList<>();
+        parent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
         return new Hisholder(v);
     }
 
@@ -56,18 +62,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
         //holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(o).getUaddress());
 
         for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-            holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
-            holder.mtxt_totalproducts.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-            qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
-            holder.mtxt_day.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day());
-            holder.mtxt_price.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts());
-
+            holder.mstatus.setText(historylist.get(position).getGetorderbykeylist().get(a).getStatus());
+            holder.mstorename.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts());
+            holder.mcreated.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day());
+            holder.mordid.setText(historylist.get(position).getOrderid());
+            holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
+            holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getStrimg());
 
         }
 
 
-        holder.mtxt_qty.setText("Total Qty: " + qtycount);
-        qtycount = 0;
+
 
 
 //        holder.mtxt_price.setText("Rs."+tprice);
@@ -82,7 +87,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
         //holder.mtxt_totalproducts.setText("Total Products: "+historylist.get(position).getMtxt_totalproducts());
         //holder.mtxt_day.setText(historylist.get(position).getMtxt_day());
         // holder.mtxt_time.setText(historylist.get(position).getMtxt_time());
-        holder.marrow.setImageResource(R.drawable.ic_navigate_next_black_24dp);
+
 
 
         holder.mbtn_detailhistory.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +136,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
 
 
 
+
                 orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
                 orderdetailSheetDialog.setContentView(mView);
                 orderdetailSheetDialog.show();
@@ -155,20 +161,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
 
 
     public class Hisholder extends RecyclerView.ViewHolder {
-        TextView mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time;
-        Button mbtn_detailhistory;
-        ImageView marrow;
+        TextView mstorename,mstatus,mcreated,mordid,mtotalprice;
+        LinearLayout mbtn_detailhistory;
+        ImageView mstrimg;
 
 
         public Hisholder(@NonNull View itemView) {
             super(itemView);
-            marrow = itemView.findViewById(R.id.arrow);
-            mtxt_price = itemView.findViewById(R.id.txt_price);
-            mtxt_qty = itemView.findViewById(R.id.txt_qty);
-            mtxt_totalproducts = itemView.findViewById(R.id.txt_totalproducts);
-            mtxt_address = itemView.findViewById(R.id.txt_address);
-            mtxt_day = itemView.findViewById(R.id.txt_day);
-            mtxt_time = itemView.findViewById(R.id.txt_time);
+
+            mstrimg = itemView.findViewById(R.id.strimg);
+
+            mtotalprice = itemView.findViewById(R.id.totalprice);
+            mstorename = itemView.findViewById(R.id.storename);
+            mstatus = itemView.findViewById(R.id.status);
+            mcreated = itemView.findViewById(R.id.created);
+            mordid = itemView.findViewById(R.id.ordid);
             mbtn_detailhistory = itemView.findViewById(R.id.btn_orderhistoy);
 
 

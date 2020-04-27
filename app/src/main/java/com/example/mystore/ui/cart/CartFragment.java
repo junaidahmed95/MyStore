@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.example.mystore.Adapter.CatLvlAdapter.selectedProducts;
+
 
 
 public class CartFragment extends Fragment {

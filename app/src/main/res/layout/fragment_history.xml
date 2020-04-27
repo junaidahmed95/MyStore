@@ -6,13 +6,52 @@
     android:layout_height="match_parent">
 
 
+    <LinearLayout
+        android:id="@+id/ly_buttons"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/lightgray"
+        android:orientation="horizontal">
+
+
+        <Button
+
+            android:id="@+id/btn_history"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:background="@drawable/btnwhite"
+            android:text="History" />
+
+        <Button
+            android:id="@+id/btn_pending"
+            android:layout_width="0dp"
+            android:textSize="16dp"
+            android:textColor="@color/black"
+            android:layout_height="42dp"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:background="@drawable/btnwhite"
+            android:backgroundTint="@color/graya"
+            android:text="pending" />
+
+
+    </LinearLayout>
+
 
 
     <androidx.recyclerview.widget.RecyclerView
-
+android:layout_below="@+id/ly_buttons"
         android:id="@+id/his_recycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
