@@ -2,7 +2,7 @@ package com.bringo.home.Model;
 
 public class CatLvlItemList {
 
-    private String simplePID;
+    private String simplePID,desc;
     String p_name;
     String p_price;
     private String storeId;
@@ -13,6 +13,14 @@ public class CatLvlItemList {
     String lol;
     String catName;
     String productid;
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
     public String getP_quantity() {
         return p_quantity;
@@ -56,8 +64,9 @@ public class CatLvlItemList {
     }
 
 
-    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId,String catName,String simplePID,String actual_price) {
+    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId,String catName,String simplePID,String actual_price,String desc) {
         this.p_name = p_name;
+        this.desc=desc;
         this.actual_price=actual_price;
         this.catName = catName;
         this.p_price = p_price;

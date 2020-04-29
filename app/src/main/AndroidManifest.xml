@@ -32,7 +32,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
-        android:name="com.bringo.home.Model.Grocery"
+        android:name=".Model.Grocery"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -40,35 +40,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".OrderTrackActivity"></activity>
         <activity
-            android:name="com.bringo.home.BringoActivity"
+            android:name=".BringoActivity"
             android:label="@string/title_activity_bringo"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name="com.bringo.home.StoreInfoActivity" />
-        <activity android:name="com.bringo.home.ViewAllStoresActivity" />
-        <activity android:name="com.bringo.home.ViewImage" />
-        <activity android:name="com.bringo.home.SearchActivity" />
-        <activity android:name="com.bringo.home.CartActivity" />
-        <activity android:name="com.bringo.home.SubCatActivity" />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".StoreInfoActivity" />
+        <activity android:name=".ViewAllStoresActivity" />
+        <activity android:name=".ViewImage" />
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".CartActivity" />
+        <activity android:name=".SubCatActivity" />
         <activity android:name=".Sub_categories" />
-        <activity android:name="com.bringo.home.OrderSummaryActivity" />
-        <activity android:name="com.bringo.home.ProfileActivity" />
+        <activity android:name=".OrderSummaryActivity" />
+        <activity android:name=".ProfileActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.bringo.home.MapActivity"
+            android:name=".MapActivity"
             android:label="@string/title_activity_map" />
-        <activity android:name="com.bringo.home.Verification" />
-        <activity android:name="com.bringo.home.PhotoVideoRedirectActivity" />
-        <activity android:name="com.bringo.home.Cameramethod" />
-        <activity android:name="com.bringo.home.MuImagesActivity" />
-        <activity android:name="com.bringo.home.videoView" />
-        <activity android:name="com.bringo.home.MessagingActivity" />
-        <activity android:name="com.bringo.home.ProductDetailActivity" />
-        <activity android:name="com.bringo.home.SplashActivity">
+        <activity android:name=".Verification" />
+        <activity android:name=".PhotoVideoRedirectActivity" />
+        <activity android:name=".Cameramethod" />
+        <activity android:name=".MuImagesActivity" />
+        <activity android:name=".videoView" />
+        <activity android:name=".MessagingActivity" />
+        <activity android:name=".ProductDetailActivity" />
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -77,7 +78,7 @@
         </activity>
 
         <service
-            android:name="com.bringo.home.Model.MyFirebaseIdService"
+            android:name=".Model.MyFirebaseIdService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -85,7 +86,7 @@
             </intent-filter>
         </service>
         <service
-            android:name="com.bringo.home.Model.MyFirebaseMessaging"
+            android:name=".Model.MyFirebaseMessaging"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

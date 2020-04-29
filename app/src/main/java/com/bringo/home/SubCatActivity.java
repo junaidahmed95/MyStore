@@ -1,6 +1,7 @@
 package com.bringo.home;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,6 +79,7 @@ public static String checkSID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_sub_cat);
 
         mloadingImage = findViewById(R.id.spin_kit);
@@ -255,7 +257,8 @@ public static String checkSID;
                             String mimage = jsonObject.getString("product_image");
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
-                            prolist.add(new CatLvlItemList(mTitle, mprice,mimage,product_id,str_id,mCat,sim_id,mprice));
+                            String desc = jsonObject.getString("product_unit");
+                            prolist.add(new CatLvlItemList(mTitle, mprice,mimage,product_id,str_id,mCat,sim_id,mprice,desc));
                         }
 
                     } catch (JSONException e) {

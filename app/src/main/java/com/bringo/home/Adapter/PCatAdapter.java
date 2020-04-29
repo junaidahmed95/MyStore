@@ -85,6 +85,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         Glide.with(mContext).asBitmap().load(proLists.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.pImage);
         holder.pName.setText(proLists.get(position).getP_name());
+        holder.pDesc.setText(proLists.get(position).getDesc());
         holder.pPrice.setText("" + proLists.get(position).getP_price());
         try {
             if (mycheckList.size() > 0) {

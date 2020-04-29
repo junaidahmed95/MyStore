@@ -3,6 +3,7 @@ package com.bringo.home;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bringo.home.Adapter.CartAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,6 +39,7 @@ public class CartActivity extends AppCompatActivity {
     private RecyclerView mCartRecyclerView;
     public static TextView mTxtView_TotalPrice;
     public static CardView mcardview2;
+    private HelpingMethods helpingMethods;
     private Button mcheckBtn;
     private List<CatLvlItemList> preferenceList;
     Toolbar mActionBarToolbar;
@@ -42,10 +48,11 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_cart);
         mCartRecyclerView = findViewById(R.id.cartRecyclerView);
         mcheckBtn = findViewById(R.id.checkBtn);
-
+        helpingMethods = new HelpingMethods(this);
         cat_Name = getIntent().getStringExtra("catName");
         store_ID = getIntent().getStringExtra("StID");
         ownerName = getIntent().getStringExtra("stname");
@@ -146,6 +153,23 @@ GoBack();
         super.finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
 }

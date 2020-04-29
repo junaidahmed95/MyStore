@@ -62,6 +62,7 @@
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:ellipsize="end"
+                android:minLines="2"
                 android:maxLines="2"
                 android:textColor="@color/secondaryTextColor" />
 
@@ -114,7 +115,7 @@
                     android:tint="@color/white"
                     app:backgroundTint="#C90A1B"
                     app:fabSize="mini"
-                    app:srcCompat="@drawable/ic_add_shopping_cart_black_24dp" />
+                    app:srcCompat="@drawable/addcartwhite" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btn_remove_cart"
@@ -125,7 +126,7 @@
                     android:visibility="gone"
                     app:backgroundTint="#C90A1B"
                     app:fabSize="mini"
-                    app:srcCompat="@drawable/ic_remove_shopping_cart_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_remcart" />
 
             </RelativeLayout>
 

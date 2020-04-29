@@ -1,6 +1,9 @@
 package com.bringo.home;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,9 +45,10 @@ public class BringoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_bringo);
 
-helpingMethods = new HelpingMethods(BringoActivity.this);
+        helpingMethods = new HelpingMethods(BringoActivity.this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
@@ -140,6 +144,16 @@ helpingMethods = new HelpingMethods(BringoActivity.this);
 
 
     @Override
+    public void onBackPressed() {
+
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.bringo, menu);
@@ -150,7 +164,7 @@ helpingMethods = new HelpingMethods(BringoActivity.this);
     @Override
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
 
@@ -159,7 +173,7 @@ helpingMethods = new HelpingMethods(BringoActivity.this);
     @Override
     protected void onPause() {
         super.onPause();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }

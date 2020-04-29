@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -139,6 +140,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_order_summary);
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("Getting addresses...");
@@ -431,8 +433,15 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                             Toast.makeText(OrderSummaryActivity.this, "Address is added" , Toast.LENGTH_SHORT).show();
 
                                             Intent sumInt = new Intent(OrderSummaryActivity.this, OrderSummaryActivity.class);
-                                            sumInt.putExtra("from","activity");
-                                            sumInt.putExtra("totalP",mTxtView_TotalPrice.getText().toString());
+                                            sumInt.putExtra("from",getIntent().getStringExtra("from"));
+
+                                            if (getIntent().getStringExtra("from").equals("activity")) {
+                                                sumInt.putExtra("totalP",mTxtView_TotalPrice.getText().toString());
+                                            } else {
+                                                sumInt.putExtra("totalP",mTxtView_Total.getText().toString());
+                                            }
+
+
                                             sumInt.putExtra("storeid", store_ID);
                                             sumInt.putExtra("stname",ownerName);
                                             sumInt.putExtra("ownerID",ownerID);
@@ -798,6 +807,22 @@ public class OrderSummaryActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
 }

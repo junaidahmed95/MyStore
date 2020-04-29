@@ -3,6 +3,7 @@ package com.bringo.home;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import com.bringo.home.Model.HelpingMethods;
@@ -19,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_splash);
         helpingMethods  =new HelpingMethods(this);
         mAuth = FirebaseAuth.getInstance();
