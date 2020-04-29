@@ -31,7 +31,7 @@ public class OrderHistory {
         this.status = status;
     }
 
-    public OrderHistory(String mtxt_price, String mtxt_qty, String mtxt_totalproducts, String mtxt_day, String image, String title, String userid, String uaddress, String status, String ptotalprice, String act_price,String strimg) {
+    public OrderHistory(String mtxt_price, String mtxt_qty, String mtxt_totalproducts, String mtxt_day, String image, String title, String userid, String uaddress, String status, String ptotalprice, String act_price) {
         this.mtxt_price = mtxt_price;
         this.mtxt_qty = mtxt_qty;
         this.mtxt_totalproducts = mtxt_totalproducts;
@@ -43,7 +43,7 @@ public class OrderHistory {
         this.status = status;
         this.ptotalprice = ptotalprice;
         this.act_price = act_price;
-        this.strimg = strimg;
+
     }
 
     String ptotalprice, act_price;
@@ -86,9 +86,10 @@ public class OrderHistory {
     List<OrderHistory> getorderbykeylist = new ArrayList<>();
 
 
-    public OrderHistory(String orderid, List<OrderHistory> getorderbykeylist) {
+    public OrderHistory(String orderid,String strimg, List<OrderHistory> getorderbykeylist) {
         this.orderid = orderid;
         this.getorderbykeylist = getorderbykeylist;
+        this.strimg = strimg;
     }
 
     public int getQtyplus() {

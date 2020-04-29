@@ -383,9 +383,9 @@ public class MessagesFragment extends Fragment {
         private void setMessageStatus(String status) {
             stImageView = mView.findViewById(R.id.stus);
             if (status.equals("seen")) {
-                stImageView.setImageResource(R.drawable.ic_double_tick);
+                stImageView.setImageResource(R.drawable.ic_action_seen);
             } else if (status.equals("sent")) {
-                stImageView.setImageResource(R.drawable.ic_done_black_24dp);
+                stImageView.setImageResource(R.drawable.ic_action_send);
             }
         }
 

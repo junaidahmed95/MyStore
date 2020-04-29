@@ -220,7 +220,7 @@ public class HomeFragment extends Fragment {
     //"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.8133&longitude=67.0707", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -242,7 +242,6 @@ public class HomeFragment extends Fragment {
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
                             String store_image = jsonObject.getString("user_thumb");
-                            //String store_name, String id, String uid, String store_image
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance,storeaddr));
 
 

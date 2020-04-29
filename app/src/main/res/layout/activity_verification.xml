@@ -412,7 +412,7 @@
                             android:layout_marginLeft="10dp"
                             android:tint="@color/colorGreen"
                             android:visibility="gone"
-                            app:srcCompat="@drawable/ic_done_black_24dp" />
+                            app:srcCompat="@drawable/ic_action_send" />
 
                         <TextView
                             android:id="@+id/sms"

@@ -32,6 +32,9 @@ import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -207,7 +210,7 @@ public static String checkSID;
             for (int i = 0; i < tabTitles.length; i++) {
                 if (i == position) {
 
-                    fragment = new CatLvlFragment(store_ID,ownerID,ownerImage,ownerName);
+                    fragment = new CatLvlFragment(store_ID,ownerID,ownerImage,ownerName,cat_Name);
 
 
                     break;
@@ -253,7 +256,6 @@ public static String checkSID;
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
                             prolist.add(new CatLvlItemList(mTitle, mprice,mimage,product_id,str_id,mCat,sim_id,mprice));
-
                         }
 
                     } catch (JSONException e) {
@@ -297,4 +299,22 @@ public static String checkSID;
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
+        }
+    }
+
 }

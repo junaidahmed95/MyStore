@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/placeholder" />
+                />
 
             <com.github.ybq.android.spinkit.SpinKitView
                 android:id="@+id/spin_kit"

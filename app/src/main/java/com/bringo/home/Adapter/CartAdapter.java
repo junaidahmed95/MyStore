@@ -1,7 +1,9 @@
 package com.bringo.home.Adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bringo.home.OrderSummaryActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bringo.home.Model.CatLvlItemList;
@@ -98,13 +101,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                 preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
 
-                mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
+                mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
                 if (fromWhere.equals("activity")) {
                     mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
                 } else {
                     mTxtView_Total.setText("" + mTotalPrice + "/-");
                 }
-
                 SaveCartData();
             }
 
@@ -122,7 +124,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     viewHolder.Mul();
                     cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
+                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getP_price());
                     if (fromWhere.equals("activity")) {
                         mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
                     } else {
@@ -138,43 +140,69 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         viewHolder.mDeleFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
-                    int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
-                    helpingMethods.SaveCartCount(finalCount,cartList.get(pos).getStoreId());
-                    if (fromWhere.equals("activity")) {
-                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
-                        setupBadge();
-                    } else {
-                        mTxtView_Total.setText("" + mTotalPrice + "/-");
-                    }
 
-                    int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
-                    MecheckList.remove(a);
-                    SaveCheckData();
-                    preferenceList.remove(a);
-                    SaveCartData();
-                    cartList.remove(pos);
-                    notifyItemRemoved(pos);
-                    notifyItemRangeChanged(pos, cartList.size());
-                    flag = true;
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+
+                                try {
+                                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
+                                    int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
+                                    helpingMethods.SaveCartCount(finalCount,cartList.get(pos).getStoreId());
+                                    if (fromWhere.equals("activity")) {
+                                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                                        setupBadge();
+                                    } else {
+                                        mTxtView_Total.setText("" + mTotalPrice + "/-");
+                                    }
+
+                                    int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
+                                    MecheckList.remove(a);
+                                    SaveCheckData();
+                                    preferenceList.remove(a);
+                                    SaveCartData();
+                                    cartList.remove(pos);
+                                    notifyItemRemoved(pos);
+                                    notifyItemRangeChanged(pos, cartList.size());
+                                    flag = true;
 
 
-                    if (cartList.size() == 0) {
-                        if (fromWhere.equals("activity")) {
-                            mcardview2.setVisibility(View.GONE);
-                        } else {
-                            mcardview1.setVisibility(View.GONE);
+                                    if (cartList.size() == 0) {
+                                        if (fromWhere.equals("activity")) {
+                                            mcardview2.setVisibility(View.GONE);
+                                        } else {
+                                            mcardview1.setVisibility(View.GONE);
+                                        }
+
+
+                                    }
+
+
+                                } catch (Exception ex) {
+                                    Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+
+                                }
+
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
                         }
-
-
                     }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setMessage("Do you want to remove this product?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
 
 
-                } catch (Exception ex) {
-                      Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
 
-                }
+
+
 
 
             }

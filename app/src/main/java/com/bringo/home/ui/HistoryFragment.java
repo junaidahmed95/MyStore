@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -46,12 +47,15 @@ public class HistoryFragment extends Fragment {
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
     List<OrderHistory> products_list;
+    List<OrderHistory> phistorylist;
+    List<OrderHistory> pproducts_list;
     private int qtyplus = 0;
     private int plus = 0;
     private ProgressDialog progressDialog;
     private int count = 0;
     private Button mbtn_history, mbtn_pending;
     private LinearLayout mly_buttons;
+    int pos = 0;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -79,22 +83,24 @@ public class HistoryFragment extends Fragment {
 
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
+        phistorylist = new ArrayList<>();
+        pproducts_list = new ArrayList<>();
 
         final ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+        if (connectionDetector.isConnected()) {
 
+            parseJSON();
+        } else {
+            mProgressDialog.cancel();
+            Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+        }
 
         mbtn_history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (connectionDetector.isConnected()) {
-                    parseJSON();
-                } else {
-                    mProgressDialog.cancel();
-                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
-                }
-                // mProgressDialog.show();
                 mbtn_history.setBackground(getResources().getDrawable(R.drawable.btnwhite));
                 mbtn_pending.setBackground(getResources().getDrawable(R.drawable.btngrey));
+
             }
         });
 
@@ -107,7 +113,6 @@ public class HistoryFragment extends Fragment {
 
             }
         });
-
 
 
         return mView;
@@ -127,7 +132,10 @@ public class HistoryFragment extends Fragment {
 
 
                     for (int i = 0; i < storeOrders.length(); i++) {
+
                         JSONObject storeOrder = storeOrders.getJSONObject(i);
+
+
                         String storeName = storeOrder.getString("str_name");
                         String storeOrderId = storeOrder.getString("ord_id");
                         String storeimg = storeOrder.getString("user_thumb");
@@ -136,6 +144,7 @@ public class HistoryFragment extends Fragment {
                         for (int j = 0; j < storeOrderDetails.length(); j++) {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
+
                             String pname = storeObject.getString("sp_name");
                             String actprice = storeObject.getString("act_prc");
                             String address = storeObject.getString("new_address");
@@ -146,29 +155,34 @@ public class HistoryFragment extends Fragment {
                             String uid = storeObject.getString("user_id");
                             String tpprice = storeObject.getString("str_prc");
                             String status = storeObject.getString("status");
-                            products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice,storeimg));
+                            products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
+
+
 
                         }
-                        historylist.add(new OrderHistory(storeOrderId, new ArrayList<OrderHistory>(products_list)));
+                        historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
                         HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
                         mhis_recycler.setAdapter(historyadp);
                         historyadp.notifyDataSetChanged();
                         products_list.clear();
+
+                        mProgressDialog.cancel();
                     }
 
 
                 } catch (JSONException e) {
-
+                    mProgressDialog.cancel();
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Check your internet connection." , Toast.LENGTH_SHORT).show();
                 }
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        mProgressDialog.cancel();
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getActivity(), "Check your internet connection." , Toast.LENGTH_SHORT).show();
                     }
                 }
         );

@@ -17,8 +17,11 @@ import androidx.core.app.NotificationCompat;
 import com.bringo.home.MessagingActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Random;
 
 public class MyFirebaseMessaging extends FirebaseMessagingService {
 
@@ -57,8 +60,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Bundle bundle = new Bundle();
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
-        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
-
+        int j = new Random().nextInt(61) + 20; // [0, 60] + 20 => [20, 80];
         intent = new Intent(this, MessagingActivity.class);
         bundle.putString("user_id", user);
         intent.putExtras(bundle);
@@ -94,7 +96,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         Bundle bundle = new Bundle();
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
-        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+        int j = new Random().nextInt(61) + 20; // [0, 60] + 20 => [20, 80];
         intent = new Intent(this, MessagingActivity.class);
         bundle.putString("user_id", user);
         intent.putExtras(bundle);

@@ -54,11 +54,12 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     private List<String> myWishList;
     private List<String> mycheckList;
     private List<CatLvlItemList> preferenceList;
-    private String sID, ownerID, ownerImage, ownerName;
+    private String sID, ownerID, ownerImage, ownerName,catName;
     private HelpingMethods helpingMethods;
 
-    public PCatAdapter(List<CatLvlItemList> proLists, Context mContext, String sID, String ownerID, String ownerImage, String ownerName) {
+    public PCatAdapter(List<CatLvlItemList> proLists, Context mContext, String sID, String ownerID, String ownerImage, String ownerName,String catName) {
         this.proLists = proLists;
+        this.catName=catName;
         this.mContext = mContext;
         this.sID = sID;
         this.ownerID = ownerID;
@@ -82,32 +83,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        //Glide.with(mContext).load(R.drawable.loading_image).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.pImage);
-        doubleBounce = new Circle();
-        holder.progressBar.setIndeterminateDrawable(doubleBounce);
-        Glide.with(mContext)
-                .load(proLists.get(position).getP_img())
-                .apply(
-                        new RequestOptions()
-                                .error(R.drawable.placeholder)
-                                .centerCrop()
-                )
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .transition(withCrossFade())
-                .into(holder.pImage);
-
-
+        Glide.with(mContext).asBitmap().load(proLists.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.pImage);
         holder.pName.setText(proLists.get(position).getP_name());
         holder.pPrice.setText("" + proLists.get(position).getP_price());
         try {
@@ -122,8 +98,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
             }
 
             if (myWishList.size() > 0) {
-                if (myWishList.contains(proLists.get(position).getProductid())) {
-                    holder.pWish.setImageResource(R.drawable.ic_favorite_black_24dp);
+                if (myWishList.contains(proLists.get(position).getSimplePID())) {
+                    holder.pWish.setImageResource(R.drawable.ic_action_fav);
                     ImageViewCompat.setImageTintList(holder.pWish,
                             ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.colorRed)));
                 } else {
@@ -150,12 +126,12 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     myFavList.remove(a);
                     SaveFavData();
                 } else {
-                    holder.pWish.setImageResource(R.drawable.ic_favorite_black_24dp);
+                    holder.pWish.setImageResource(R.drawable.ic_action_fav);
                     ImageViewCompat.setImageTintList(holder.pWish,
                             ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.colorRed)));
                     myWishList.add(proLists.get(position).getSimplePID());
                     SaveWishData();
-                    myFavList.add(new CatLvlItemList(proLists.get(position).getP_name(), proLists.get(position).getP_price(), proLists.get(position).getP_img(), proLists.get(position).getProductid(), position,proLists.get(position).getStoreId(), proLists.get(position).getCatName(),proLists.get(position).getSimplePID(),proLists.get(position).getActual_price()));
+                    myFavList.add(new CatLvlItemList(proLists.get(position).getP_name(), proLists.get(position).getP_price(), proLists.get(position).getP_quantity(), proLists.get(position).getP_img(), position,proLists.get(position).getProductid(), proLists.get(position).getStoreId(),proLists.get(position).getActual_price(),proLists.get(position).getSimplePID()));
                     SaveFavData();
                 }
             }
@@ -171,6 +147,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                 intent.putExtra("pID", proLists.get(position).getProductid());
                 intent.putExtra("spID", proLists.get(position).getSimplePID());
                 intent.putExtra("oName", ownerName);
+                intent.putExtra("catName",catName);
                 intent.putExtra("oImage", ownerImage);
                 intent.putExtra("oID", ownerID);
                 intent.putExtra("name", proLists.get(position).getP_name());
@@ -243,13 +220,11 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView pImage, pWish;
-        ProgressBar progressBar;
         private TextView pName, pPrice,pDesc;
         private FloatingActionButton mbtn_add_cart, mbtn_remove_cart;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            progressBar = itemView.findViewById(R.id.spin_kit);
             pImage = itemView.findViewById(R.id.product_image);
             pDesc = itemView.findViewById(R.id.product_desc);
             pName = itemView.findViewById(R.id.product_title);

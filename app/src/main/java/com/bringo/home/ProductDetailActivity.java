@@ -39,7 +39,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName;
+    private String pID, pImage, pPrice, pName, StID, catName,ownerName,ownerID,ownerImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +63,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         pPrice = getIntent().getStringExtra("price");
         pImage = getIntent().getStringExtra("image");
         pID = getIntent().getStringExtra("pID");
-
+        ownerName = getIntent().getStringExtra("oName");
+        ownerID = getIntent().getStringExtra("oID");
+        ownerImage = getIntent().getStringExtra("oImage");
         StID = getIntent().getStringExtra("StID");
         catName = getIntent().getStringExtra("catName");
 
@@ -246,9 +248,13 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void GoBack() {
         Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
-        intent.putExtra("storeid", StID);
+        intent.putExtra("storeid", storeID);
         intent.putExtra("catName", catName);
+        intent.putExtra("stname",ownerName);
+        intent.putExtra("ownerID",ownerID);
+        intent.putExtra("ownerImage",ownerImage);
         startActivity(intent);
+
     }
 
     @Override

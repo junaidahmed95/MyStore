@@ -58,7 +58,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
 
     @Override
     public void onBindViewHolder(@NonNull OrderHolder holder, final int position) {
-        Glide.with(context).load(OrderList.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
+        Glide.with(context).asBitmap().load(OrderList.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.mitem_image);
         holder.mtxt_item_name.setText(OrderList.get(position).getP_name());
         holder.mtxt_item_price.setText("Rs."+OrderList.get(position).getP_price()+"/-");
 
@@ -81,14 +81,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
         holder.mwish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int a = myWishList.indexOf(OrderList.get(position).getProductid());
-                myWishList.remove(a);
-                SaveWishData();
-                myFavList.remove(a);
-                SaveFavData();
-                OrderList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, OrderList.size());
+                if (myWishList.contains(OrderList.get(position).getSimplePID())) {
+                    int a = myWishList.indexOf(OrderList.get(position).getSimplePID());
+                    myWishList.remove(a);
+                    SaveWishData();
+                    myFavList.remove(a);
+                    SaveFavData();
+                    OrderList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, OrderList.size());
+                }
+
+
             }
         });
 
@@ -133,35 +137,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
         }
     }
 
-    private void SaveFavData() {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("Myfav", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(myFavList);
-        editor.putString("favlist", json);
-        editor.apply();
-    }
-
-
-    private void GetFavData() {
-        try {
-            SharedPreferences sharedPreferences = context.getSharedPreferences("Myfav", MODE_PRIVATE);
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString("favlist", null);
-            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
-            }.getType();
-            myFavList = gson.fromJson(json, type);
-
-            if (myFavList == null) {
-                myFavList = new ArrayList<>();
-            }
-
-
-        } catch (Exception e) {
-            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void SaveWishData() {
         SharedPreferences sharedPreferences = context.getSharedPreferences("Mywish", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -187,7 +162,43 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
 
 
         } catch (Exception e) {
-            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            if (context != null) {
+                Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+
+    }
+
+    private void SaveFavData() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("Myfav", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(myFavList);
+        editor.putString("favlist", json);
+        editor.apply();
+    }
+
+
+    private void GetFavData() {
+        try {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("Myfav", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("favlist", null);
+            Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
+            }.getType();
+            myFavList = gson.fromJson(json, type);
+
+            if (myFavList == null) {
+                myFavList = new ArrayList<>();
+            }
+
+
+        } catch (Exception e) {
+            if (context != null) {
+                Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

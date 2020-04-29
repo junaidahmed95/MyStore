@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -65,7 +68,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
             holder.mcreated.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day());
             holder.mordid.setText(historylist.get(position).getOrderid());
             holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-            holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getStrimg());
+            Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
 
         }
 

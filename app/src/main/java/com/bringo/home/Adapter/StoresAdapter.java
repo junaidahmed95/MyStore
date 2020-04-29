@@ -36,7 +36,6 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
 
 
     private List<ShowStores> storeList;
-    private Sprite doubleBounce;
     private Context mcontext;
     private boolean displayAll;
     private Activity activity;
@@ -59,29 +58,8 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.txt_storename.setText(storeList.get(position).getStore_name());
         holder.txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
-        doubleBounce = new Circle();
-        holder.progressBar.setIndeterminateDrawable(doubleBounce);
-        Glide.with(mcontext)
-                .load(storeList.get(position).getStore_image())
-                .apply(
-                        new RequestOptions()
-                                .error(R.drawable.placeholder)
-                                .centerCrop()
-                )
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
+        Glide.with(mcontext).asBitmap().load(storeList.get(position).getStore_image()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.mimg_store);
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .transition(withCrossFade())
-                .into(holder.mimg_store);
 
         holder.storecardId.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,7 +94,6 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ProgressBar progressBar;
         private CardView storecardId;
         private ImageView mimg_store;
         private TextView txt_storedistance,txt_storename;
@@ -127,7 +104,6 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
             mimg_store = itemView.findViewById(R.id.img_store);
             txt_storedistance = itemView.findViewById(R.id.txt_storedistance);
             txt_storename = itemView.findViewById(R.id.txt_storename);
-            progressBar = itemView.findViewById(R.id.spin_kit);
         }
     }
 }

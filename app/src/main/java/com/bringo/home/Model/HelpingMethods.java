@@ -30,6 +30,13 @@ public class HelpingMethods {
         editor.apply();
     }
 
+    public String GetUName() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("name", null);
+        return sid;
+    }
+
+
     public void SaveCartCount(int mCount,String dBnAme){
         SharedPreferences sharedPreferences = activity.getSharedPreferences(dBnAme, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

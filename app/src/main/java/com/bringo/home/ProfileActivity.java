@@ -151,7 +151,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         mName = findViewById(R.id.userName);
         muser_Name = findViewById(R.id.user_Name);
         mPhone = findViewById(R.id.userPhone);
-        mEmail = findViewById(R.id.userEmail);
 
         mProgressBar = findViewById(R.id.progressBar);
         mAddPicFab = findViewById(R.id.addPic);
@@ -216,7 +215,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        mupdateProfile.setOnClickListener(new View.OnClickListener() {
+        mImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ProfileSheet();
@@ -368,9 +367,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         custID = jsonObject.get("id").toString();
 
 
-                        mProgressDialog.cancel();
                     } catch (JSONException e) {
-                        mProgressDialog.cancel();
                         e.printStackTrace();
                     }
 
@@ -381,7 +378,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mProgressDialog.cancel();
             }
         });
 
@@ -403,8 +399,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         jsonObject = response.getJSONObject(i);
                         addresslist.add(new AddressClass(jsonObject.get("address").toString(),false));
 
-
-                        mProgressDialog.cancel();
                     } catch (JSONException e) {
                         mProgressDialog.cancel();
                         e.printStackTrace();
@@ -415,11 +409,13 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 addressAdapter = new AddressAdapter(addresslist);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
+                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mProgressDialog.cancel();
+                Toast.makeText(ProfileActivity.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -31,16 +31,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
-                    android:background="@drawable/placeholder"
                     android:scaleType="centerCrop" />
 
-                <com.github.ybq.android.spinkit.SpinKitView
-                    android:id="@+id/spin_kit"
-                    style="@style/SpinKitView.Large.Circle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    app:SpinKit_Color="@color/colorAccent" />
 
             </RelativeLayout>
 
@@ -76,6 +68,7 @@
                     android:paddingRight="6dp"
                     android:paddingBottom="1dp"
                     android:text="47%"
+                    android:visibility="gone"
                     android:textColor="@color/white" />
 
                 <TextView
@@ -84,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text="4.8"
+                    android:text="-"
                     android:textColor="@android:color/black" />
 
                 <ImageView

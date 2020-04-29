@@ -68,7 +68,9 @@ public class WishListFragment extends Fragment {
 
 
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            if (getActivity() != null) {
+                Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

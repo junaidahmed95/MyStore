@@ -111,7 +111,7 @@
                         android:id="@+id/txt_seen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_done_black_24dp" />
+                        app:srcCompat="@drawable/ic_action_send" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -152,7 +152,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_marginRight="6dp"
                     android:layout_marginBottom="2dp"
-                    app:srcCompat="@drawable/ic_done_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_send" />
 
                 <TextView
                     android:id="@+id/text_time1"
@@ -217,7 +217,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_marginRight="6dp"
                     android:layout_marginBottom="2dp"
-                    app:srcCompat="@drawable/ic_done_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_send" />
 
                 <TextView
                     android:id="@+id/v_time"
@@ -317,7 +317,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginTop="24dp"
                     android:layout_marginRight="8dp"
-                    app:srcCompat="@drawable/ic_done_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_send" />
 
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
@@ -386,7 +386,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_marginRight="10dp"
                     android:gravity="center"
-                    app:srcCompat="@drawable/ic_done_black_24dp"
+                    app:srcCompat="@drawable/ic_action_send"
                     tools:ignore="NotSibling" />
 
             </RelativeLayout>
@@ -700,7 +700,7 @@
                     android:id="@+id/order_seen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_done_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_send" />
             </LinearLayout>
 
         </RelativeLayout>

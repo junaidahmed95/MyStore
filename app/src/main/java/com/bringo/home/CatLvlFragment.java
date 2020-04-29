@@ -39,10 +39,11 @@ public class CatLvlFragment extends Fragment {
     private RequestQueue requestQueue;
     private String mTitle;
     private RecyclerView mpRecyclerView;
-    private String sID, ownerID, ownerImage, ownerName;
+    private String sID, ownerID, ownerImage, ownerName,catName;
 
-    public CatLvlFragment(String sID, String ownerID, String ownerImage, String ownerName) {
+    public CatLvlFragment(String sID, String ownerID, String ownerImage, String ownerName,String catName) {
         // Required empty public constructor
+        this.catName=catName;
         this.sID = sID;
         this.ownerID = ownerID;
         this.ownerName = ownerName;
@@ -56,7 +57,7 @@ public class CatLvlFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_cat_lvl, container, false);
         mpRecyclerView = view.findViewById(R.id.pRecyclerView);
-        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         originalList = new ArrayList<>();
 
         return view;
@@ -76,7 +77,7 @@ public class CatLvlFragment extends Fragment {
                             originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price()));
                         }
                     }
-                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName);
+                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName,catName);
                     mpRecyclerView.setAdapter(proAdapter);
                     proAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);

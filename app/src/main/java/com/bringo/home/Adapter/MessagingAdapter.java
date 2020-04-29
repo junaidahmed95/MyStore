@@ -160,9 +160,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
 //                viewHolder.txt_seen.setImageResource(R.drawable.ic_tickdelivery);
 //            } else
                 if (!chat.isSeen()) {
-                    viewHolder.txt_seen.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.txt_seen.setImageResource(R.drawable.ic_action_send);
                 } else {
-                    viewHolder.txt_seen.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.txt_seen.setImageResource(R.drawable.ic_action_seen);
                 }
 
                 viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
@@ -285,9 +285,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.voicecrd.setVisibility(View.VISIBLE);
 
                 if (chat.isSeen()) {
-                    viewHolder.mvo_seen.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.mvo_seen.setImageResource(R.drawable.ic_action_seen);
                 } else {
-                    viewHolder.mvo_seen.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.mvo_seen.setImageResource(R.drawable.ic_action_send);
                 }
 
                 mChat.get(i).setPause(true);
@@ -561,9 +561,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.image.setVisibility(View.VISIBLE);
 
                 if (chat.isSeen()) {
-                    viewHolder.txt_seen1.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.txt_seen1.setImageResource(R.drawable.ic_action_seen);
                 } else {
-                    viewHolder.txt_seen1.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.txt_seen1.setImageResource(R.drawable.ic_action_send);
                 }
 
 
@@ -695,9 +695,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 }
 
                 if (chat.isSeen()) {
-                    viewHolder.mv_seen.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.mv_seen.setImageResource(R.drawable.ic_action_seen);
                 } else {
-                    viewHolder.mv_seen.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.mv_seen.setImageResource(R.drawable.ic_action_send);
                 }
 
 
@@ -820,9 +820,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.Map_link_card.setVisibility(View.VISIBLE);
 
                 if (chat.isSeen()) {
-                    viewHolder.txt_seen2.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.txt_seen2.setImageResource(R.drawable.ic_action_seen);
                 } else {
-                    viewHolder.txt_seen2.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.txt_seen2.setImageResource(R.drawable.ic_action_send);
                 }
 
                 String[] location = chat.getMessage().split(",");
@@ -859,9 +859,9 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.morder_time.setText(tim);
 
                 if (chat.isSeen()) {
-                    viewHolder.morder_seen.setImageResource(R.drawable.ic_done_all_black_24dp);
+                    viewHolder.morder_seen.setImageResource(R.drawable.ic_action_seen);
                 } else {
-                    viewHolder.morder_seen.setImageResource(R.drawable.ic_done_black_24dp);
+                    viewHolder.morder_seen.setImageResource(R.drawable.ic_action_send);
                 }
 
                 viewHolder.mbtn_order_detail.setOnClickListener(new View.OnClickListener() {

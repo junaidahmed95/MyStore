@@ -470,7 +470,7 @@
                 android:id="@+id/order_seen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_done_black_24dp" />
+                app:srcCompat="@drawable/ic_action_send" />
         </LinearLayout>
 
         <RelativeLayout

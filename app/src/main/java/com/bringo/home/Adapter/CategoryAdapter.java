@@ -62,33 +62,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        doubleBounce = new Circle();
-        holder.progressBar.setIndeterminateDrawable(doubleBounce);
-        Glide.with(mContext)
-                .load(productList.get(position).getCatImage())
-                .apply(
-                        new RequestOptions()
-                                .error(R.drawable.placeholder)
-                                .centerCrop()
-                )
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .transition(withCrossFade())
-                .apply(new RequestOptions().placeholder(R.drawable.placeholder))
-                .into(holder.categoryImage);
+        Glide.with(mContext).asBitmap().load(productList.get(position).getCatImage()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.categoryImage);
         holder.categoryName.setText(productList.get(position).getCatName());
-
-
         holder.mcv_cat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,7 +75,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 intent.putExtra("ownerImage",ownerImage);
                 mContext.startActivity(intent);
                 activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-
             }
         });
     }

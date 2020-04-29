@@ -2211,7 +2211,6 @@ if(dataSnapshot.exists()){
                     Data data = new Data(sender_id, R.mipmap.ic_launcher, username + ": " + message, "New Message",
                             receiver_id);
                     String mToken = dataSnapshot.child("token").getValue().toString();
-                    Toast.makeText(MessagingActivity.this, ""+mToken, Toast.LENGTH_SHORT).show();
                     Sender sender = new Sender(data, mToken);
 
                     apiService.sendNotification(sender)
@@ -2387,7 +2386,6 @@ if(dataSnapshot.exists()){
     protected void onResume() {
         super.onResume();
         FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mAuth.getUid()).child("status").setValue(0);
-        /*   currentUser(userid);*/
     }
 
     @Override

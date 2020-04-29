@@ -53,8 +53,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="16dp"
+                    android:tint="@color/white"
                     android:background="@android:color/transparent"
-                    app:srcCompat="@drawable/ic_shopping_basket_black_24dp" />
+                    app:srcCompat="@drawable/ic_action_basket" />
 
             </RelativeLayout>
 

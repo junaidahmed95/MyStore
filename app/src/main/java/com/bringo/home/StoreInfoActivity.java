@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ import com.bringo.home.Adapter.CategoryAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +52,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     public static boolean flagfroprice = true;
     public static TextView textCartItemCount;
     public static int mCartItemCount = 0;
-
+    private ImageView mstImage;
 
     public static List<CatLvlItemList> favlist = new ArrayList<>();
     public static List<String> checklist = new ArrayList<>();
@@ -63,6 +66,7 @@ public class StoreInfoActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        mstImage = findViewById(R.id.stImageView);
         mstName = findViewById(R.id.stName);
         mstAddress = findViewById(R.id.stAddress);
         mretryBtn = findViewById(R.id.retryBtn);
@@ -71,6 +75,9 @@ public class StoreInfoActivity extends AppCompatActivity {
         ownerAdd = getIntent().getStringExtra("address");
         ownerImage = getIntent().getStringExtra("ownerImage");
         ownerID = getIntent().getStringExtra("ownerID");
+
+        //Glide.with(getApplicationContext()).asBitmap().load(ownerImage).apply(new RequestOptions().placeholder(R.drawable.store_background)).into(mstImage);
+
 
         mstAddress.setText(ownerAdd);
         mstName.setText(ownerName);

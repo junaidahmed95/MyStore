@@ -800,7 +800,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void getPermisssion() {
-
         Dexter.withActivity(Verification.this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {

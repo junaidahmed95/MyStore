@@ -4,8 +4,7 @@
 
     <item
         android:id="@+id/menu_cart"
-        android:icon="@drawable/ic_action_cart"
-        android:iconTint="@color/white"
+        android:icon="@drawable/ic_action_basketwhite"
         android:title="cart"
         app:actionLayout="@layout/cart_batch_count"
         app:showAsAction="always">
