@@ -59,7 +59,7 @@ public class BringoActivity extends AppCompatActivity {
 
         final CircleImageView mUserImage = navHeaderView.findViewById(R.id.userImage);
         final TextView mUserName = navHeaderView.findViewById(R.id.userName);
-        if (FirebaseAuth.getInstance().getUid() != null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

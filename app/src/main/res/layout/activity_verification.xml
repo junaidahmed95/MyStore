@@ -644,7 +644,16 @@
                         android:background="@drawable/btn_shape"
                         android:text="Select Your Location"
                         android:textAllCaps="false"
+                        android:layout_marginBottom="16dp"
                         android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/btnPrivacyPolicy"
+                        android:layout_width="wrap_content"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:text="By proceeding I acknowledge that I have read the Privacy Policy"
+                        android:layout_height="wrap_content"/>
 
                     <Button
                         android:id="@+id/button_create"

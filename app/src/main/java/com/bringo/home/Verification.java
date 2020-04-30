@@ -123,6 +123,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class Verification extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     Task location;
+    private TextView mbtnPrivacyPolicy;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Button mSendCode, mbutton_verify, mResend_button, mButton_selctLocation;
     private ProgressBar mProgressBar, proBbar;
@@ -171,7 +172,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_verification);
-
+        mbtnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
         FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -191,6 +192,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
                             PorterDuff.Mode.MULTIPLY));
         }
+
+        mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bringo.biz/privacypolicy.php"));
+                startActivity(browserIntent);
+            }
+        });
 
         login = findViewById(R.id.login);
         signup = findViewById(R.id.signup);
