@@ -39,7 +39,7 @@
         android:layout_marginLeft="70dp"
         android:layout_marginBottom="70dp"
         android:tint="@android:color/white"
-        app:srcCompat="@drawable/ic_done_black_24dp" />
+        app:srcCompat="@drawable/ic_action_send" />
 
     <ImageView
         android:id="@+id/cancle"

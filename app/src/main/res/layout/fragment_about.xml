@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.AboutFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_width="wrap_content"
+        android:layout_margin="16dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:text="WHAT IS BRINGO HOME ?"
+        android:layout_height="wrap_content"/>
 
-</FrameLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="@string/about_usp1"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginLeft="4dp"
+        android:textColor="@color/secondaryTextColor"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginRight="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/about_usp2"
+        android:textColor="@color/secondaryTextColor"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginRight="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:text="@string/about_usp3"
+        android:textColor="@color/secondaryTextColor"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

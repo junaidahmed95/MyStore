@@ -8,6 +8,9 @@
     <string name="file_limit_size_upload_format"> files must be less than %sMB</string>
     <string name="title_activity_map">Map</string>
     <string name="detailText"><u>Full Details</u></string>
+    <string name="about_usp1">Bringo home is all about getting stuff ordered in the neighborhood area with best service and rates. Customer can simply buy grocery or get any service related to home maintenance with a click of a button now.  Our customers can actually see how many feets/meter away is the store and what price is this store offering before deciding to do business with this store or other.</string>
+    <string name="about_usp2">Bringo provides all type of stores and services however major categories include : For Stores- General Store, Grocery Store, Electrical store, Chicken or Meat Shop etc and for Services it includes : Electrician, Beautician, AC repairs, Mechanic , General Physician, Doctors etc.</string>
+    <string name="about_usp3">So for e.g You feeling like getting your hair-cutting done at home? Just Bringo!!!! Or for that matter if you want to get Corner-store Chai/Tea delivered at home : Just Bringo!!!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
