@@ -34,16 +34,9 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    if(mUser!=null && helpingMethods.GetUName()!=null){
                         startActivity(new Intent(SplashActivity.this, BringoActivity.class));
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         finish();
-                    }else {
-                        startActivity(new Intent(SplashActivity.this, Verification.class));
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                        finish();
-                    }
-
                 }
             }
         };

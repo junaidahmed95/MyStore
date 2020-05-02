@@ -1,8 +1,10 @@
 package com.bringo.home;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -15,10 +17,12 @@ import android.graphics.PorterDuffColorFilter;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.transition.TransitionManager;
@@ -65,6 +69,9 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -140,6 +147,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     static Geocoder geocoder;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
+    private FusedLocationProviderClient mFusedLocationClient;
+    int PERMISSION_ID = 44;
     static List<Address> addresses;
     private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE";
     private Animation animBlink;
@@ -172,6 +181,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_verification);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mbtnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
         FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
             @Override
@@ -196,7 +206,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bringo.biz/privacypolicy.php"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/privacy.policy"));
                 startActivity(browserIntent);
             }
         });
@@ -271,16 +281,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                main_screen.setVisibility(View.GONE);
-                rely.setVisibility(View.VISIBLE);
+                CheckLocationPermission();
             }
         });
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                main_screen.setVisibility(View.GONE);
-                rely.setVisibility(View.VISIBLE);
+                CheckLocationPermission();
             }
         });
 
@@ -313,7 +321,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (con.isConnected()) {
                     mCreateAlertDialog.show();
                     ////////////////////////////////////////////////////////////////////////
-                    String url = "https://chhatt.com/Cornstr/grocery/api/reg";
+                    String url = "http://bringo.biz/api/reg";
                     VolleyMultipartRequest multipartRequest = new
                             VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
                                 @Override
@@ -778,14 +786,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
 
 
-                            //Toast.makeText(Verification.this, "User created" + mAuth.getUid(), Toast.LENGTH_SHORT).show();
-
-
-                            if (ContextCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                kamkicheez();
-                            } else {
-                                getPermisssion();
-                            }
 
 
                         } else {
@@ -810,23 +810,127 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void getPermisssion() {
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+        );
+    }
+
+    @SuppressLint("MissingPermission")
+    private void requestNewLocationData() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(0);
+        mLocationRequest.setFastestInterval(0);
+        mLocationRequest.setNumUpdates(1);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(Verification.this);
+        mFusedLocationClient.requestLocationUpdates(
+                mLocationRequest, mLocationCallback,
+                Looper.myLooper()
+        );
+
+    }
+
+    private LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+            SetMap(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+        }
+    };
+
+    private boolean checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        return false;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLastLocation() {
+        if (checkPermissions()) {
+            if (isLocationEnabled()) {
+                mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                        new OnCompleteListener<Location>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Location> task) {
+                                final Location location = task.getResult();
+                                if (location == null) {
+                                    main_screen.setVisibility(View.GONE);
+                                    rely.setVisibility(View.VISIBLE);
+                                    requestNewLocationData();
+                                } else {
+                                    main_screen.setVisibility(View.GONE);
+                                    rely.setVisibility(View.VISIBLE);
+                                    SetMap(location.getLatitude(),location.getLongitude());
+                                }
+                            }
+                        }
+                );
+            } else {
+                Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        } else {
+            requestPermissions();
+        }
+    }
+
+    private void SetMap(final double latitude, final double longitude) {
+        try {
+            ((SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
+
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+
+                    Your_Location = new LatLng(latitude, longitude);
+                    mMap = googleMap;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
+                    mAddress = getAddress(latitude, longitude);
+                    mEdiText_address.setText(mAddress);
+                    if (mMap != null) {
+                        Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
+                    }
+                    // Rest of the stuff you need to do with the map
+                }
+            });
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(
+                Verification.this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                PERMISSION_ID
+        );
+    }
+
+    private void CheckLocationPermission() {
         Dexter.withActivity(Verification.this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        kamkicheez();
+                        getLastLocation();
                     }
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
                         if (response.isPermanentlyDenied()) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(Verification.this);
+                            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(Verification.this);
                             builder.setTitle("Permission Denied")
                                     .setMessage("Permission to access device location is permanently denied. you need to go to setting to allow the permission.")
-                                    .setNegativeButton("Deny", null)
-                                    .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             Intent intent = new Intent();
@@ -836,7 +940,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                     })
                                     .show();
                         } else {
-                            helpingMethods.SnackBar("Permission Denied", mPhoneNumber);
+                            Toast.makeText(Verification.this, "Permission Denied.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -849,50 +953,16 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+
+
     private void resendVerificationCode(String fullNumberWithPlus, PhoneAuthProvider.ForceResendingToken mResendToken) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 fullNumberWithPlus, 60, TimeUnit.SECONDS, this, mCallbacks, mResendToken);
     }
 
 
-    private void kamkicheez() {
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(Verification.this);
-        if (ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        location = mFusedLocationProviderClient.getLastLocation();
-        location.addOnCompleteListener(new OnCompleteListener() {
-            @Override
-            public void onComplete(@NonNull Task task) {
-                if (task.isSuccessful()) {
-                    final android.location.Location currentLocation = (Location) task.getResult();
-                    try {
-                        ((SupportMapFragment) getSupportFragmentManager()
-                                .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
 
-                            @Override
-                            public void onMapReady(GoogleMap googleMap) {
 
-                                Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                                mMap = googleMap;
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
-                                mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
-                                mEdiText_address.setText(mAddress);
-                                if (mMap != null) {
-                                    Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
-                                }
-                                // Rest of the stuff you need to do with the map
-                            }
-                        });
-
-                    } catch (Exception e) {
-
-                    }
-
-                }
-            }
-        });
-    }
 
     public String getAddress(Double lat, Double lng) {
 
@@ -937,8 +1007,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }
         checkApi();
         verifyPhoneNumberWithCode(mVerificationId, code);
-
-        get_user = "https://chhatt.com/Cornstr/grocery/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
+        get_user = "http://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
         parseJSON();
     }
 
@@ -969,8 +1038,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onResume() {
         super.onResume();
-
-
         if (flag) {
             String[] getvv = mylatlng.split(",");
             final double latitude = Double.parseDouble(getvv[0]);
@@ -1005,53 +1072,42 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void parseJSON() {
-
-
         FirebaseUser user = mAuth.getCurrentUser();
         final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(get_user, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
-
-                    helpingMethods.saveuser(mAuth.getUid(),null,null,null);
                     stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
                     mSigninContainer.setVisibility(View.VISIBLE);
                     mVerifyContainer.setVisibility(View.GONE);
 
                 } else {
-
-                    mSigninContainer.setVisibility(View.GONE);
-                    Intent intent = new Intent(Verification.this, BringoActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-
-
                     for (int i = 0; i < response.length(); i++) {
                         try {
-
                             jsonObject = response.getJSONObject(i);
-
                             String u_name = jsonObject.getString("user_name");
                             String u_address = jsonObject.getString("address");
                             String u_image = jsonObject.getString("user_image");
                             helpingMethods.saveuser(u_name,u_image,u_address,mPhoneNumber.getText().toString());
 
                         } catch (Exception e) {
-
+                            Toast.makeText(Verification.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
 
-
-                    // helpingMethods.saveuser(u_name, u_image, u_nic, u_address, u_email, u_businessntn, u_number, u_role, null);
-
-
+                    mSigninContainer.setVisibility(View.GONE);
+                    Intent intent = new Intent(Verification.this, BringoActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    finish();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Toast.makeText(Verification.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

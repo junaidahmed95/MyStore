@@ -37,7 +37,6 @@ public class StoreInfoActivity extends AppCompatActivity {
 
     private ImageButton mbtnBack;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
-    private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/maincat";
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     private TextView mstName, mstAddress;
@@ -126,7 +125,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     }
 
     private void parseJSON() {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("http://bringo.biz/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;

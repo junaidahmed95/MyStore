@@ -22,6 +22,7 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -107,10 +108,16 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         grd_str.setLayoutManager(layoutManager);
-        //ye rha hai umair
-
         nearesStoresList = new ArrayList<>();
 
+        ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+        if (connectionDetector.isConnected()) {
+            mloadingImage.setVisibility(View.VISIBLE);
+            mretryBtn.setVisibility(View.GONE);
+            CheckLocationPermission();
+        } else {
+            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+        }
 
         mretryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,10 +133,11 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
         mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
         categoryRecyclerView = root.findViewById(R.id.gd1);
-        //mprogressbar = root.findViewById(R.id.progressbar);
+        GetNearestStores();
 
 
         final SliderAdapter adapter = new SliderAdapter(getActivity());
@@ -171,9 +179,7 @@ public class HomeFragment extends Fragment {
         return false;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void GetNearestStores(){
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
             CheckLocationPermission();
@@ -185,15 +191,20 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-        );
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                    LocationManager.NETWORK_PROVIDER
+            );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        CheckLocationPermission();
     }
 
     @SuppressLint("MissingPermission")
     private void requestNewLocationData() {
-
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(0);
@@ -216,11 +227,11 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    //String url = "https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
-    //"https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
+    //String url = "http://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+    //"http://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -329,7 +340,9 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
                         if (response.isPermanentlyDenied()) {
-                            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
+                            mloadingImage.setVisibility(View.GONE);
+                            mretryBtn.setVisibility(View.VISIBLE);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("Permission Denied")
                                     .setMessage("Permission to access device location is permanently denied. you need to go to setting to allow the permission.")
                                     .setNegativeButton("Cancel", null)
@@ -343,7 +356,9 @@ public class HomeFragment extends Fragment {
                                     })
                                     .show();
                         } else {
+                            mloadingImage.setVisibility(View.GONE);
                             Toast.makeText(getContext(), "Permission Denied.", Toast.LENGTH_SHORT).show();
+                            mretryBtn.setVisibility(View.VISIBLE);
                         }
                     }
 

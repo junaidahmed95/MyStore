@@ -62,7 +62,6 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         list = new ArrayList<>();
-       // JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+getIntent().getStringExtra("storeid");
 
 
         createExampleList();
@@ -124,7 +123,7 @@ public class SearchActivity extends AppCompatActivity {
     private void createExampleList() {
 
 
-        JsonArrayRequest request = new JsonArrayRequest("https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id="+getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("http://bringo.biz/api/get/stores/products?str_id="+getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 

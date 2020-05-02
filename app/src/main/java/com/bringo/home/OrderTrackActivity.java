@@ -60,7 +60,7 @@ public class OrderTrackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_track);
         list = new ArrayList<>();
-        get_status = "https://chhatt.com/Cornstr/grocery/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
+        get_status = "http://bringo.biz/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
         mtxt_ordertime = findViewById(R.id.txt_ordertime);
         mtxt_storename = findViewById(R.id.txt_storename);
         btnhis_detail = findViewById(R.id.btnhis_detail);

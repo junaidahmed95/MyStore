@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:id="@+id/status_recycler"
-    android:layout_height="wrap_content"
-    android:background="#F0F0F0"
-    android:orientation="vertical"/>
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/status_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F0F0F0"
+        android:orientation="vertical" />
+
+    <Button
+        android:id="@+id/btnSiglo"
+        android:layout_width="wrap_content"
+        android:text="Sign Up / Sign In"
+        android:textColor="@color/white"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:background="@drawable/btn_shape"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>
