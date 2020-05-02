@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.bringo.home.Model.HelpingMethods;
@@ -56,7 +57,7 @@ public class BringoActivity extends AppCompatActivity {
 
 
         View navHeaderView = navigationView.inflateHeaderView(R.layout.nav_header_bringo);
-
+        Button msignupBtn = navHeaderView.findViewById(R.id.signupBtn);
         final CircleImageView mUserImage = navHeaderView.findViewById(R.id.userImage);
         final TextView mUserName = navHeaderView.findViewById(R.id.userName);
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
@@ -92,23 +93,29 @@ public class BringoActivity extends AppCompatActivity {
             });
 
 
+        }else {
+            msignupBtn.setVisibility(View.VISIBLE);
+            msignupBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    drawer.closeDrawer(GravityCompat.START);
+                    startActivity(new Intent(BringoActivity.this, Verification.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
+            });
         }
 
         mUserImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(BringoActivity.this, ProfileActivity.class));
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                drawer.closeDrawer(GravityCompat.START);
+                OpenProFile();
             }
         });
 
         mUserName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(BringoActivity.this, ProfileActivity.class));
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                drawer.closeDrawer(GravityCompat.START);
+                OpenProFile();
             }
         });
 
@@ -117,7 +124,7 @@ public class BringoActivity extends AppCompatActivity {
         // menu should be sidered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_cart, R.id.nav_wishlist, R.id.nav_wallet, R.id.nav_paymen, R.id.nav_messager
-                , R.id.nav_hist, R.id.nav_order, R.id.nav_setting, R.id.nav_contact, R.id.nav_about)
+                , R.id.nav_hist, R.id.nav_order, R.id.nav_contact, R.id.nav_about)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -140,6 +147,18 @@ public class BringoActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void OpenProFile() {
+        if(FirebaseAuth.getInstance().getUid()!=null && helpingMethods.GetUName()!=null){
+            drawer.closeDrawer(GravityCompat.START);
+            startActivity(new Intent(BringoActivity.this, ProfileActivity.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }else {
+            drawer.closeDrawer(GravityCompat.START);
+            startActivity(new Intent(BringoActivity.this, Verification.class));
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }
     }
 
 

@@ -651,9 +651,12 @@
                         android:id="@+id/btnPrivacyPolicy"
                         android:layout_width="wrap_content"
                         android:layout_marginRight="16dp"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/holo_blue_bright"
                         android:layout_marginLeft="16dp"
                         android:text="By proceeding I acknowledge that I have read the Privacy Policy"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal" />
 
                     <Button
                         android:id="@+id/button_create"

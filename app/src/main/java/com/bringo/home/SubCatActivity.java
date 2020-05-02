@@ -236,7 +236,7 @@ public static String checkSID;
 
 
     private void GetStoreData() {
-        mJSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/stores/products?str_id=" + store_ID;
+        mJSON_URL = "http://bringo.biz/api/get/stores/products?str_id=" + store_ID;
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

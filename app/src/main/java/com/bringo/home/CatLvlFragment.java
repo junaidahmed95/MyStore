@@ -30,8 +30,6 @@ import static com.bringo.home.SubCatActivity.prolist;
 public class CatLvlFragment extends Fragment {
 
 
-    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/product";
-    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/storeprods";
     private String JSON_URL = "";
     private boolean isOneTime;
     private JsonArrayRequest request;

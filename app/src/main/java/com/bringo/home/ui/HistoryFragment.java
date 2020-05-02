@@ -1,6 +1,7 @@
 package com.bringo.home.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -23,8 +24,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bringo.home.Adapter.HistoryAdapter;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
+import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
@@ -41,9 +44,9 @@ import java.util.List;
 public class HistoryFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private StringRequest request;
+    private Button mbtnSiglo;
     private RequestQueue requestQueue;
-    //private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=jAHDba6PiRNDzgT8QadpePR1eju1";
-    private final String JSON_URL = "https://chhatt.com/Cornstr/grocery/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "http://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
     List<OrderHistory> products_list;
@@ -51,6 +54,7 @@ public class HistoryFragment extends Fragment {
     List<OrderHistory> pproducts_list;
     private int qtyplus = 0;
     private int plus = 0;
+    private HelpingMethods helpingMethods;
     private ProgressDialog progressDialog;
     private int count = 0;
     private Button mbtn_history, mbtn_pending;
@@ -71,6 +75,15 @@ public class HistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        mbtnSiglo = mView.findViewById(R.id.btnSiglo);
+        helpingMethods = new HelpingMethods(getActivity());
+        mbtnSiglo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), Verification.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
 
         mbtn_history = mView.findViewById(R.id.btn_history);
         mbtn_pending = mView.findViewById(R.id.btn_pending);
@@ -86,14 +99,19 @@ public class HistoryFragment extends Fragment {
         phistorylist = new ArrayList<>();
         pproducts_list = new ArrayList<>();
 
-        final ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-        if (connectionDetector.isConnected()) {
-
-            parseJSON();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            final ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+            if (connectionDetector.isConnected()) {
+                parseJSON();
+            } else {
+                mProgressDialog.cancel();
+                Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+            }
         } else {
             mProgressDialog.cancel();
-            Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+            mbtnSiglo.setVisibility(View.VISIBLE);
         }
+
 
         mbtn_history.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,7 +176,6 @@ public class HistoryFragment extends Fragment {
                             products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
 
 
-
                         }
                         historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
                         HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
@@ -173,7 +190,7 @@ public class HistoryFragment extends Fragment {
                 } catch (JSONException e) {
                     mProgressDialog.cancel();
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your internet connection." , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                 }
             }
         },
@@ -182,7 +199,7 @@ public class HistoryFragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         mProgressDialog.cancel();
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getActivity(), "Check your internet connection." , Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
         );

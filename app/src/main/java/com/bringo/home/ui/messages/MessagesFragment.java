@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,6 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bringo.home.BringoActivity;
+import com.bringo.home.Model.HelpingMethods;
+import com.bringo.home.Verification;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bringo.home.MessagingActivity;
@@ -65,12 +69,14 @@ public class MessagesFragment extends Fragment {
     public static MenuItem searchitem;
     public static boolean checkingtheqactivity = false;
     String name, image;
+    private HelpingMethods helpingMethods;
     private LinearLayoutManager linearLayoutManager;
     FirebaseRecyclerAdapter<NewUsers, ConvViewHolder> mAdapter;
     FirebaseRecyclerOptions<NewUsers> options;
     private String user_id;
     private List<NewUsers> usersList;
     private ProgressBar msmsPBar;
+    private Button mbtnSiglo;
 
     public MessagesFragment() {
         // Required empty public constructor
@@ -86,10 +92,12 @@ public class MessagesFragment extends Fragment {
         mConvList = mView.findViewById(R.id.recycler_view);
         linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        mbtnSiglo  =mView.findViewById(R.id.btnSiglo);
         mAuth = FirebaseAuth.getInstance();
         usersList = new ArrayList<>();
+        helpingMethods = new HelpingMethods(getActivity());
         user_id = mAuth.getUid();
-        if (user_id != null) {
+        if (user_id != null && helpingMethods.GetUName()!=null) {
             msmsPBar.setVisibility(View.VISIBLE);
             mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chatlist");
             mConvDatabase.keepSynced(true);
@@ -125,6 +133,15 @@ public class MessagesFragment extends Fragment {
             });
 
 
+        }else {
+            mbtnSiglo.setVisibility(View.VISIBLE);
+            mbtnSiglo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(getActivity(), Verification.class));
+                    getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
+            });
         }
 
 

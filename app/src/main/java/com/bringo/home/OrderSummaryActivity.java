@@ -100,7 +100,7 @@ import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 
 public class OrderSummaryActivity extends AppCompatActivity {
     APIService apiService;
-    private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "http://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
     private static List<CatLvlItemList> orderSummaryList;
     private Button mconfirmorder_btn;
@@ -120,7 +120,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     String OrdrerID;
     private String status = "";
     String dayString;
-    private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = "http://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
     List<AddressClass> kuchbhe;
     private JsonArrayRequest request;
     private ProgressDialog progressDialog;
@@ -235,7 +235,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                 hashMap.put("totalPrice", "Rs." + pTotalPrice);
                                 hashMap.put("sender", FirebaseAuth.getInstance().getUid());
                                 hashMap.put("delivery", "not available");
-                                String url = "https://chhatt.com/Cornstr/grocery/api/post/up_order";
+                                String url = "http://bringo.biz/api/post/up_order";
                                 StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
@@ -423,7 +423,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://chhatt.com/Cornstr/grocery/api/post/address";
+                                    String url = "http://bringo.biz/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {

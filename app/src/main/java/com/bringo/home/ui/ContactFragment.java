@@ -23,6 +23,7 @@ import com.bringo.home.MessagingActivity;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.R;
+import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -99,17 +100,23 @@ public class ContactFragment extends Fragment {
         mchatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-                if(connectionDetector.isConnected()){
-                    Intent mintent = new Intent(getActivity(), MessagingActivity.class);
-                    mintent.putExtra("user_id", "BrwELMpWZEa057zF77OZdTx63k23");
-                    mintent.putExtra("uName", sName);
-                    mintent.putExtra("uImage", sImage);
-                    mintent.putExtra("check", "one");
-                    mintent.putExtra("forward", "one");
-                    startActivity(mintent);
+                if(FirebaseAuth.getInstance().getUid()!=null && helpingMethods.GetUName()!=null){
+                    ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                    if(connectionDetector.isConnected()){
+                        Intent mintent = new Intent(getActivity(), MessagingActivity.class);
+                        mintent.putExtra("user_id", "BrwELMpWZEa057zF77OZdTx63k23");
+                        mintent.putExtra("uName", sName);
+                        mintent.putExtra("uImage", sImage);
+                        mintent.putExtra("check", "one");
+                        mintent.putExtra("forward", "one");
+                        startActivity(mintent);
+                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    }
+                }else {
+                    startActivity(new Intent(getActivity(), Verification.class));
                     getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }
+
             }
         });
 

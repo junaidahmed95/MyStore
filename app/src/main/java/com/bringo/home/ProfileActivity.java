@@ -127,8 +127,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private EditText meditaddress;
     private JsonArrayRequest request,addressrequest;
     private RequestQueue requestQueue,addressrequestQueue;
-    private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
-    private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "http://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = "http://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -558,7 +558,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://chhatt.com/Cornstr/grocery/api/post/address";
+                                    String url = "http://bringo.biz/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {

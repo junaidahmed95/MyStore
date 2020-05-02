@@ -169,7 +169,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
-                    android:text="BringoHome@gmail.com"
+                    android:text="Support@bringo.biz"
                     android:textStyle="bold"
                     android:textColor="@color/primaryTextColor" />
 
