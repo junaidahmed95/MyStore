@@ -35,6 +35,16 @@
             android:padding="2dp">
 
             <Button
+                android:id="@+id/selectadd"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginRight="16dp"
+                android:layout_toLeftOf="@+id/cancel"
+                android:background="@drawable/cancel_shape"
+                android:text="select Location"
+                android:textColor="@android:color/white" />
+
+            <Button
                 android:id="@+id/cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"

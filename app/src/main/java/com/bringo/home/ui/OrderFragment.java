@@ -116,7 +116,7 @@ public class OrderFragment extends Fragment {
                         for (int j = 0; j < storeOrderDetails.length(); j++) {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
-                            if (storeObject.getString("status").equals("1")) {
+                            if (!storeObject.getString("status").equals("null")) {
                                 String pname = storeObject.getString("sp_name");
                                 String actprice = storeObject.getString("act_prc");
                                 String address = storeObject.getString("new_address");
@@ -133,11 +133,15 @@ public class OrderFragment extends Fragment {
 
 
                         }
-                        historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
-                        StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity());
-                        mstatus_recycler.setAdapter(statusAdapter);
-                        statusAdapter.notifyDataSetChanged();
-                        products_list.clear();
+                        if (products_list.size() > 0) {
+
+                            historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
+                            StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity());
+                            mstatus_recycler.setAdapter(statusAdapter);
+                            statusAdapter.notifyDataSetChanged();
+                            products_list.clear();
+
+                        }
 
 
                         // mProgressDialog.cancel();

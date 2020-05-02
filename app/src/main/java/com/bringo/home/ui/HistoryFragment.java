@@ -116,21 +116,177 @@ public class HistoryFragment extends Fragment {
         mbtn_history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                products_list.clear();
+                historylist.clear();
+
                 mbtn_history.setBackground(getResources().getDrawable(R.drawable.btnwhite));
                 mbtn_pending.setBackground(getResources().getDrawable(R.drawable.btngrey));
 
+
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                // Initialize a new JsonArrayRequest instance
+                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+
+                            JSONArray storeOrders = response.getJSONArray(0);
+                            JSONObject storeOrdersDetail = response.getJSONObject(1);
+
+
+                            for (int i = 0; i < storeOrders.length(); i++) {
+
+                                JSONObject storeOrder = storeOrders.getJSONObject(i);
+
+
+                                String storeName = storeOrder.getString("str_name");
+                                String storeOrderId = storeOrder.getString("ord_id");
+                                String storeimg = storeOrder.getString("user_thumb");
+                                JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
+
+                                for (int j = 0; j < storeOrderDetails.length(); j++) {
+
+                                    JSONObject storeObject = storeOrderDetails.getJSONObject(j);
+                                    if (storeObject.getString("status").equals("4")) {
+                                        String pname = storeObject.getString("sp_name");
+                                        String actprice = storeObject.getString("act_prc");
+                                        String address = storeObject.getString("new_address");
+                                        String proimage = storeObject.getString("sp_image");
+                                        String pqty = storeObject.getString("ord_qty");
+                                        String tprice = storeObject.getString("t_price");
+                                        String datetime = storeObject.getString("created_at");
+                                        String uid = storeObject.getString("user_id");
+                                        String tpprice = storeObject.getString("str_prc");
+                                        String status = storeObject.getString("status");
+                                        products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
+
+                                    }
+
+
+                                }
+                                if(historylist.size() > 0){
+                                    historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
+                                    HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
+                                    mhis_recycler.setAdapter(historyadp);
+                                    historyadp.notifyDataSetChanged();
+                                    products_list.clear();
+                                }
+
+
+
+                                // mProgressDialog.cancel();
+                            }
+
+
+                        } catch (JSONException e) {
+                            // mProgressDialog.cancel();
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // mProgressDialog.cancel();
+                                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                );
+
+                // Add JsonArrayRequest to the RequestQueue
+                requestQueue.add(jsonArrayRequest);
             }
+
+
         });
 
         mbtn_pending.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                products_list.clear();
+                historylist.clear();
+                RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
+                // Initialize a new JsonArrayRequest instance
+                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+
+                            JSONArray storeOrders = response.getJSONArray(0);
+                            JSONObject storeOrdersDetail = response.getJSONObject(1);
+
+
+                            for (int i = 0; i < storeOrders.length(); i++) {
+
+                                JSONObject storeOrder = storeOrders.getJSONObject(i);
+
+
+                                String storeName = storeOrder.getString("str_name");
+                                String storeOrderId = storeOrder.getString("ord_id");
+                                String storeimg = storeOrder.getString("user_thumb");
+                                JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
+
+                                for (int j = 0; j < storeOrderDetails.length(); j++) {
+
+                                    JSONObject storeObject = storeOrderDetails.getJSONObject(j);
+                                    if (storeObject.getString("status").equals("null")) {
+                                        String pname = storeObject.getString("sp_name");
+                                        String actprice = storeObject.getString("act_prc");
+                                        String address = storeObject.getString("new_address");
+                                        String proimage = storeObject.getString("sp_image");
+                                        String pqty = storeObject.getString("ord_qty");
+                                        String tprice = storeObject.getString("t_price");
+                                        String datetime = storeObject.getString("created_at");
+                                        String uid = storeObject.getString("user_id");
+                                        String tpprice = storeObject.getString("str_prc");
+                                        String status = storeObject.getString("status");
+                                        products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
+
+                                    }
+
+                                }
+                                if (products_list.size() > 0) {
+                                    historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
+                                    HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
+                                    mhis_recycler.setAdapter(historyadp);
+                                    historyadp.notifyDataSetChanged();
+                                    products_list.clear();
+                                }
+
+
+
+                                // mProgressDialog.cancel();
+                            }
+
+
+                        } catch (JSONException e) {
+                            // mProgressDialog.cancel();
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // mProgressDialog.cancel();
+                                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                );
+
+                // Add JsonArrayRequest to the RequestQueue
+                requestQueue.add(jsonArrayRequest);
 
                 mbtn_history.setBackground(getResources().getDrawable(R.drawable.btngrey));
                 mbtn_pending.setBackground(getResources().getDrawable(R.drawable.btnwhite));
 
             }
         });
+
 
 
         return mView;
