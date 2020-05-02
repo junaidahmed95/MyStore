@@ -38,7 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statusholder> {
     public static List<OrderHistory> historylist;
-    List<OrderHistory> list;
+    public static List<OrderHistory> list;
     Context mContext;
     String name, created;
     String image;
@@ -76,10 +76,11 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
             public void onClick(View v) {
 
                 Intent intent = new Intent(mContext, OrderTrackActivity.class);
+                intent.putExtra("position", position);
                 intent.putExtra("orderid", historylist.get(position).getOrderid());
                 intent.putExtra("storename", name);
                 intent.putExtra("created", created);
-                //intent.putExtra("storeimage", image);
+                intent.putExtra("storeimage", image);
                 mContext.startActivity(intent);
 
 

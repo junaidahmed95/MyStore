@@ -61,9 +61,13 @@ import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.RequestHandlerSingleten;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -93,6 +97,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.bringo.home.Verification.mylatlng;
+
 
 public class ProfileActivity extends AppCompatActivity implements OnMapReadyCallback {
     private FloatingActionButton maddAddre;
@@ -119,6 +125,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap mMap;
     Task location;
+    EditText muserName;
+    Boolean flag = false;
 
     private ProgressDialog mProgressDialog;
 
@@ -544,12 +552,23 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                     final ConnectionDetector detector = new ConnectionDetector(ProfileActivity.this);
-                    final EditText muserName = promptsView.findViewById(R.id.userAdd);
+                    muserName = promptsView.findViewById(R.id.userAdd);
                     final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+                    Button mselectadd = promptsView.findViewById(R.id.selectadd);
                     Button mCancel = promptsView.findViewById(R.id.cancel);
                     Button mSave = promptsView.findViewById(R.id.save);
+
+                    mselectadd.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(ProfileActivity.this, MapActivity.class);
+                            //flag = true;
+                            intent.putExtra("activity","profile");
+                            startActivity(intent);
+                        }
+                    });
 
                     mSave.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -627,23 +646,23 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                         mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
-//                        ((SupportMapFragment) getSupportFragmentManager()
-//                                .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
-//
-//                            @Override
-//                            public void onMapReady(GoogleMap googleMap) {
-//
-//                                Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-//                                mMap = googleMap;
-//                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
-//                                mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
-                        muserName.setText(mAddress);
-//                                if (mMap != null) {
-//                                    Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
-//                                }
+                        ((SupportMapFragment) getSupportFragmentManager()
+                                .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
+
+                            @Override
+                            public void onMapReady(GoogleMap googleMap) {
+
+                                Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                                mMap = googleMap;
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
+                                mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
+                                muserName.setText(mAddress);
+                                if (mMap != null) {
+                                    Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
+                                }
 //                                // Rest of the stuff you need to do with the map
-//                            }
-//                        });
+                            }
+                        });
 
                     } catch (Exception e) {
                         Log.d("dfg", e.getMessage());
@@ -722,6 +741,37 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 .check();
     }
 
+    public void onResume () {
+        super.onResume();
+
+
+        if (flag) {
+            String[] getvv = mylatlng.split(",");
+            final double latitude = Double.parseDouble(getvv[0]);
+            final double longitude = Double.parseDouble(getvv[1]);
+            Your_Location = new LatLng(latitude, longitude);
+            ((SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
+
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+
+                    mMap = googleMap;
+                    mMap = googleMap;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
+                    mAddress = getAddress(latitude, longitude);
+                    muserName.setText(mAddress);
+                    if (mMap != null) {
+                        Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
+                    }
+                    // Rest of the stuff you need to do with the map
+                }
+            });
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapview);
+            mapFragment.getMapAsync(ProfileActivity.this);
+        }
+
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

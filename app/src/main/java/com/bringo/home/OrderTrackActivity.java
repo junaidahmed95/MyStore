@@ -11,6 +11,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,11 +26,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.OrderHistoryDetailAdapter;
 import com.bringo.home.Model.OrderHistory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import static com.bringo.home.Adapter.StatusAdapter.historylist;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +65,7 @@ public class OrderTrackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_track);
         list = new ArrayList<>();
-        get_status = "http://bringo.biz/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
+        get_status = "https://chhatt.com/Cornstr/grocery/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
         mtxt_ordertime = findViewById(R.id.txt_ordertime);
         mtxt_storename = findViewById(R.id.txt_storename);
         btnhis_detail = findViewById(R.id.btnhis_detail);
@@ -68,7 +73,6 @@ public class OrderTrackActivity extends AppCompatActivity {
 
         mstepOneFab = findViewById(R.id.stepOneFab);
         mstepTwoBar = findViewById(R.id.stepOneBar);
-
 
         mstepTwoFab = findViewById(R.id.stepTwoFab);
         mstepThreeBar = findViewById(R.id.stepThreeBar);
@@ -81,8 +85,70 @@ public class OrderTrackActivity extends AppCompatActivity {
         mtxt_storename.setText(getIntent().getStringExtra("storename"));
         mtxt_ordertime.setText(getIntent().getStringExtra("created"));
         Glide.with(this).load(getIntent().getStringExtra("storeimage")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mstoreimg).toString();
-
+        position = getIntent().getIntExtra("position",0);
         status();
+
+        btnhis_detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                View mView = LayoutInflater.from(OrderTrackActivity.this).inflate(R.layout.orderdetail_sheet, null);
+                Toolbar mappBar = mView.findViewById(R.id.appBar);
+
+                mappBar.setTitle("Order Detail");
+                final RecyclerView recyclerView = mView.findViewById(R.id.oorderdetail_gd);
+
+                TextView mtxt_qtys = mView.findViewById(R.id.txt_total_qtys);
+                TextView mtxt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
+                TextView mtxt_addresss = mView.findViewById(R.id.txt_addresss);
+                TextView mtxt_prices = mView.findViewById(R.id.totalitemprice);
+
+
+                for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
+                    Log.d("Order",historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
+                    mtxt_addresss.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
+                    mtxt_prices.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
+                    qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
+                    list.add(new OrderHistory(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_price(), historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), historylist.get(position).getGetorderbykeylist().get(a).getAct_price(), historylist.get(position).getGetorderbykeylist().get(a).getImage(), historylist.get(position).getGetorderbykeylist().get(a).getTitle()));
+                }
+
+
+
+
+
+
+                mtxt_totalproductss.setText("" + historylist.get(position).getGetorderbykeylist().size());
+
+
+
+
+
+                mtxt_qtys.setText("Qty: " + qtycount);
+                qtycount = 0;
+
+
+                FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);
+
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(OrderTrackActivity.this);
+                linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+
+                OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(new ArrayList<OrderHistory>(list), getApplicationContext());
+                recyclerView.setAdapter(orderAdapter);
+
+                list.clear();
+
+
+                orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
+                orderdetailSheetDialog.setContentView(mView);
+                orderdetailSheetDialog.show();
+
+
+            }
+        });
+
 
 
 
