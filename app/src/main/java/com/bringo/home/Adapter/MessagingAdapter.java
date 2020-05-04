@@ -888,7 +888,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                         recyclerView.setLayoutManager(linearLayoutManager);
                         final List<CatLvlItemList> mCatLvlItemList = new ArrayList<>();
 
-                        String url = "http://bringo.biz/api/get/stores/orders?str_id=" + chat.getStoreID() + "&ord_id=" + chat.getOrderID();
+                        String url = "https://bringo.biz/api/get/stores/orders?str_id=" + chat.getStoreID() + "&ord_id=" + chat.getOrderID();
                         RequestQueue requestQueue = Volley.newRequestQueue(mContext);
                         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                             @Override

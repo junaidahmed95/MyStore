@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import com.bringo.home.Adapter.CategoryAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -39,6 +41,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
+
     private TextView mstName, mstAddress;
     private Button mretryBtn;
     private ProgressDialog mProgressDialog;
@@ -52,7 +55,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     public static TextView textCartItemCount;
     public static int mCartItemCount = 0;
     private ImageView mstImage;
-
+    private HelpingMethods helpingMethods;
     public static List<CatLvlItemList> favlist = new ArrayList<>();
     public static List<String> checklist = new ArrayList<>();
 
@@ -65,11 +68,13 @@ public class StoreInfoActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        stID = getIntent().getStringExtra("storeid");
+        helpingMethods = new HelpingMethods(this);
         mstImage = findViewById(R.id.stImageView);
         mstName = findViewById(R.id.stName);
         mstAddress = findViewById(R.id.stAddress);
         mretryBtn = findViewById(R.id.retryBtn);
-        stID = getIntent().getStringExtra("storeid");
+
         ownerName = getIntent().getStringExtra("stname");
         ownerAdd = getIntent().getStringExtra("address");
         ownerImage = getIntent().getStringExtra("ownerImage");
@@ -125,7 +130,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     }
 
     private void parseJSON() {
-        request = new JsonArrayRequest("http://bringo.biz/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;

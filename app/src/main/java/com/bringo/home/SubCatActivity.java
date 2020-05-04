@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,12 +45,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bringo.home.BringoActivity.textCartItemCount;
 
 
 public class SubCatActivity extends AppCompatActivity {
 
-
+public static TextView textCartItemCount;
     private String mJSON_URL = "";
     private String[] tabTitles;
     private JsonArrayRequest mrequest;
@@ -236,7 +236,7 @@ public static String checkSID;
 
 
     private void GetStoreData() {
-        mJSON_URL = "http://bringo.biz/api/get/stores/products?str_id=" + store_ID;
+        mJSON_URL = "https://bringo.biz/api/get/stores/products?str_id=" + store_ID;
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

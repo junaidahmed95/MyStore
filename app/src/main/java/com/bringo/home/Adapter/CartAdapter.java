@@ -32,11 +32,10 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static com.bringo.home.BringoActivity.MainsetupBadge;
 import static com.bringo.home.CartActivity.mTxtView_TotalPrice;
 //import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;
-
 import static com.bringo.home.CartActivity.mcardview2;
-import static com.bringo.home.SubCatActivity.setupBadge;
 import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 import static com.bringo.home.ui.cart.CartFragment.mcardview1;
 
@@ -74,7 +73,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
         viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
 
-        if (!flag){
+        if (!flag) {
             mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
             if (fromWhere.equals("activity")) {
                 mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
@@ -85,8 +84,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             }
 
         }
-
-
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -146,18 +143,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
-
                                 try {
                                     mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
                                     int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
-                                    helpingMethods.SaveCartCount(finalCount,cartList.get(pos).getStoreId());
+                                    helpingMethods.SaveCartCount(finalCount, cartList.get(pos).getStoreId());
+                                    MainsetupBadge();
                                     if (fromWhere.equals("activity")) {
                                         mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
-                                        setupBadge();
                                     } else {
                                         mTxtView_Total.setText("" + mTotalPrice + "/-");
                                     }
-
                                     int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
                                     MecheckList.remove(a);
                                     SaveCheckData();
@@ -175,13 +170,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                         } else {
                                             mcardview1.setVisibility(View.GONE);
                                         }
-
-
                                     }
 
 
                                 } catch (Exception ex) {
-                                    Toast.makeText(mContext, ""+ex.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, "" + ex.getMessage(), Toast.LENGTH_SHORT).show();
 
                                 }
 
@@ -198,11 +191,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                 builder.setMessage("Do you want to remove this product?").setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
-
-
-
-
-
 
 
             }
@@ -279,7 +267,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             if (preferenceList == null) {
                 preferenceList = new ArrayList<>();
             }
-
 
 
         } catch (Exception e) {

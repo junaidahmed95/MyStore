@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,9 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.bringo.home.BringoActivity.MainsetupBadge;
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.bringo.home.SubCatActivity.setupBadge;
-
 public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
     private List<CatLvlItemList> proLists;
@@ -90,11 +91,11 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
         try {
             if (mycheckList.size() > 0) {
                 if (mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_add_cart.hide();
-                    holder.mbtn_remove_cart.show();
+                    holder.mbtn_add_cart.setVisibility(View.GONE);
+                    holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
                 } else {
-                    holder.mbtn_remove_cart.hide();
-                    holder.mbtn_add_cart.show();
+                    holder.mbtn_remove_cart.setVisibility(View.GONE);
+                    holder.mbtn_add_cart.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -163,11 +164,12 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (!mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_add_cart.hide();
-                    holder.mbtn_remove_cart.show();
+                    holder.mbtn_add_cart.setVisibility(View.GONE);
+                    holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(proLists.get(position).getStoreId()) + 1;
                     helpingMethods.SaveCartCount(finalCount, proLists.get(position).getStoreId());
                     setupBadge();
+                    MainsetupBadge();
                     if (helpingMethods.GetStoreID() != null) {
                         if (!helpingMethods.GetStoreID().equals(proLists.get(position).getStoreId())) {
                             helpingMethods.SaveStoreData(sID, ownerName, ownerImage, ownerID);
@@ -195,8 +197,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (mycheckList.contains(proLists.get(position).getSimplePID())) {
-                    holder.mbtn_remove_cart.hide();
-                    holder.mbtn_add_cart.show();
+                    holder.mbtn_remove_cart.setVisibility(View.GONE);
+                    holder.mbtn_add_cart.setVisibility(View.VISIBLE);
                     int a = mycheckList.indexOf(proLists.get(position).getSimplePID());
                     mycheckList.remove(a);
                     SaveCheckData();
@@ -206,6 +208,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     int finalCount = helpingMethods.GetCartCount(proLists.get(position).getStoreId()) - 1;
                     helpingMethods.SaveCartCount(finalCount, proLists.get(position).getStoreId());
                     setupBadge();
+                    MainsetupBadge();
                 }
 
             }
@@ -222,7 +225,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
         private ImageView pImage, pWish;
         private TextView pName, pPrice,pDesc;
-        private FloatingActionButton mbtn_add_cart, mbtn_remove_cart;
+        private Button mbtn_add_cart, mbtn_remove_cart;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

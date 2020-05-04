@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -28,6 +29,7 @@ import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
 import com.bringo.home.Verification;
+import com.bringo.home.ViewAllStoresActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
@@ -44,11 +46,12 @@ import java.util.List;
 public class HistoryFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private StringRequest request;
-    private Button mbtnSiglo;
+    private Button mbtnSiglo,mvAllStore;
     private RequestQueue requestQueue;
-    private final String JSON_URL = "http://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     RecyclerView mhis_recycler;
     List<OrderHistory> historylist;
+    private TextView mplaceText;
     List<OrderHistory> products_list;
     List<OrderHistory> phistorylist;
     List<OrderHistory> pproducts_list;
@@ -75,6 +78,15 @@ public class HistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        mvAllStore = mView.findViewById(R.id.vAllStore);
+        mplaceText = mView.findViewById(R.id.placeText);
+        mvAllStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), ViewAllStoresActivity.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
         mbtnSiglo = mView.findViewById(R.id.btnSiglo);
         helpingMethods = new HelpingMethods(getActivity());
         mbtnSiglo.setOnClickListener(new View.OnClickListener() {
@@ -337,6 +349,12 @@ public class HistoryFragment extends Fragment {
                         HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
                         mhis_recycler.setAdapter(historyadp);
                         historyadp.notifyDataSetChanged();
+
+                        if(products_list.size()==0){
+                            mplaceText.setVisibility(View.VISIBLE);
+                            mvAllStore.setVisibility(View.VISIBLE);
+                        }
+
                         products_list.clear();
 
                         mProgressDialog.cancel();

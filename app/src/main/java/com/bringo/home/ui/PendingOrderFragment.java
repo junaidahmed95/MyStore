@@ -1,7 +1,8 @@
 package com.bringo.home.ui;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,9 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -22,12 +20,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.bringo.home.Adapter.StatusAdapter;
-import com.bringo.home.Model.ConnectionDetector;
-import com.bringo.home.Model.HelpingMethods;
+import com.bringo.home.Adapter.HistoryAdapter;
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
-import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
@@ -37,71 +32,42 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class OrderFragment extends Fragment {
 
-    String get_status = "https://bringo.biz/api/get/order/status?ord_id=9bGqUshRJrS8ZHPk";
+public class PendingOrderFragment extends Fragment {
+
     private final String JSON_URL = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
-    List<OrderHistory> historylist;
-    private Button mbtnSiglo;
-    private TextView mnoOrder;
+    private List<OrderHistory> historylist;
+    private List<OrderHistory> products_list;
     private ProgressDialog mProgressDialog;
-    private HelpingMethods helpingMethods;
-    List<OrderHistory> products_list;
-    RecyclerView mstatus_recycler;
+    private RecyclerView mhis_recycler;
 
-    public OrderFragment() {
+
+    public PendingOrderFragment() {
         // Required empty public constructor
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-               Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_order, container, false);
+                             Bundle savedInstanceState) {
+        View mView = inflater.inflate(R.layout.fragment_pending_order, container, false);
         mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage("Getting orders...");
+        mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
-        mnoOrder = view.findViewById(R.id.noOrder);
+
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
-        helpingMethods = new HelpingMethods(getActivity());
-        mstatus_recycler = view.findViewById(R.id.status_recycler);
-        mbtnSiglo = view.findViewById(R.id.btnSiglo);
+        mhis_recycler = mView.findViewById(R.id.his_recycler);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        mstatus_recycler.setLayoutManager(linearLayoutManager);
-
-        mbtnSiglo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), Verification.class));
-                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-            }
-        });
-
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
-            ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-            if (connectionDetector.isConnected()) {
-                parseJSON();
-            } else {
-                mProgressDialog.cancel();
-                Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
-            }
-
-        } else {
-            mProgressDialog.cancel();
-            mbtnSiglo.setVisibility(View.VISIBLE);
-        }
+        mhis_recycler.setLayoutManager(linearLayoutManager);
 
 
-        return view;
+        parseJSON();
+
+        return mView;
     }
-
 
     private void parseJSON() {
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
@@ -129,7 +95,7 @@ public class OrderFragment extends Fragment {
                         for (int j = 0; j < storeOrderDetails.length(); j++) {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
-                            if (!storeObject.getString("status").equals("null")) {
+                            if (storeObject.getString("status").equals("null")) {
                                 String pname = storeObject.getString("sp_name");
                                 String actprice = storeObject.getString("act_prc");
                                 String address = storeObject.getString("new_address");
@@ -146,17 +112,15 @@ public class OrderFragment extends Fragment {
 
 
                         }
-                        if (products_list.size() > 0) {
-
+                        if(products_list.size()>0){
                             historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
-                            StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity());
-                            mstatus_recycler.setAdapter(statusAdapter);
-                            statusAdapter.notifyDataSetChanged();
+                            HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
+                            mhis_recycler.setAdapter(historyadp);
+                            historyadp.notifyDataSetChanged();
                             products_list.clear();
-
-                        } else if(products_list.size() == 0) {
-                            mnoOrder.setVisibility(View.VISIBLE);
                         }
+
+
 
 
                         mProgressDialog.cancel();
@@ -166,6 +130,7 @@ public class OrderFragment extends Fragment {
                 } catch (JSONException e) {
                     mProgressDialog.cancel();
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                 }
             }
         },
@@ -174,7 +139,7 @@ public class OrderFragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         mProgressDialog.cancel();
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -182,5 +147,6 @@ public class OrderFragment extends Fragment {
         // Add JsonArrayRequest to the RequestQueue
         requestQueue.add(jsonArrayRequest);
     }
+
 
 }

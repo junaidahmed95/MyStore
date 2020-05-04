@@ -56,6 +56,7 @@ public class OrderTrackActivity extends AppCompatActivity {
     private int qtycount = 0;
     BottomSheetDialog orderdetailSheetDialog;
     List<OrderHistory> list;
+    String chkstuts;
 
     FloatingActionButton mstepOneFab, mstepTwoFab, mstepThreeFab, mstepFourFab;
     ProgressBar mstepTwoBar, mstepThreeBar, mstepFourBar;
@@ -65,7 +66,7 @@ public class OrderTrackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_track);
         list = new ArrayList<>();
-        get_status = "https://chhatt.com/Cornstr/grocery/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
+        get_status = "https://bringo.biz/api/get/order/status?ord_id="+getIntent().getStringExtra("orderid");
         mtxt_ordertime = findViewById(R.id.txt_ordertime);
         mtxt_storename = findViewById(R.id.txt_storename);
         btnhis_detail = findViewById(R.id.btnhis_detail);
@@ -103,29 +104,28 @@ public class OrderTrackActivity extends AppCompatActivity {
                 TextView mtxt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
                 TextView mtxt_addresss = mView.findViewById(R.id.txt_addresss);
                 TextView mtxt_prices = mView.findViewById(R.id.totalitemprice);
+                TextView mstatus = mView.findViewById(R.id.status);
 
 
                 for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
                     Log.d("Order",historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
                     mtxt_addresss.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
                     mtxt_prices.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-                    qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
+                    chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
                     list.add(new OrderHistory(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_price(), historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), historylist.get(position).getGetorderbykeylist().get(a).getAct_price(), historylist.get(position).getGetorderbykeylist().get(a).getImage(), historylist.get(position).getGetorderbykeylist().get(a).getTitle()));
                 }
+                mtxt_totalproductss.setText(""+ historylist.get(position).getGetorderbykeylist().size());
+                mtxt_qtys.setText(""+historylist.get(position).getOrderid());
+                if(chkstuts.equals("1")){
+                    mstatus.setText("Acceted");
+                }else if(chkstuts.equals("2")){
+                    mstatus.setText("Assembled");
+                }else if(chkstuts.equals("3")){
+                    mstatus.setText("OnRoute");
+                }else if(chkstuts.equals("4")){
+                    mstatus.setText("Delivered");
+                }
 
-
-
-
-
-
-                mtxt_totalproductss.setText("" + historylist.get(position).getGetorderbykeylist().size());
-
-
-
-
-
-                mtxt_qtys.setText("Qty: " + qtycount);
-                qtycount = 0;
 
 
                 FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);
@@ -175,14 +175,27 @@ public class OrderTrackActivity extends AppCompatActivity {
 
 
                     } else if (status.equals("2")) {
+                        mstepThreeBar.setProgress(100);
+                        mstepTwoFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        mstepThreeBar.setProgressBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                    } else if (status.equals("3")) {
                         mstepTwoFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                         mstepThreeBar.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        mstepFourBar.setProgress(100);
+                        mstepThreeBar.setProgress(100);
 
-                    } else if (status.equals("3")) {
                         mstepThreeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                         mstepFourBar.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
 
                     } else if (status.equals("4")) {
+                        mstepTwoFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        mstepThreeBar.setProgressBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        mstepFourBar.setProgress(100);
+                        mstepThreeBar.setProgress(100);
+                        mstepThreeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+                        mstepFourBar.setProgressBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+
+
                         mstepFourFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
                     }
 
@@ -208,4 +221,3 @@ public class OrderTrackActivity extends AppCompatActivity {
 
     }
 }
-

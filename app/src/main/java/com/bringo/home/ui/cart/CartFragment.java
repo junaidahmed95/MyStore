@@ -19,8 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bringo.home.Adapter.CartAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.OrderSummaryActivity;
 import com.bringo.home.R;
+import com.bringo.home.Verification;
+import com.bringo.home.ViewAllStoresActivity;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,20 +35,29 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 
 
-
 public class CartFragment extends Fragment {
 
     private RecyclerView mCartRecyclerView, mAddressRecyclerView;
     public static TextView mTxtView_Total;
+    private TextView mplaceText;
+    private HelpingMethods helpingMethods;
     public static CardView mcardview1;
-    private Button mcheckBtn;
+    private Button mcheckBtn,mvAllStore;
     private List<CatLvlItemList> preferenceList;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
+    public View onCreateView(@NonNull final LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_cart, container, false);
-
-
+        helpingMethods = new HelpingMethods(getActivity());
+        mvAllStore = root.findViewById(R.id.vAllStore);
+        mplaceText = root.findViewById(R.id.placeText);
+        mvAllStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), ViewAllStoresActivity.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
         mTxtView_Total = root.findViewById(R.id.totalPrice);
         mCartRecyclerView = root.findViewById(R.id.cartRecyclerView);
         mcheckBtn = root.findViewById(R.id.checkBtn);
@@ -59,23 +72,32 @@ public class CartFragment extends Fragment {
 
         if (preferenceList.size() == 0) {
             mcardview1.setVisibility(View.GONE);
-
+            mplaceText.setVisibility(View.VISIBLE);
+            mvAllStore.setVisibility(View.VISIBLE);
         }
 
 
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-                if(connectionDetector.isConnected()){
-                    Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
-                    sumInt.putExtra("from", "fragement");
-                    sumInt.putExtra("totalP",mTxtView_Total.getText().toString());
-                    startActivity(sumInt);
+                if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+                    ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                    if (connectionDetector.isConnected()) {
+                        Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
+                        sumInt.putExtra("from", "fragement");
+                        sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
+                        startActivity(sumInt);
+                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    } else {
+                        Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Intent intent = new Intent(getActivity(), Verification.class);
+                    intent.putExtra("for","cart");
+                    getActivity().startActivity(intent);
                     getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                }else {
-                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                 }
+
 
             }
         });

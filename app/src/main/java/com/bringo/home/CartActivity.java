@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class CartActivity extends AppCompatActivity {
 
     private CartAdapter cartAdapter;
@@ -43,12 +42,12 @@ public class CartActivity extends AppCompatActivity {
     private Button mcheckBtn;
     private List<CatLvlItemList> preferenceList;
     Toolbar mActionBarToolbar;
-    private String cat_Name, store_ID,ownerID,ownerImage,ownerName;
+    private String cat_Name, store_ID, ownerID, ownerImage, ownerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_cart);
         mCartRecyclerView = findViewById(R.id.cartRecyclerView);
         mcheckBtn = findViewById(R.id.checkBtn);
@@ -67,34 +66,38 @@ public class CartActivity extends AppCompatActivity {
         mActionBarToolbar.setTitle("My Cart");
         GetCartData();
 
-        cartAdapter = new CartAdapter(preferenceList, CartActivity.this,"activity");
+        cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity");
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+                    ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
+                    if (connectionDetector.isConnected()) {
+                        Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
+                        sumInt.putExtra("from", "activity");
+                        sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
+                        sumInt.putExtra("storeid", store_ID);
+                        sumInt.putExtra("stname", ownerName);
+                        sumInt.putExtra("ownerID", ownerID);
+                        sumInt.putExtra("ownerImage", ownerImage);
+                        startActivity(sumInt);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    } else {
+                        Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                    }
 
-                ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
-                if(connectionDetector.isConnected()){
-                    Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
-                    sumInt.putExtra("from","activity");
-                    sumInt.putExtra("totalP",mTxtView_TotalPrice.getText().toString());
-                    sumInt.putExtra("storeid", store_ID);
-                    sumInt.putExtra("stname",ownerName);
-                    sumInt.putExtra("ownerID",ownerID);
-                    sumInt.putExtra("ownerImage",ownerImage);
-                    startActivity(sumInt);
+                } else {
+                    Intent intent = new Intent(CartActivity.this, Verification.class);
+                    intent.putExtra("for","cart");
+                    startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                }else {
-                    Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
-
 
 
             }
@@ -102,13 +105,21 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void GoBack() {
-        Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
-        intent.putExtra("storeid", store_ID);
-        intent.putExtra("catName", cat_Name);
-        intent.putExtra("stname",ownerName);
-        intent.putExtra("ownerID",ownerID);
-        intent.putExtra("ownerImage",ownerImage);
-        startActivity(intent);
+        if(getIntent().getStringExtra("for")!=null){
+            Intent intent = new Intent(CartActivity.this, BringoActivity.class);
+            startActivity(intent);
+        }
+
+        if(!cat_Name.equals("")){
+            Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
+            intent.putExtra("storeid", store_ID);
+            intent.putExtra("catName", cat_Name);
+            intent.putExtra("stname", ownerName);
+            intent.putExtra("ownerID", ownerID);
+            intent.putExtra("ownerImage", ownerImage);
+            startActivity(intent);
+        }
+
     }
 
     @Override
@@ -121,7 +132,7 @@ public class CartActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-GoBack();
+            GoBack();
             finish();
         }
 
@@ -158,7 +169,7 @@ GoBack();
     @Override
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
 
@@ -167,7 +178,7 @@ GoBack();
     @Override
     protected void onPause() {
         super.onPause();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }
