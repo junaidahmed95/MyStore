@@ -26,7 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bringo.home.SubCatActivity.setupBadge;
+import static com.bringo.home.BringoActivity.MainsetupBadge;
+
 
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -125,8 +126,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     int finalCount = helpingMethods.GetCartCount(storeID) + 1;
                     helpingMethods.SaveCartCount(finalCount, storeID);
-                    setupBadge();
-
+                    MainsetupBadge();
                     if (helpingMethods.GetStoreID() == null) {
                         helpingMethods.SaveStoreData(storeID, getIntent().getStringExtra("oName"), getIntent().getStringExtra("oImage"), getIntent().getStringExtra("oID"));
                     }
@@ -157,7 +157,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     maddToCart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(storeID) - 1;
                     helpingMethods.SaveCartCount(finalCount, storeID);
-                    setupBadge();
+                    MainsetupBadge();
                     int a = mycheckList.indexOf(spID);
                     mycheckList.remove(a);
                     SaveCheckData();

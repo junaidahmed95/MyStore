@@ -208,6 +208,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/privacy.policy"));
                 startActivity(browserIntent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -321,7 +322,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (con.isConnected()) {
                     mCreateAlertDialog.show();
                     ////////////////////////////////////////////////////////////////////////
-                    String url = "http://bringo.biz/api/reg";
+                    String url = "https://bringo.biz/api/reg";
                     VolleyMultipartRequest multipartRequest = new
                             VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
                                 @Override
@@ -351,8 +352,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                                 if (task.isSuccessful()) {
                                                     helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
                                                     Intent intent = new Intent(Verification.this, BringoActivity.class);
+                                                    if(getIntent().getStringExtra("for")!=null){
+                                                        intent.putExtra("cart","open");
+                                                    }
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                     startActivity(intent);
+                                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                                     finish();
                                                 } else {
                                                     mCreateAlertDialog.dismiss();
@@ -454,6 +459,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     parseJSON();
                     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                     startActivityForResult(signInIntent, 101);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else {
                     helpingMethods.SnackBar("Check your internet connection.", v);
                 }
@@ -563,6 +569,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 Intent intent = new Intent(Verification.this, MapActivity.class);
                 flag = true;
                 startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -628,7 +635,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        startActivity(new Intent(Verification.this, BringoActivity.class));
+                                        Intent intent = new Intent(Verification.this, BringoActivity.class);
+                                        if(getIntent().getStringExtra("for")!=null){
+                                            intent.putExtra("cart","open");
+                                        }
+                                        startActivity(intent);
+                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                     } else {
                                         mCreateAlertDialog.dismiss();
                                         helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
@@ -874,6 +886,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         } else {
             requestPermissions();
@@ -1007,7 +1020,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }
         checkApi();
         verifyPhoneNumberWithCode(mVerificationId, code);
-        get_user = "http://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
+        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
         parseJSON();
     }
 
@@ -1098,6 +1111,11 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
                     mSigninContainer.setVisibility(View.GONE);
                     Intent intent = new Intent(Verification.this, BringoActivity.class);
+
+                    if(getIntent().getStringExtra("for")!=null){
+                        intent.putExtra("cart","open");
+                    }
+
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -1143,6 +1161,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             codeText.setText("");
             mTimer.setText("");
 
+        }else {
+            finish();
         }
 
     }

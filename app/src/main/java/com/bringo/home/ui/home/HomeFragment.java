@@ -228,10 +228,10 @@ public class HomeFragment extends Fragment {
     };
 
     //String url = "http://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
-    //"http://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
+    //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8133&longitude=67.0707", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -257,6 +257,7 @@ public class HomeFragment extends Fragment {
 
 
                         } catch (JSONException e) {
+                            grd_str.setVisibility(View.GONE);
                             mloadingImage.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
@@ -265,12 +266,10 @@ public class HomeFragment extends Fragment {
                     }
                     allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(),false);
                     grd_str.setAdapter(allStoreAdapter);
+                    grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                    grd_str.setVisibility(View.VISIBLE);
                     mBtnViewAll.setVisibility(View.VISIBLE);
-
-
                 }
 
 
@@ -278,6 +277,7 @@ public class HomeFragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                grd_str.setVisibility(View.GONE);
                 mloadingImage.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                 mretryBtn.setVisibility(View.VISIBLE);

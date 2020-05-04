@@ -4,13 +4,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -25,6 +31,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -39,32 +46,36 @@ public class BringoActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private DrawerLayout drawer;
-    private HelpingMethods helpingMethods;
+    public static HelpingMethods helpingMethods;
+    private LinearLayout minLayout, moutLayout;
     private String sName, sImage;
     public static TextView textCartItemCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_bringo);
-
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         helpingMethods = new HelpingMethods(BringoActivity.this);
+        if (getIntent().getStringExtra("cart") != null) {
+            OpencartActivity();
+        }
+        setContentView(R.layout.activity_bringo);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-
-
         View navHeaderView = navigationView.inflateHeaderView(R.layout.nav_header_bringo);
+        minLayout = navHeaderView.findViewById(R.id.inLayout);
+        moutLayout = navHeaderView.findViewById(R.id.outLayout);
         Button msignupBtn = navHeaderView.findViewById(R.id.signupBtn);
         final CircleImageView mUserImage = navHeaderView.findViewById(R.id.userImage);
         final TextView mUserName = navHeaderView.findViewById(R.id.userName);
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
+                        minLayout.setVisibility(View.VISIBLE);
                         Glide.with(getApplicationContext()).asBitmap().load(dataSnapshot.child("picture").getValue().toString()).apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_round)).into(mUserImage);
                         mUserName.setText(dataSnapshot.child("name").getValue().toString().toUpperCase());
                     }
@@ -91,10 +102,8 @@ public class BringoActivity extends AppCompatActivity {
 
                 }
             });
-
-
-        }else {
-            msignupBtn.setVisibility(View.VISIBLE);
+        } else {
+            moutLayout.setVisibility(View.VISIBLE);
             msignupBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -123,26 +132,61 @@ public class BringoActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be sidered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_cart, R.id.nav_wishlist, R.id.nav_wallet, R.id.nav_paymen, R.id.nav_messager
-                , R.id.nav_hist, R.id.nav_order, R.id.nav_contact, R.id.nav_about)
+                R.id.nav_home, R.id.nav_cart, R.id.nav_wishlist, R.id.nav_wallet, R.id.nav_paymen, R.id.nav_messager, R.id.nav_order, R.id.nav_contact, R.id.nav_about)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        navigationView.getMenu().getItem(7).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+                    drawer.closeDrawer(GravityCompat.START);
+                    ConnectionDetector detector = new ConnectionDetector(BringoActivity.this);
+                    if (detector.isConnected()) {
+                        startActivity(new Intent(BringoActivity.this, MyOrdersActivity.class));
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    } else {
+                        Toast.makeText(BringoActivity.this, "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    drawer.closeDrawer(GravityCompat.START);
+                    startActivity(new Intent(BringoActivity.this, Verification.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
+                return false;
+            }
+        });
+
         navigationView.getMenu().getItem(8).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent mintent = new Intent(BringoActivity.this, MessagingActivity.class);
-                mintent.putExtra("user_id", "BrwELMpWZEa057zF77OZdTx63k23");
-                mintent.putExtra("uName", sName);
-                mintent.putExtra("uImage", sImage);
-                mintent.putExtra("check", "one");
-                mintent.putExtra("forward", "one");
-                startActivity(mintent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                drawer.closeDrawer(GravityCompat.START);
+
+                if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+                    drawer.closeDrawer(GravityCompat.START);
+                    ConnectionDetector detector = new ConnectionDetector(BringoActivity.this);
+                    if (detector.isConnected()) {
+                        Intent mintent = new Intent(BringoActivity.this, MessagingActivity.class);
+                        mintent.putExtra("user_id", "BrwELMpWZEa057zF77OZdTx63k23");
+                        mintent.putExtra("uName", sName);
+                        mintent.putExtra("uImage", sImage);
+                        mintent.putExtra("check", "one");
+                        mintent.putExtra("forward", "one");
+                        startActivity(mintent);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    } else {
+                        Toast.makeText(BringoActivity.this, "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    drawer.closeDrawer(GravityCompat.START);
+                    startActivity(new Intent(BringoActivity.this, Verification.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
                 return false;
             }
         });
@@ -150,11 +194,11 @@ public class BringoActivity extends AppCompatActivity {
     }
 
     private void OpenProFile() {
-        if(FirebaseAuth.getInstance().getUid()!=null && helpingMethods.GetUName()!=null){
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             drawer.closeDrawer(GravityCompat.START);
             startActivity(new Intent(BringoActivity.this, ProfileActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        }else {
+        } else {
             drawer.closeDrawer(GravityCompat.START);
             startActivity(new Intent(BringoActivity.this, Verification.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -167,18 +211,70 @@ public class BringoActivity extends AppCompatActivity {
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }else {
+        } else {
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.bringo, menu);
+
+        final MenuItem menuItem = menu.findItem(R.id.action_cart);
+        View actionView = MenuItemCompat.getActionView(menuItem);
+        textCartItemCount = actionView.findViewById(R.id.cart_badge);
+
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
+        MainsetupBadge();
         return true;
     }
 
+
+    public static void MainsetupBadge() {
+        if (helpingMethods.GetStoreID() != null) {
+            if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) == 0) {
+                if (textCartItemCount.getVisibility() != View.GONE) {
+                    textCartItemCount.setVisibility(View.GONE);
+                }
+            } else {
+                textCartItemCount.setText("" + helpingMethods.GetCartCount(helpingMethods.GetStoreID()));
+                //textCartItemCount.setText(""+2);
+                if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+        }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_cart) {
+            if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
+                OpencartActivity();
+            }
+        }
+        return true;
+    }
+
+    private void OpencartActivity() {
+        Intent intent = new Intent(this, CartActivity.class);
+        intent.putExtra("StID", helpingMethods.GetStoreID());
+        intent.putExtra("catName", "");
+        intent.putExtra("stname", helpingMethods.GetStoreName());
+        intent.putExtra("ownerID", helpingMethods.GetStoreUID());
+        intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
 
     @Override
     protected void onResume() {

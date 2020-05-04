@@ -13,6 +13,33 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/cardVew1" />
 
+    <TextView
+        android:id="@+id/placeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Your cart is empty! click on the below button to place a order thanks"
+        android:textAlignment="center"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:textColor="@color/primaryTextColor"
+        android:textStyle="bold"
+        />
+
+    <Button
+        android:id="@+id/vAllStore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_shape"
+        android:paddingLeft="8dp"
+        android:visibility="gone"
+        android:paddingRight="8dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/placeText"
+        android:text="Place Order"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardVew1"
         android:layout_width="match_parent"
@@ -65,9 +92,9 @@
                 android:id="@+id/totalPrice"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
-                android:gravity="center_vertical"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/rs"
+                android:gravity="center_vertical"
                 android:textColor="@android:color/black" />
 
             <Button

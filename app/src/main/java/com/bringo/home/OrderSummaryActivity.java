@@ -100,7 +100,7 @@ import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 
 public class OrderSummaryActivity extends AppCompatActivity {
     APIService apiService;
-    private final String JSON_URL = "http://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
     private static List<CatLvlItemList> orderSummaryList;
     private Button mconfirmorder_btn;
@@ -114,13 +114,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     private List<CatLvlItemList> preferenceList;
     private JsonArrayRequest addressrequest;
-    private RequestQueue addressrequestQueue,requestQueue;
+    private RequestQueue addressrequestQueue, requestQueue;
     private static AddressAdapter addressAdapter;
     private String address;
     String OrdrerID;
     private String status = "";
     String dayString;
-    private final String Get_URL = "http://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = "https://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
     List<AddressClass> kuchbhe;
     private JsonArrayRequest request;
     private ProgressDialog progressDialog;
@@ -140,7 +140,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_order_summary);
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("Getting addresses...");
@@ -217,34 +217,32 @@ public class OrderSummaryActivity extends AppCompatActivity {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                 progressDialog.show();
-
                                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                                 final String id = reference.child("Chats").push().getKey();
-                                final DatabaseReference orderreference = FirebaseDatabase.getInstance().getReference();
-                                OrdrerID = reference.child("OrderDetail").push().getKey();
-                                final HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put("message", "new order");
-                                hashMap.put("time", ServerValue.TIMESTAMP);
-                                hashMap.put("seen", false);
-                                hashMap.put("type", "Order");
-                                hashMap.put("chatid", id);
-                                hashMap.put("orderID", OrdrerID);
-                                hashMap.put("storeID", store_ID);
-                                hashMap.put("address", cusaddress);
-                                hashMap.put("totalProduct", preferenceList.size());
-                                hashMap.put("totalPrice", "Rs." + pTotalPrice);
-                                hashMap.put("sender", FirebaseAuth.getInstance().getUid());
-                                hashMap.put("delivery", "not available");
-                                String url = "http://bringo.biz/api/post/up_order";
+                                String url = "https://bringo.biz/api/post/up_order";
                                 StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
+                                        OrdrerID = response;
+                                        final HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("message", "new order");
+                                        hashMap.put("time", ServerValue.TIMESTAMP);
+                                        hashMap.put("seen", false);
+                                        hashMap.put("type", "Order");
+                                        hashMap.put("chatid", id);
+                                        hashMap.put("orderID", OrdrerID);
+                                        hashMap.put("storeID", store_ID);
+                                        hashMap.put("address", cusaddress);
+                                        hashMap.put("totalProduct", preferenceList.size());
+                                        hashMap.put("totalPrice", "Rs." + pTotalPrice);
+                                        hashMap.put("sender", FirebaseAuth.getInstance().getUid());
+                                        hashMap.put("delivery", "not available");
                                         unreadReference = FirebaseDatabase.getInstance().getReference().child("Unread").child(FirebaseAuth.getInstance().getUid()).child(ownerID);
                                         reference.child("Chats").child(FirebaseAuth.getInstance().getUid() + ownerID).child(id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    helpingMethods.SaveCartCount(0,store_ID);
+                                                    helpingMethods.SaveCartCount(0, store_ID);
                                                     helpingMethods.SaveStoreData(null, null, null, null);
                                                     mycheckList.clear();
                                                     SaveCheckData();
@@ -272,11 +270,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                         });
 
 
-
-
-
-
-
                                     }
                                 }, new Response.ErrorListener() {
                                     @Override
@@ -298,7 +291,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                         HashMap hashMap = new HashMap<>();
 
 
-
                                         for (int a = 0; a < preferenceList.size(); a++) {
                                             hashMap.put("str_prc[" + a + "]", preferenceList.get(a).getP_price());
                                             hashMap.put("ord_qty[" + a + "]", preferenceList.get(a).getP_quantity());
@@ -311,7 +303,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                             hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
                                             hashMap.put("t_price", pTotalPrice);
                                             hashMap.put("time", tim);
-                                            hashMap.put("ord_id", OrdrerID);
                                             hashMap.put("day", dayString);
 
 
@@ -331,11 +322,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
                                 postdata.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                                 RequestHandlerSingleten.getInstance(getBaseContext()).addToRequestQueue(postdata);
-
-
-
-
-
 
 
                                 break;
@@ -423,29 +409,29 @@ public class OrderSummaryActivity extends AppCompatActivity {
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "http://bringo.biz/api/post/address";
+                                    String url = "https://bringo.biz/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {
                                             mProgressDialog.dismiss();
                                             alertDialog.cancel();
 
-                                            Toast.makeText(OrderSummaryActivity.this, "Address is added" , Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(OrderSummaryActivity.this, "Address is added", Toast.LENGTH_SHORT).show();
 
                                             Intent sumInt = new Intent(OrderSummaryActivity.this, OrderSummaryActivity.class);
-                                            sumInt.putExtra("from",getIntent().getStringExtra("from"));
+                                            sumInt.putExtra("from", getIntent().getStringExtra("from"));
 
                                             if (getIntent().getStringExtra("from").equals("activity")) {
-                                                sumInt.putExtra("totalP",mTxtView_TotalPrice.getText().toString());
+                                                sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
                                             } else {
-                                                sumInt.putExtra("totalP",mTxtView_Total.getText().toString());
+                                                sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
                                             }
 
 
                                             sumInt.putExtra("storeid", store_ID);
-                                            sumInt.putExtra("stname",ownerName);
-                                            sumInt.putExtra("ownerID",ownerID);
-                                            sumInt.putExtra("ownerImage",ownerImage);
+                                            sumInt.putExtra("stname", ownerName);
+                                            sumInt.putExtra("ownerID", ownerID);
+                                            sumInt.putExtra("ownerImage", ownerImage);
                                             startActivity(sumInt);
                                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                         }
@@ -494,7 +480,6 @@ public class OrderSummaryActivity extends AppCompatActivity {
                             }
 
 
-
                         }
 
                     });
@@ -524,7 +509,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 //                        });
 
                     } catch (Exception e) {
-                        Toast.makeText(OrderSummaryActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -811,7 +796,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
 
@@ -820,7 +805,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }

@@ -50,7 +50,6 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Product Name"
                 android:textColor="@color/primaryTextColor"
                 android:textStyle="bold" />
 
@@ -61,19 +60,20 @@
                 android:layout_below="@+id/product_title"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
+                android:layout_marginBottom="1dp"
                 android:ellipsize="end"
-                android:minLines="2"
-                android:maxLines="2"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:textColor="@color/secondaryTextColor" />
 
             <RelativeLayout
+                android:id="@+id/priceLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/product_desc"
                 android:layout_marginLeft="3dp"
-                android:layout_marginTop="2dp"
                 android:layout_marginRight="3dp"
-                android:layout_marginBottom="6dp">
+                android:layout_marginBottom="4dp">
 
                 <TextView
                     android:id="@+id/product_price1"
@@ -92,7 +92,9 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/product_price1"
-                    android:text="1200"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:textColor="@color/primaryTextColor"
                     android:textStyle="bold" />
 
@@ -106,30 +108,34 @@
                     android:textColor="@color/primaryTextColor"
                     android:textStyle="bold" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_add_cart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:tint="@color/white"
-                    app:backgroundTint="#C90A1B"
-                    app:fabSize="mini"
-                    app:srcCompat="@drawable/addcartwhite" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_remove_cart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:visibility="gone"
-                    app:backgroundTint="#C90A1B"
-                    app:fabSize="mini"
-                    app:srcCompat="@drawable/ic_action_remcart" />
-
             </RelativeLayout>
 
+            <Button
+                android:id="@+id/btn_add_cart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/priceLayout"
+                android:background="@drawable/button_shape"
+                android:drawableRight="@drawable/addcartwhite"
+                android:drawableTint="@color/white"
+                android:paddingRight="20dp"
+                android:text="Add"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btn_remove_cart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/priceLayout"
+                android:background="@drawable/button_shape"
+                android:drawableRight="@drawable/ic_action_remcart"
+                android:drawableTint="@color/white"
+                android:paddingRight="20dp"
+                android:text="Remove"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:visibility="gone" />
 
         </RelativeLayout>
 

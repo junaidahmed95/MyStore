@@ -123,7 +123,7 @@ public class SearchActivity extends AppCompatActivity {
     private void createExampleList() {
 
 
-        JsonArrayRequest request = new JsonArrayRequest("http://bringo.biz/api/get/stores/products?str_id="+getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/api/get/stores/products?str_id="+getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
