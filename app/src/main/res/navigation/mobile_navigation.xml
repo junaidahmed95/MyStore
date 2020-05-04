@@ -3,31 +3,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/nav_home">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.example.mystore.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_home"
+        android:name="com.bringo.home.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home"/>
 
     <fragment
-        android:id="@+id/navigation_messages"
-        android:name="com.example.mystore.ui.messages.MessagesFragment"
-        android:label="@string/title_messages"
-        tools:layout="@layout/fragment_messages" />
+        android:id="@+id/nav_cart"
+        android:name="com.bringo.home.ui.cart.CartFragment"
+        android:label="My Cart"
+        tools:layout="@layout/fragment_cart"/>
 
     <fragment
-        android:id="@+id/navigation_cart"
-        android:name="com.example.mystore.ui.cart.CartFragment"
-        android:label="@string/title_cart"
-        tools:layout="@layout/fragment_cart" />
+        android:id="@+id/nav_wishlist"
+        android:name="com.bringo.home.ui.WishListFragment"
+        android:label="My Wishlist"
+        tools:layout="@layout/fragment_wish_list"/>
 
     <fragment
-        android:id="@+id/navigation_account"
-        android:name="com.example.mystore.ui.account.AccountFragment"
-        android:label="@string/title_account"
-        tools:layout="@layout/fragment_cart" />
+        android:id="@+id/nav_wallet"
+        android:name="com.bringo.home.ui.WalletFragment"
+        android:label="My Wallet"
+        tools:layout="@layout/fragment_wallet"/>
 
+    <fragment
+        android:id="@+id/nav_paymen"
+        android:name="com.bringo.home.ui.PaymentsFragment"
+        android:label="Payments"
+        tools:layout="@layout/fragment_payments"/>
+
+    <fragment
+        android:id="@+id/nav_messager"
+        android:name="com.bringo.home.ui.messages.MessagesFragment"
+        android:label="Interactions/Messenger"
+        tools:layout="@layout/fragment_messages"/>
+
+    <fragment
+        android:id="@+id/nav_order"
+        android:name="com.bringo.home.ui.OrderFragment"
+        android:label="Current Order(s)"
+        tools:layout="@layout/fragment_order"/>
+
+
+
+    <fragment
+        android:id="@+id/nav_contact"
+        android:name="com.bringo.home.ui.ContactFragment"
+        android:label="Contact Us"
+        tools:layout="@layout/fragment_contact"/>
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.bringo.home.ui.AboutFragment"
+        android:label="About Us"
+        tools:layout="@layout/fragment_about"/>
 
 </navigation>

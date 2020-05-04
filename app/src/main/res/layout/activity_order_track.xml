@@ -2,18 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F0F0F0"
     android:orientation="vertical"
-    tools:context=".OrderTrackActivity">
-
-
-        <include
-            android:id="@+id/bar"
-            layout="@layout/toolbar" />
+    android:layout_width="match_parent"
+    android:background="#F0F0F0"
+    android:layout_height="match_parent">
 
     <ScrollView
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F0F0F0"
@@ -40,7 +35,7 @@
                 <LinearLayout
 
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="60dp"
                     android:orientation="horizontal">
 
 
@@ -66,8 +61,10 @@
 
                         <TextView
                             android:id="@+id/txt_ordertime"
+                            android:layout_marginBottom="3dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:maxLength="16"
                             android:text="05:30 PM"
                             android:textColor="@android:color/black">
 
@@ -455,8 +452,6 @@
                     android:id="@+id/stepFourFab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
                     android:layout_marginTop="16dp"
                     android:src="@drawable/deliverd"
                     android:tint="@android:color/white"
@@ -520,4 +515,5 @@
 
         </LinearLayout>
     </ScrollView>
-    </LinearLayout>
+
+</LinearLayout>

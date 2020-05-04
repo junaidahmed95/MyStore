@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#D6D6D6"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
@@ -52,27 +53,27 @@
         android:id="@+id/content_main"
         layout="@layout/bar" />
 
-    <ProgressBar
-        android:visibility="gone"
+
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/spin_kit"
+        style="@style/SpinKitView.Large.CubeGrid"
+        android:layout_width="wrap_content"
         android:layout_centerInParent="true"
-        android:id="@+id/progressbar"
+        android:layout_height="wrap_content"
+        app:SpinKit_Color="@color/colorAccent" />
+
+    <Button
+        android:id="@+id/retryBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="115dp" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fbcart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="16dp"
-        android:tint="@color/white"
-        android:visibility="gone"
-        app:srcCompat="@drawable/ic_shopping_cart_black_24dp">
-
-    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+        android:layout_gravity="center"
+        android:background="@drawable/btn_shape"
+        android:text="Retry"
+        android:textAllCaps="false"
+        android:layout_centerInParent="true"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

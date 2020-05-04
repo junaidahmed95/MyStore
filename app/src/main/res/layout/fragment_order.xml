@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/status_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F0F0F0"
+        android:orientation="vertical" />
+
+    <TextView
+        android:id="@+id/noOrder"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:textAlignment="center"
+        android:layout_margin="16dp"
+        android:textStyle="bold"
+        android:layout_centerInParent="true"
+        android:textColor="@color/primaryTextColor"
+        android:text="Currently your order is not active yet! or place any order thanks"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/vAllStore"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_shape"
+        android:paddingLeft="8dp"
+        android:layout_below="@+id/noOrder"
+        android:layout_centerHorizontal="true"
+        android:paddingRight="8dp"
+        android:text="Place Order"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/btnSiglo"
+        android:layout_width="wrap_content"
+        android:text="Sign Up / Sign In"
+        android:textColor="@color/white"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:background="@drawable/btn_shape"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

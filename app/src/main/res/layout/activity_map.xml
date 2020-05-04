@@ -108,7 +108,7 @@
             android:tint="@android:color/white"
             app:backgroundTint="@color/colorPrimary"
             app:elevation="3dp"
-            app:srcCompat="@drawable/ic_done_black_24dp" />
+            app:srcCompat="@drawable/ic_action_send" />
 
     </RelativeLayout>
 
