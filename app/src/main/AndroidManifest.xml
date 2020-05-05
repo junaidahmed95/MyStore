@@ -41,12 +41,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MyOrdersActivity"></activity>
-        <activity android:name=".OrderTrackActivity" />
         <activity
-            android:name=".BringoActivity"
-            android:label="@string/title_activity_bringo"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".MyOrdersActivity" />
+        <activity android:name=".OrderTrackActivity" />
         <activity android:name=".StoreInfoActivity" />
         <activity android:name=".ViewAllStoresActivity" />
         <activity android:name=".ViewImage" />

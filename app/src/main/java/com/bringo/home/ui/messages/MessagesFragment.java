@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bringo.home.BringoActivity;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Verification;
 import com.bumptech.glide.Glide;

@@ -27,6 +27,9 @@ import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,13 +40,14 @@ import java.util.List;
 
 public class StoreInfoActivity extends AppCompatActivity {
 
-    private ImageButton mbtnBack;
+    private ImageButton mbtnBack, mbtn_search;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
-
+    private HelpingMethods helpingMethods;
     private TextView mstName, mstAddress;
     private Button mretryBtn;
+    private TextView textCartItemCount;
     private ProgressDialog mProgressDialog;
     private List<String> backupList;
     private List<Category> productList;
@@ -52,12 +56,11 @@ public class StoreInfoActivity extends AppCompatActivity {
     private RecyclerView categoryRecyclerView;
 
     public static boolean flagfroprice = true;
-    public static TextView textCartItemCount;
     public static int mCartItemCount = 0;
     private ImageView mstImage;
-    private HelpingMethods helpingMethods;
     public static List<CatLvlItemList> favlist = new ArrayList<>();
     public static List<String> checklist = new ArrayList<>();
+    private ImageView mbasketImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +71,32 @@ public class StoreInfoActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        mbtn_search = findViewById(R.id.btnSearch);
         stID = getIntent().getStringExtra("storeid");
         helpingMethods = new HelpingMethods(this);
+        textCartItemCount = findViewById(R.id.cart_badge);
+        mbasketImageView = findViewById(R.id.basketImageView);
+        mbasketImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (helpingMethods.GetStoreID().equals(stID)) {
+                    if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
+                        Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
+                        intent.putExtra("StID", helpingMethods.GetStoreID());
+                        intent.putExtra("catName", "");
+                        intent.putExtra("stname", helpingMethods.GetStoreName());
+                        intent.putExtra("ownerID", helpingMethods.GetStoreUID());
+                        intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    }
+                }
+
+
+            }
+        });
+
+
         mstImage = findViewById(R.id.stImageView);
         mstName = findViewById(R.id.stName);
         mstAddress = findViewById(R.id.stAddress);
@@ -95,6 +122,16 @@ public class StoreInfoActivity extends AppCompatActivity {
 
         categoryRecyclerView = findViewById(R.id.cat_recyclerView);
         categoryRecyclerView.setLayoutManager(new GridLayoutManager(StoreInfoActivity.this, 2));
+
+        mbtn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StoreInfoActivity.this, SearchActivity.class);
+                intent.putExtra("stID", stID);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
 
         ConnectionDetector connectionDetector = new ConnectionDetector(StoreInfoActivity.this);
         if (connectionDetector.isConnected()) {
@@ -139,7 +176,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                     try {
                         jsonObject = response.getJSONObject(i);
                         String catTitle = jsonObject.getString("m_name");
-                        String catimage = jsonObject.getString("product_image");
+                        String catimage = jsonObject.getString("thumbnail");
                         if (!backupList.contains(jsonObject.getString("m_name"))) {
                             backupList.add(jsonObject.getString("m_name"));
                             productList.add(new Category(catimage, catTitle));
@@ -187,6 +224,44 @@ public class StoreInfoActivity extends AppCompatActivity {
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    private void MainBadge() {
+        if (helpingMethods.GetStoreID() != null) {
+            if (helpingMethods.GetStoreID().equals(stID)) {
+                if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) == 0) {
+                    if (textCartItemCount.getVisibility() != View.GONE) {
+                        textCartItemCount.setVisibility(View.GONE);
+                    }
+                } else {
+                    textCartItemCount.setText("" + helpingMethods.GetCartCount(helpingMethods.GetStoreID()));
+                    //textCartItemCount.setText(""+2);
+                    if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                        textCartItemCount.setVisibility(View.VISIBLE);
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MainBadge();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
 }

@@ -33,6 +33,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
     BottomSheetDialog orderdetailSheetDialog;
     private int qtycount = 0;
     private int tprice = 0;
+    String chkstuts;
 
 
     public HistoryAdapter(List<OrderHistory> historylist, Context mContext) {
@@ -62,8 +63,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
 
         //holder.mtxt_address.setText(historylist.get(position).getGetorderbykeylist().get(o).getUaddress());
 
+
         for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-            holder.mstatus.setText(historylist.get(position).getGetorderbykeylist().get(a).getStatus());
+            chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
+
             holder.mstorename.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts());
             holder.mcreated.setText(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day());
             holder.mordid.setText(historylist.get(position).getOrderid());
@@ -71,6 +74,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
             Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
 
         }
+
+        if(chkstuts.equals("null")){
+            holder.mstatus.setText("Pending");
+        }else if(chkstuts.equals("2")){
+            holder.mstatus.setText("Assembled");
+        }else if(chkstuts.equals("3")){
+            holder.mstatus.setText("OnRoute");
+        }else if(chkstuts.equals("4")){
+            holder.mstatus.setText("Delivered");
+        }else if(chkstuts.equals("1")){
+            holder.mstatus.setText("Accepted");
+        }
+
+
+
 
 
 
@@ -104,20 +122,27 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.Hisholde
                 TextView mtxt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
                 TextView mtxt_addresss = mView.findViewById(R.id.txt_addresss);
                 TextView mtxt_prices = mView.findViewById(R.id.totalitemprice);
+                TextView mstatus = mView.findViewById(R.id.status);
 
 
                 for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
                     mtxt_addresss.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
                     mtxt_prices.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-                    qtycount += Integer.parseInt(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty());
+                    chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
                     list.add(new OrderHistory(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_price(), historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), historylist.get(position).getGetorderbykeylist().get(a).getAct_price(), historylist.get(position).getGetorderbykeylist().get(a).getImage(), historylist.get(position).getGetorderbykeylist().get(a).getTitle()));
 
                 }
                 mtxt_totalproductss.setText(""+ historylist.get(position).getGetorderbykeylist().size());
-
-
-                mtxt_qtys.setText("Qty: "+qtycount);
-                qtycount = 0;
+                mtxt_qtys.setText(""+historylist.get(position).getOrderid());
+                if(chkstuts.equals("1")){
+                    mstatus.setText("Accepted");
+                }else if(chkstuts.equals("2")){
+                    mstatus.setText("Assembled");
+                }else if(chkstuts.equals("3")){
+                    mstatus.setText("OnRoute");
+                }else if(chkstuts.equals("4")){
+                    mstatus.setText("Delivered");
+                }
 
 
                 FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);

@@ -66,6 +66,8 @@ public class CartActivity extends AppCompatActivity {
         mActionBarToolbar.setTitle("My Cart");
         GetCartData();
 
+        mTxtView_TotalPrice.setText(""+helpingMethods.GetCartTotal());
+
         cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity");
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
@@ -106,7 +108,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void GoBack() {
         if(getIntent().getStringExtra("for")!=null){
-            Intent intent = new Intent(CartActivity.this, BringoActivity.class);
+            Intent intent = new Intent(CartActivity.this, MainActivity.class);
             startActivity(intent);
         }
 

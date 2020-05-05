@@ -75,7 +75,7 @@ public class CatLvlFragment extends Fragment {
                             originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price(),prolist.get(i).getDesc()));
                         }
                     }
-                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName,catName);
+                    PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName,catName,false);
                     mpRecyclerView.setAdapter(proAdapter);
                     proAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);

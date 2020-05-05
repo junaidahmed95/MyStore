@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bringo.home.BringoActivity.MainsetupBadge;
+import static com.bringo.home.MainActivity.MainsetupBadge;
 
 
 public class ProductDetailActivity extends AppCompatActivity {
