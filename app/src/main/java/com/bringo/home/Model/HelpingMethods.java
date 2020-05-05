@@ -85,4 +85,18 @@ public class HelpingMethods {
         return uiD;
     }
 
+    public int GetCartTotal() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("CartTotal", Context.MODE_PRIVATE);
+        int sid = sharedPreferences.getInt("amount", 0);
+        return sid;
+    }
+
+
+    public void SaveCartTotal(int total){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("CartTotal", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("amount",total);
+        editor.apply();
+    }
+
 }

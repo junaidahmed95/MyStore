@@ -34,7 +34,7 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                        startActivity(new Intent(SplashActivity.this, BringoActivity.class));
+                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         finish();
                 }

@@ -59,7 +59,7 @@ public class OrderFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-               Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_order, container, false);
         mProgressDialog = new ProgressDialog(getActivity());
@@ -154,7 +154,7 @@ public class OrderFragment extends Fragment {
                             statusAdapter.notifyDataSetChanged();
                             products_list.clear();
 
-                        } else if(products_list.size() == 0) {
+                        } else if(historylist.size() == 0) {
                             mnoOrder.setVisibility(View.VISIBLE);
                         }
 

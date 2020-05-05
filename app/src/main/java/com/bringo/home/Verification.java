@@ -351,7 +351,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
-                                                    Intent intent = new Intent(Verification.this, BringoActivity.class);
+                                                    Intent intent = new Intent(Verification.this, MainActivity.class);
                                                     if(getIntent().getStringExtra("for")!=null){
                                                         intent.putExtra("cart","open");
                                                     }
@@ -635,7 +635,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intent = new Intent(Verification.this, BringoActivity.class);
+                                        Intent intent = new Intent(Verification.this, MainActivity.class);
                                         if(getIntent().getStringExtra("for")!=null){
                                             intent.putExtra("cart","open");
                                         }
@@ -1110,7 +1110,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                     mSigninContainer.setVisibility(View.GONE);
-                    Intent intent = new Intent(Verification.this, BringoActivity.class);
+                    Intent intent = new Intent(Verification.this, MainActivity.class);
 
                     if(getIntent().getStringExtra("for")!=null){
                         intent.putExtra("cart","open");

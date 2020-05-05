@@ -42,7 +42,7 @@ public class CartFragment extends Fragment {
     private TextView mplaceText;
     private HelpingMethods helpingMethods;
     public static CardView mcardview1;
-    private Button mcheckBtn,mvAllStore;
+    private Button mcheckBtn, mvAllStore;
     private List<CatLvlItemList> preferenceList;
 
     public View onCreateView(@NonNull final LayoutInflater inflater,
@@ -76,7 +76,7 @@ public class CartFragment extends Fragment {
             mvAllStore.setVisibility(View.VISIBLE);
         }
 
-
+        mTxtView_Total.setText("" + helpingMethods.GetCartTotal());
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,7 +93,7 @@ public class CartFragment extends Fragment {
                     }
                 } else {
                     Intent intent = new Intent(getActivity(), Verification.class);
-                    intent.putExtra("for","cart");
+                    intent.putExtra("for", "cart");
                     getActivity().startActivity(intent);
                     getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }

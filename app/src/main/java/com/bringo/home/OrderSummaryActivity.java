@@ -243,6 +243,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     helpingMethods.SaveCartCount(0, store_ID);
+                                                    helpingMethods.SaveCartTotal(0);
                                                     helpingMethods.SaveStoreData(null, null, null, null);
                                                     mycheckList.clear();
                                                     SaveCheckData();

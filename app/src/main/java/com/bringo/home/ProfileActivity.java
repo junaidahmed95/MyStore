@@ -564,7 +564,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(ProfileActivity.this, MapActivity.class);
-                            //flag = true;
                             intent.putExtra("activity","profile");
                             startActivity(intent);
                         }

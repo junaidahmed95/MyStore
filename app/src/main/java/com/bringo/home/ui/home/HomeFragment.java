@@ -231,7 +231,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8133&longitude=67.0707", new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
