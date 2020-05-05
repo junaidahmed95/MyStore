@@ -41,12 +41,12 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName,ownerName,ownerID,ownerImage;
+    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_product_detail);
 
         Toolbar toolbar = findViewById(R.id.viewBar);
@@ -142,7 +142,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     mycheckList.add(spID);
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID,pPrice,spID));
+                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID));
                     SaveCartData();
                 }
 
@@ -249,13 +249,24 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void GoBack() {
-        Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
-        intent.putExtra("storeid", storeID);
-        intent.putExtra("catName", catName);
-        intent.putExtra("stname",ownerName);
-        intent.putExtra("ownerID",ownerID);
-        intent.putExtra("ownerImage",ownerImage);
-        startActivity(intent);
+        if (catName.equals("")) {
+            Intent intent = new Intent(ProductDetailActivity.this, SearchActivity.class);
+            intent.putExtra("stID", storeID);
+            intent.putExtra("catName", catName);
+            intent.putExtra("stname", ownerName);
+            intent.putExtra("ownerID", ownerID);
+            intent.putExtra("ownerImage", ownerImage);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
+            intent.putExtra("storeid", storeID);
+            intent.putExtra("catName", catName);
+            intent.putExtra("stname", ownerName);
+            intent.putExtra("ownerID", ownerID);
+            intent.putExtra("ownerImage", ownerImage);
+            startActivity(intent);
+        }
+
 
     }
 

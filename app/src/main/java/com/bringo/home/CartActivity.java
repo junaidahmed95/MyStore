@@ -81,15 +81,20 @@ public class CartActivity extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
                     if (connectionDetector.isConnected()) {
-                        Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
-                        sumInt.putExtra("from", "activity");
-                        sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
-                        sumInt.putExtra("storeid", store_ID);
-                        sumInt.putExtra("stname", ownerName);
-                        sumInt.putExtra("ownerID", ownerID);
-                        sumInt.putExtra("ownerImage", ownerImage);
-                        startActivity(sumInt);
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        if(helpingMethods.GetCartTotal()>=300){
+                            Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
+                            sumInt.putExtra("from", "activity");
+                            sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
+                            sumInt.putExtra("storeid", store_ID);
+                            sumInt.putExtra("stname", ownerName);
+                            sumInt.putExtra("ownerID", ownerID);
+                            sumInt.putExtra("ownerImage", ownerImage);
+                            startActivity(sumInt);
+                            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        }else {
+                            Toast.makeText(CartActivity.this, "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
+                        }
+
                     } else {
                         Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
@@ -107,14 +112,17 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void GoBack() {
-        if(getIntent().getStringExtra("for")!=null){
-            Intent intent = new Intent(CartActivity.this, MainActivity.class);
-            startActivity(intent);
-        }
-
         if(!cat_Name.equals("")){
             Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
             intent.putExtra("storeid", store_ID);
+            intent.putExtra("catName", cat_Name);
+            intent.putExtra("stname", ownerName);
+            intent.putExtra("ownerID", ownerID);
+            intent.putExtra("ownerImage", ownerImage);
+            startActivity(intent);
+        }else {
+            Intent intent = new Intent(CartActivity.this, SearchActivity.class);
+            intent.putExtra("stID", store_ID);
             intent.putExtra("catName", cat_Name);
             intent.putExtra("stname", ownerName);
             intent.putExtra("ownerID", ownerID);

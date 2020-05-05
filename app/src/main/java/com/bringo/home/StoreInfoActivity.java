@@ -73,6 +73,10 @@ public class StoreInfoActivity extends AppCompatActivity {
         mProgressDialog.show();
         mbtn_search = findViewById(R.id.btnSearch);
         stID = getIntent().getStringExtra("storeid");
+        ownerName = getIntent().getStringExtra("stname");
+        ownerAdd = getIntent().getStringExtra("address");
+        ownerImage = getIntent().getStringExtra("ownerImage");
+        ownerID = getIntent().getStringExtra("ownerID");
         helpingMethods = new HelpingMethods(this);
         textCartItemCount = findViewById(R.id.cart_badge);
         mbasketImageView = findViewById(R.id.basketImageView);
@@ -102,10 +106,7 @@ public class StoreInfoActivity extends AppCompatActivity {
         mstAddress = findViewById(R.id.stAddress);
         mretryBtn = findViewById(R.id.retryBtn);
 
-        ownerName = getIntent().getStringExtra("stname");
-        ownerAdd = getIntent().getStringExtra("address");
-        ownerImage = getIntent().getStringExtra("ownerImage");
-        ownerID = getIntent().getStringExtra("ownerID");
+
 
         //Glide.with(getApplicationContext()).asBitmap().load(ownerImage).apply(new RequestOptions().placeholder(R.drawable.store_background)).into(mstImage);
 
@@ -128,6 +129,10 @@ public class StoreInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(StoreInfoActivity.this, SearchActivity.class);
                 intent.putExtra("stID", stID);
+                intent.putExtra("catName", "");
+                intent.putExtra("stname", ownerName);
+                intent.putExtra("ownerID", ownerID);
+                intent.putExtra("ownerImage", ownerImage);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }

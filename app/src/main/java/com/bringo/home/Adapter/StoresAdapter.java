@@ -58,7 +58,7 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.txt_storename.setText(storeList.get(position).getStore_name());
         holder.txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
-        Glide.with(mcontext).asBitmap().load(storeList.get(position).getStore_image()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.mimg_store);
+        Glide.with(mcontext).asBitmap().load(storeList.get(position).getStore_image()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mimg_store);
 
 
         holder.storecardId.setOnClickListener(new View.OnClickListener() {
