@@ -83,11 +83,16 @@ public class CartFragment extends Fragment {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                     if (connectionDetector.isConnected()) {
-                        Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
-                        sumInt.putExtra("from", "fragement");
-                        sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
-                        startActivity(sumInt);
-                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        if(helpingMethods.GetCartTotal()>=300){
+                            Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
+                            sumInt.putExtra("from", "fragement");
+                            sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
+                            startActivity(sumInt);
+                            getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        }else {
+                            Toast.makeText(getActivity(), "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
+                        }
+
                     } else {
                         Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                     }

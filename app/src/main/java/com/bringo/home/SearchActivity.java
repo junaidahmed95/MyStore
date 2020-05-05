@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.bringo.home.Adapter.PCatAdapter;
 import com.bringo.home.Model.CatLvlItemList;
+import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,6 +61,8 @@ public class SearchActivity extends AppCompatActivity {
     PCatAdapter pCatAdapter;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private RecyclerView.LayoutManager mLayoutManager;
+    private String  ownerID, ownerImage, ownerName,cat_Name;
+    private static String store_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,12 @@ public class SearchActivity extends AppCompatActivity {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        store_ID  = getIntent().getStringExtra("stID");
+        cat_Name = getIntent().getStringExtra("catName");
+        ownerName = getIntent().getStringExtra("stname");
+        ownerImage = getIntent().getStringExtra("ownerImage");
+        ownerID = getIntent().getStringExtra("ownerID");
+
         meditText = findViewById(R.id.edittext);
         toolbar = findViewById(R.id.toolbar);
         helpingMethods = new HelpingMethods(this);
@@ -81,44 +90,17 @@ public class SearchActivity extends AppCompatActivity {
         list = new ArrayList<>();
 
         prolist = new ArrayList<>();
-        createExampleList();
+        ConnectionDetector connectionDetector = new ConnectionDetector(this);
+        if(connectionDetector.isConnected()){
+            createExampleList();
+        }else {
+            Toast.makeText(this, "Check your internet and retry again.", Toast.LENGTH_SHORT).show();
+        }
+
 
 
     }
 
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.cart_menu, menu);
-//
-//        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
-//        View actionView = MenuItemCompat.getActionView(menuItem);
-//        // if (checklist.size() == 0) {
-//        //    textCartItemCount = actionView.findViewById(R.id.cart_badge);
-//        // }
-//        actionView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onOptionsItemSelected(menuItem);
-//            }
-//        });
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == android.R.id.home) {
-//            CheckForCart();
-//            finish();
-//        } else if (id == R.id.menu_cart) {
-//            if (!textCartItemCount.getText().toString().equals("0") && checklist.size() > 0) {
-//                Intent intent = new Intent(this, CartActivity.class);
-//                startActivity(intent);
-//            }
-//        }
-//        return true;
-//    }
 
 
     private void filter(String text) {
@@ -161,7 +143,7 @@ public class SearchActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                pCatAdapter = new PCatAdapter(prolist, SearchActivity.this, getIntent().getStringExtra("stid"), null, null, null, null,true);
+                pCatAdapter = new PCatAdapter(prolist, SearchActivity.this, store_ID, ownerID, ownerImage, ownerName, cat_Name,true);
                 mRecyclerView.setAdapter(pCatAdapter);
                 pCatAdapter.notifyDataSetChanged();
                 mProgressDialog.cancel();
@@ -184,7 +166,7 @@ public class SearchActivity extends AppCompatActivity {
                         if (!s.toString().trim().equals("")) {
                             filter(s.toString());
                         }else {
-                            pCatAdapter = new PCatAdapter(prolist, SearchActivity.this, getIntent().getStringExtra("stid"), null, null, null, null,true);
+                            pCatAdapter = new PCatAdapter(prolist, SearchActivity.this, store_ID, ownerID, ownerImage, ownerName, cat_Name,true);
                             mRecyclerView.setAdapter(pCatAdapter);
                             pCatAdapter.notifyDataSetChanged();
                         }
@@ -237,6 +219,66 @@ public class SearchActivity extends AppCompatActivity {
         }
 
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.cart_menu, menu);
+
+        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
+        View actionView = MenuItemCompat.getActionView(menuItem);
+
+
+        textCartItemCount = actionView.findViewById(R.id.cart_badge);
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
+
+        SearchsetupBadge();
+        return true;
+    }
+
+    public static void SearchsetupBadge() {
+        if (helpingMethods.GetCartCount(store_ID) == 0) {
+            if (textCartItemCount.getVisibility() != View.GONE) {
+                textCartItemCount.setVisibility(View.GONE);
+            }
+        } else {
+            textCartItemCount.setText("" + helpingMethods.GetCartCount(store_ID));
+            //textCartItemCount.setText(""+2);
+            if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                textCartItemCount.setVisibility(View.VISIBLE);
+            }
+
+        }
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+        } else if (id == R.id.menu_cart) {
+            if (helpingMethods.GetCartCount(store_ID) > 0) {
+                Intent intent = new Intent(this, CartActivity.class);
+                intent.putExtra("StID", store_ID);
+                intent.putExtra("catName", cat_Name);
+                intent.putExtra("stname",ownerName);
+                intent.putExtra("ownerID",ownerID);
+                intent.putExtra("ownerImage",ownerImage);
+                startActivity(intent);
+                finish();
+            }
+        }
+        return true;
+    }
+
 
     @Override
     protected void onPause() {

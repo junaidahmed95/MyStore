@@ -125,6 +125,7 @@ public class HomeFragment extends Fragment {
                 ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                 if (connectionDetector.isConnected()) {
                     mloadingImage.setVisibility(View.VISIBLE);
+                    mcdv_dialog.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.GONE);
                     CheckLocationPermission();
                 } else {
@@ -227,11 +228,11 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    //String url = "http://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
