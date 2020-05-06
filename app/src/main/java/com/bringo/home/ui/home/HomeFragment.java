@@ -201,6 +201,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
     }
 

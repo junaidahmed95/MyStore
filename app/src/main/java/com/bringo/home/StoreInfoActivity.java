@@ -88,6 +88,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                         Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
                         intent.putExtra("StID", helpingMethods.GetStoreID());
                         intent.putExtra("catName", "");
+                        intent.putExtra("for", "finish");
                         intent.putExtra("stname", helpingMethods.GetStoreName());
                         intent.putExtra("ownerID", helpingMethods.GetStoreUID());
                         intent.putExtra("ownerImage", helpingMethods.GetStoreImage());

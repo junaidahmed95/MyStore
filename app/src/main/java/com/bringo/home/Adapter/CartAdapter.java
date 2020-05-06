@@ -110,7 +110,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     viewHolder.Mul();
                     cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-                    int total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getP_price());
+                    int total = 0;
+                    if (helpingMethods.GetCartTotal() > Integer.parseInt(cartList.get(pos).getP_price())) {
+                        total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getP_price());
+                    } else {
+                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal();
+                    }
+
+
                     helpingMethods.SaveCartTotal(total);
                     if (fromWhere.equals("activity")) {
                         mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal() + "/-");
@@ -137,7 +144,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
                                     helpingMethods.SaveCartCount(finalCount, cartList.get(pos).getStoreId());
                                     MainsetupBadge();
-                                    int total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getActual_price());
+
+                                    int total = 0;
+                                    if (helpingMethods.GetCartTotal() > Integer.parseInt(cartList.get(pos).getActual_price())) {
+                                        total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getActual_price());
+                                    } else {
+                                        total = Integer.parseInt(cartList.get(pos).getActual_price()) - helpingMethods.GetCartTotal();
+                                    }
                                     helpingMethods.SaveCartTotal(total);
                                     if (fromWhere.equals("activity")) {
                                         mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal() + "/-");

@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
+                    if (dataSnapshot.exists() && dataSnapshot.child("picture").exists()) {
                         minLayout.setVisibility(View.VISIBLE);
                         Glide.with(getApplicationContext()).asBitmap().load(dataSnapshot.child("picture").getValue().toString()).apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_round)).into(mUserImage);
                         mUserName.setText(dataSnapshot.child("name").getValue().toString().toUpperCase());
@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CartActivity.class);
         intent.putExtra("StID", helpingMethods.GetStoreID());
         intent.putExtra("catName", "");
+        intent.putExtra("for","finish");
         intent.putExtra("stname", helpingMethods.GetStoreName());
         intent.putExtra("ownerID", helpingMethods.GetStoreUID());
         intent.putExtra("ownerImage", helpingMethods.GetStoreImage());

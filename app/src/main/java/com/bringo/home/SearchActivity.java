@@ -268,6 +268,7 @@ public class SearchActivity extends AppCompatActivity {
             if (helpingMethods.GetCartCount(store_ID) > 0) {
                 Intent intent = new Intent(this, CartActivity.class);
                 intent.putExtra("StID", store_ID);
+                intent.putExtra("for", "search");
                 intent.putExtra("catName", cat_Name);
                 intent.putExtra("stname",ownerName);
                 intent.putExtra("ownerID",ownerID);

@@ -66,7 +66,7 @@ public class CartActivity extends AppCompatActivity {
         mActionBarToolbar.setTitle("My Cart");
         GetCartData();
 
-        mTxtView_TotalPrice.setText(""+helpingMethods.GetCartTotal());
+        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal());
 
         cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity");
         mCartRecyclerView.setAdapter(cartAdapter);
@@ -81,7 +81,7 @@ public class CartActivity extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
                     if (connectionDetector.isConnected()) {
-                        if(helpingMethods.GetCartTotal()>=300){
+                        if (helpingMethods.GetCartTotal() >= 300) {
                             Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
                             sumInt.putExtra("from", "activity");
                             sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
@@ -91,7 +91,7 @@ public class CartActivity extends AppCompatActivity {
                             sumInt.putExtra("ownerImage", ownerImage);
                             startActivity(sumInt);
                             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                        }else {
+                        } else {
                             Toast.makeText(CartActivity.this, "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
                         }
 
@@ -101,7 +101,7 @@ public class CartActivity extends AppCompatActivity {
 
                 } else {
                     Intent intent = new Intent(CartActivity.this, Verification.class);
-                    intent.putExtra("for","cart");
+                    intent.putExtra("for", "cart");
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }
@@ -112,23 +112,28 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void GoBack() {
-        if(!cat_Name.equals("")){
-            Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
-            intent.putExtra("storeid", store_ID);
-            intent.putExtra("catName", cat_Name);
-            intent.putExtra("stname", ownerName);
-            intent.putExtra("ownerID", ownerID);
-            intent.putExtra("ownerImage", ownerImage);
-            startActivity(intent);
-        }else {
-            Intent intent = new Intent(CartActivity.this, SearchActivity.class);
-            intent.putExtra("stID", store_ID);
-            intent.putExtra("catName", cat_Name);
-            intent.putExtra("stname", ownerName);
-            intent.putExtra("ownerID", ownerID);
-            intent.putExtra("ownerImage", ownerImage);
-            startActivity(intent);
-        }
+        if (getIntent().getStringExtra("for").equals("finish")) {
+            finish();
+        } else if (getIntent().getStringExtra("for").equals("subcart")) {
+                Intent intent = new Intent(CartActivity.this, SubCatActivity.class);
+                intent.putExtra("storeid", store_ID);
+                intent.putExtra("catName", cat_Name);
+                intent.putExtra("stname", ownerName);
+                intent.putExtra("ownerID", ownerID);
+                intent.putExtra("ownerImage", ownerImage);
+                startActivity(intent);
+        } else if (getIntent().getStringExtra("for").equals("search")) {
+                Intent intent = new Intent(CartActivity.this, SearchActivity.class);
+                intent.putExtra("stID", store_ID);
+                intent.putExtra("catName", cat_Name);
+                intent.putExtra("stname", ownerName);
+                intent.putExtra("ownerID", ownerID);
+                intent.putExtra("ownerImage", ownerImage);
+                startActivity(intent);
+            }
+
+
+
 
     }
 

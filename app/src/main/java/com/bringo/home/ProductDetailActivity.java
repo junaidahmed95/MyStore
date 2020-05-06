@@ -2,6 +2,9 @@ package com.bringo.home;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bringo.home.Adapter.PCatAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bringo.home.Model.CatLvlItemList;
@@ -26,22 +30,23 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bringo.home.Adapter.PCatAdapter.subcatproLists;
 import static com.bringo.home.MainActivity.MainsetupBadge;
 
 
 public class ProductDetailActivity extends AppCompatActivity {
 
-    private SliderView sliderView;
     private List<String> mycheckList;
     private List<CatLvlItemList> preferenceList;
     private String storeID;
     private String spID;
-    private TextView mName, mprice;
+    private RecyclerView mpRecyclerView;
+    private TextView mName, mprice,mp_desc;
     private ImageView mpImage;
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage;
+    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage,mdesc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +59,17 @@ public class ProductDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        sliderView = findViewById(R.id.imageSlider);
         mpImage = findViewById(R.id.pImage);
         mcheckout = findViewById(R.id.checkout);
+        mpRecyclerView = findViewById(R.id.relatePList);
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+
         storeID = getIntent().getStringExtra("sID");
         spID = getIntent().getStringExtra("spID");
+        mdesc = getIntent().getStringExtra("desc");
         mremoveToCart = findViewById(R.id.removeToCart);
+        mp_desc = findViewById(R.id.p_desc);
+        mp_desc.setText(mdesc);
         maddToCart = findViewById(R.id.addToCart);
         position = getIntent().getIntExtra("pos", 0);
         pName = getIntent().getStringExtra("name");
@@ -97,19 +107,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-
-//
-//        final SliderAdapter adapter = new SliderAdapter(this);
-//        adapter.setCount(6);
-//
-//        sliderView.setSliderAdapter(adapter);
-//
-//        sliderView.setOnIndicatorClickListener(new DrawController.ClickListener() {
-//            @Override
-//            public void onIndicatorClicked(int position) {
-//                sliderView.setCurrentPagePosition(position);
-//            }
-//        });
 
         mprice = findViewById(R.id.p_price);
         mName = findViewById(R.id.p_name);
@@ -168,6 +165,13 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             }
         });
+
+        if(getIntent().getStringExtra("from").equals("subcart")){
+            PCatAdapter proAdapter = new PCatAdapter(subcatproLists, this, storeID,ownerID, ownerImage, ownerName,catName,false);
+            mpRecyclerView.setAdapter(proAdapter);
+            proAdapter.notifyDataSetChanged();
+        }
+
     }
 
     private void SaveCheckData() {
