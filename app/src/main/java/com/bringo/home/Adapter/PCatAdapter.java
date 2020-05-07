@@ -155,6 +155,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                 intent.putExtra("proLists", position);
                 intent.putExtra("from", "subcart");
                 intent.putExtra("sID", subcatproLists.get(position).getStoreId());
+                intent.putExtra("isSearch",isForSearch);
                 intent.putExtra("pID", subcatproLists.get(position).getProductid());
                 intent.putExtra("spID", subcatproLists.get(position).getSimplePID());
                 intent.putExtra("desc", subcatproLists.get(position).getDesc());

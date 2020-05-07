@@ -130,7 +130,23 @@ public class CartActivity extends AppCompatActivity {
                 intent.putExtra("ownerID", ownerID);
                 intent.putExtra("ownerImage", ownerImage);
                 startActivity(intent);
-            }
+            }else if (getIntent().getStringExtra("for").equals("detail")) {
+            Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
+            intent.putExtra("image", getIntent().getStringExtra("image"));
+            intent.putExtra("proLists",  getIntent().getStringExtra("proLists"));
+            intent.putExtra("from", "subcart");
+            intent.putExtra("sID", store_ID);
+            intent.putExtra("pID", getIntent().getStringExtra("pID"));
+            intent.putExtra("spID", getIntent().getStringExtra("spID"));
+            intent.putExtra("desc", getIntent().getStringExtra("desc"));
+            intent.putExtra("oName", ownerName);
+            intent.putExtra("catName", cat_Name);
+            intent.putExtra("oImage", ownerImage);
+            intent.putExtra("oID", ownerID);
+            intent.putExtra("name", getIntent().getStringExtra("name"));
+            intent.putExtra("price", getIntent().getStringExtra("price"));
+            startActivity(intent);
+        }
 
 
 

@@ -41,12 +41,12 @@ public class ProductDetailActivity extends AppCompatActivity {
     private String storeID;
     private String spID;
     private RecyclerView mpRecyclerView;
-    private TextView mName, mprice,mp_desc;
+    private TextView mName, mprice, mp_desc;
     private ImageView mpImage;
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage,mdesc;
+    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage, mdesc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         mpImage = findViewById(R.id.pImage);
         mcheckout = findViewById(R.id.checkout);
         mpRecyclerView = findViewById(R.id.relatePList);
-        mpRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        mpRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         storeID = getIntent().getStringExtra("sID");
         spID = getIntent().getStringExtra("spID");
@@ -97,9 +97,26 @@ public class ProductDetailActivity extends AppCompatActivity {
         mcheckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                GetCheckData();
                 if (mycheckList.size() > 0) {
                     Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+                    intent.putExtra("for", "detail");
+                    intent.putExtra("image", pImage);
+                    intent.putExtra("proLists", position);
+                    intent.putExtra("from", "subcart");
+                    intent.putExtra("StID", storeID);
+                    intent.putExtra("pID", pID);
+                    intent.putExtra("spID", spID);
+                    intent.putExtra("desc", mdesc);
+                    intent.putExtra("oName", ownerName);
+                    intent.putExtra("catName", catName);
+                    intent.putExtra("oImage", ownerImage);
+                    intent.putExtra("oID", ownerID);
+                    intent.putExtra("name", pName);
+                    intent.putExtra("price", pPrice);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    finish();
                 } else {
                     Toast.makeText(ProductDetailActivity.this, "Your cart is empty.", Toast.LENGTH_SHORT).show();
                 }
@@ -123,7 +140,10 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     int finalCount = helpingMethods.GetCartCount(storeID) + 1;
                     helpingMethods.SaveCartCount(finalCount, storeID);
+
                     MainsetupBadge();
+                    int total = helpingMethods.GetCartTotal() + Integer.parseInt(pPrice);
+                    helpingMethods.SaveCartTotal(total);
                     if (helpingMethods.GetStoreID() == null) {
                         helpingMethods.SaveStoreData(storeID, getIntent().getStringExtra("oName"), getIntent().getStringExtra("oImage"), getIntent().getStringExtra("oID"));
                     }
@@ -155,6 +175,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                     int finalCount = helpingMethods.GetCartCount(storeID) - 1;
                     helpingMethods.SaveCartCount(finalCount, storeID);
                     MainsetupBadge();
+                    int total = helpingMethods.GetCartTotal() - Integer.parseInt(pPrice);
+                    helpingMethods.SaveCartTotal(total);
                     int a = mycheckList.indexOf(spID);
                     mycheckList.remove(a);
                     SaveCheckData();
@@ -166,8 +188,14 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-        if(getIntent().getStringExtra("from").equals("subcart")){
-            PCatAdapter proAdapter = new PCatAdapter(subcatproLists, this, storeID,ownerID, ownerImage, ownerName,catName,false);
+        if (getIntent().getStringExtra("from").equals("subcart")) {
+
+            PCatAdapter proAdapter;
+            if (getIntent().getBooleanExtra("isSearch", false) == true) {
+                proAdapter = new PCatAdapter(subcatproLists, this, storeID, ownerID, ownerImage, ownerName, catName, true);
+            } else {
+                proAdapter = new PCatAdapter(subcatproLists, this, storeID, ownerID, ownerImage, ownerName, catName, false);
+            }
             mpRecyclerView.setAdapter(proAdapter);
             proAdapter.notifyDataSetChanged();
         }
