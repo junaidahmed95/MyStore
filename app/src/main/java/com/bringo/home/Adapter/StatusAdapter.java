@@ -26,6 +26,7 @@ import com.bringo.home.OrderTrackActivity;
 import com.bringo.home.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,15 +71,15 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
             image = Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg).toString();
             name = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts();
         }
-        if(chkstuts.equals("1")){
+        if (chkstuts.equals("1")) {
             holder.mstatus.setText("Accepted");
-        }else if(chkstuts.equals("2")){
+        } else if (chkstuts.equals("2")) {
             holder.mstatus.setText("Assembled");
-        }else if(chkstuts.equals("3")){
+        } else if (chkstuts.equals("3")) {
             holder.mstatus.setText("OnRoute");
-        }else if(chkstuts.equals("4")){
+        } else if (chkstuts.equals("4")) {
             holder.mstatus.setText("Delivered");
-        }else if(chkstuts.equals("null")){
+        } else if (chkstuts.equals("null")) {
             holder.mstatus.setText("Pending");
         }
         holder.mcreated.setText(created);
@@ -86,15 +87,17 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
         holder.mclick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent intent = new Intent(mContext, OrderTrackActivity.class);
-                intent.putExtra("position", position);
-                intent.putExtra("orderid", historylist.get(position).getOrderid());
-                intent.putExtra("storename", name);
-                intent.putExtra("created", created);
-                intent.putExtra("storeimage", image);
-                mContext.startActivity(intent);
-
+                if (!holder.mstatus.getText().toString().equals("Pending")) {
+                    Intent intent = new Intent(mContext, OrderTrackActivity.class);
+                    intent.putExtra("position", position);
+                    intent.putExtra("orderid", historylist.get(position).getOrderid());
+                    intent.putExtra("storename", name);
+                    intent.putExtra("created", created);
+                    intent.putExtra("storeimage", image);
+                    mContext.startActivity(intent);
+                } else {
+                    Toast.makeText(mContext, "This order is not accepted yet!!", Toast.LENGTH_SHORT).show();
+                }
 
 
             }

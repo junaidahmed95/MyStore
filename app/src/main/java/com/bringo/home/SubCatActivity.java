@@ -185,6 +185,7 @@ public static String checkSID;
             if (helpingMethods.GetCartCount(checkSID) > 0) {
                 Intent intent = new Intent(this, CartActivity.class);
                 intent.putExtra("StID", store_ID);
+                intent.putExtra("for", "subcart");
                 intent.putExtra("catName", cat_Name);
                 intent.putExtra("stname",ownerName);
                 intent.putExtra("ownerID",ownerID);

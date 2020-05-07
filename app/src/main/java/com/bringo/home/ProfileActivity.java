@@ -97,6 +97,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.bringo.home.MapActivity.myaddress;
 import static com.bringo.home.Verification.mylatlng;
 
 
@@ -125,23 +126,22 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GoogleMap mMap;
     Task location;
-    EditText muserName;
-    Boolean flag = false;
-
+    boolean flag = false;
     private ProgressDialog mProgressDialog;
+
 
     static Geocoder geocoder;
     private String address = "", city = "";
     private EditText meditaddress;
     private JsonArrayRequest request,addressrequest;
     private RequestQueue requestQueue,addressrequestQueue;
-    private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
-    private final String Get_URL = "https://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
 
+    private EditText muserName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_profile);
 
         mProgressDialog = new ProgressDialog(this);
@@ -161,6 +161,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         mName = findViewById(R.id.userName);
         muser_Name = findViewById(R.id.user_Name);
         mPhone = findViewById(R.id.userPhone);
+        //mEmail = findViewById(R.id.userEmail);
 
         mProgressBar = findViewById(R.id.progressBar);
         mAddPicFab = findViewById(R.id.addPic);
@@ -225,7 +226,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         });
 
 
-        mImage.setOnClickListener(new View.OnClickListener() {
+        mupdateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ProfileSheet();
@@ -377,7 +378,9 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         custID = jsonObject.get("id").toString();
 
 
+                        mProgressDialog.cancel();
                     } catch (JSONException e) {
+                        mProgressDialog.cancel();
                         e.printStackTrace();
                     }
 
@@ -388,6 +391,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                mProgressDialog.cancel();
             }
         });
 
@@ -409,6 +413,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         jsonObject = response.getJSONObject(i);
                         addresslist.add(new AddressClass(jsonObject.get("address").toString(),false));
 
+
+                        mProgressDialog.cancel();
                     } catch (JSONException e) {
                         mProgressDialog.cancel();
                         e.printStackTrace();
@@ -419,13 +425,11 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 addressAdapter = new AddressAdapter(addresslist);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
-                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mProgressDialog.cancel();
-                Toast.makeText(ProfileActivity.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -545,6 +549,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
             public void onComplete(@NonNull Task task) {
                 if (task.isSuccessful()) {
 
+
                     LayoutInflater li = LayoutInflater.from(ProfileActivity.this);
                     View promptsView = li.inflate(R.layout.editaddress_dialog, null);
                     final androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(ProfileActivity.this);
@@ -555,7 +560,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                     muserName = promptsView.findViewById(R.id.userAdd);
                     final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
                     Button mselectadd = promptsView.findViewById(R.id.selectadd);
                     Button mCancel = promptsView.findViewById(R.id.cancel);
                     Button mSave = promptsView.findViewById(R.id.save);
@@ -564,6 +568,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(ProfileActivity.this, MapActivity.class);
+                            flag = true;
                             intent.putExtra("activity","profile");
                             startActivity(intent);
                         }
@@ -576,7 +581,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://bringo.biz/api/post/address";
+                                    String url = "https://chhatt.com/Cornstr/grocery/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {
@@ -659,14 +664,17 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                                 if (mMap != null) {
                                     Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
                                 }
-//                                // Rest of the stuff you need to do with the map
                             }
+                                // Rest of the stuff you need to do with the map
+
                         });
 
                     } catch (Exception e) {
                         Log.d("dfg", e.getMessage());
 
                     }
+
+
 
 
 //                    mSave.setOnClickListener(new View.OnClickListener() {
@@ -771,6 +779,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

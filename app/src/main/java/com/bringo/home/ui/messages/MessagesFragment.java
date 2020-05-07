@@ -97,7 +97,6 @@ public class MessagesFragment extends Fragment {
         helpingMethods = new HelpingMethods(getActivity());
         user_id = mAuth.getUid();
         if (user_id != null && helpingMethods.GetUName()!=null) {
-            msmsPBar.setVisibility(View.VISIBLE);
             mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chatlist");
             mConvDatabase.keepSynced(true);
             mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");

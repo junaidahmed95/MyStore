@@ -96,16 +96,16 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
             }
         });
 
-        holder.mcdv_buttomsheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, ProductDetailActivity.class);
-                intent.putExtra("image",OrderList.get(position).getP_img());
-                intent.putExtra("name",OrderList.get(position).getP_name());
-                intent.putExtra("price",OrderList.get(position).getP_price());
-                context.startActivity(intent);
-            }
-        });
+//        holder.mcdv_buttomsheet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(context, ProductDetailActivity.class);
+//                intent.putExtra("image",OrderList.get(position).getP_img());
+//                intent.putExtra("name",OrderList.get(position).getP_name());
+//                intent.putExtra("price",OrderList.get(position).getP_price());
+//                context.startActivity(intent);
+//            }
+//        });
 
     }
 

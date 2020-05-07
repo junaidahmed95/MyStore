@@ -29,11 +29,9 @@ public class MyOrdersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_orders);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Your Orders");
+        toolbar.setTitle("Other Orders");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
 
 
         tablayout = findViewById(R.id.tabs);

@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 import com.bringo.home.Adapter.PlaceAutocompleteAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -51,6 +53,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
@@ -58,7 +61,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+
+
 import static com.bringo.home.Verification.mylatlng;
+
+
 
 public class MapActivity extends AppCompatActivity
         implements OnMapReadyCallback,
@@ -96,6 +108,8 @@ public class MapActivity extends AppCompatActivity
     static String city = "";
     static Geocoder geocoder;
     static List<Address> addresses;
+    AutoCompleteTextView place_search;
+
 
 
     //widgets
@@ -108,6 +122,7 @@ public class MapActivity extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
+
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -176,6 +191,12 @@ public class MapActivity extends AppCompatActivity
         cityLat = getIntent().getStringExtra("lat");
         cityLong = getIntent().getStringExtra("long");
 
+
+
+
+
+
+
         try {
             String get = getIntent().getStringExtra("search");
             if (!get.equals("")) {
@@ -197,6 +218,9 @@ public class MapActivity extends AppCompatActivity
                 Toast.makeText(MapActivity.this, "" + mSearchText.getText(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
 
         mSearchText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -519,7 +543,15 @@ public class MapActivity extends AppCompatActivity
                         //mMap.addMarker(new MarkerOptions().position(centre).title(a));
                         latLng = UserCurrentLocation.getPosition();
 
-                        Verification.mAddress = getAddress(centre.latitude,centre.longitude);
+                        if (getIntent().getStringExtra("activity").equals("verification")){
+                            Verification.mAddress = getAddress(centre.latitude,centre.longitude);
+                        }else if(getIntent().getStringExtra("activity").equals("profile")){
+                            ProfileActivity.mAddress = getAddress(centre.latitude,centre.longitude);
+                        }else if(getIntent().getStringExtra("activity").equals("order")){
+                            OrderSummaryActivity.mAddress = getAddress(centre.latitude,centre.longitude);
+                        }
+
+
 
                         myaddress = getAddress(centre.latitude, centre.longitude);
                         mylatlng = centre.latitude + "," + centre.longitude;
@@ -635,6 +667,8 @@ public class MapActivity extends AppCompatActivity
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
     }
+
+
 
 }
 
