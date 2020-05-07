@@ -167,9 +167,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private FloatingActionButton mfbpic;
     private CircleImageView musercrimage;
     private Uri imageuri;
-    private Button mbutton_create,login,signup;
+    private Button mbutton_create, login, signup;
     private EditText mmusername;
-    private  Bitmap bitmap = null;
+    private Bitmap bitmap = null;
     private String get_user;
     private PhoneAuthCredential credential;
     private LinearLayout main_screen;
@@ -179,7 +179,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_verification);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mbtnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
@@ -350,10 +350,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""));
                                                     Intent intent = new Intent(Verification.this, MainActivity.class);
-                                                    if(getIntent().getStringExtra("for")!=null){
-                                                        intent.putExtra("cart","open");
+                                                    if (getIntent().getStringExtra("for") != null) {
+                                                        intent.putExtra("cart", "open");
                                                     }
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                     startActivity(intent);
@@ -566,7 +566,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mButton_selctLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(Verification.this, MapActivity.class);
+                intent.putExtra("activity", "verification");
                 flag = true;
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -625,7 +627,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             hashMap.put("name", user);
                             hashMap.put("picture", photo);
                             hashMap.put("email", email);
-                            hashMap.put("phone",mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                            hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                             hashMap.put("latlong", mylatlng);
                             hashMap.put("address", mEdiText_address.getText().toString().trim());
                             hashMap.put("status", 0);
@@ -636,8 +638,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Intent intent = new Intent(Verification.this, MainActivity.class);
-                                        if(getIntent().getStringExtra("for")!=null){
-                                            intent.putExtra("cart","open");
+                                        if (getIntent().getStringExtra("for") != null) {
+                                            intent.putExtra("cart", "open");
                                         }
                                         startActivity(intent);
                                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -798,8 +800,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                         if (task.isSuccessful()) {
 
 
-
-
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 proBbar.setVisibility(View.GONE);
@@ -849,7 +849,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Location mLastLocation = locationResult.getLastLocation();
-            SetMap(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+            SetMap(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
 
@@ -877,7 +877,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 } else {
                                     main_screen.setVisibility(View.GONE);
                                     rely.setVisibility(View.VISIBLE);
-                                    SetMap(location.getLatitude(),location.getLongitude());
+                                    SetMap(location.getLatitude(), location.getLongitude());
                                 }
                             }
                         }
@@ -966,15 +966,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
-
     private void resendVerificationCode(String fullNumberWithPlus, PhoneAuthProvider.ForceResendingToken mResendToken) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 fullNumberWithPlus, 60, TimeUnit.SECONDS, this, mCallbacks, mResendToken);
     }
-
-
-
 
 
     public String getAddress(Double lat, Double lng) {
@@ -1102,18 +1097,18 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             String u_name = jsonObject.getString("user_name");
                             String u_address = jsonObject.getString("address");
                             String u_image = jsonObject.getString("user_image");
-                            helpingMethods.saveuser(u_name,u_image,u_address,mPhoneNumber.getText().toString());
+                            helpingMethods.saveuser(u_name, u_image, u_address, mPhoneNumber.getText().toString());
 
                         } catch (Exception e) {
-                            Toast.makeText(Verification.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     mSigninContainer.setVisibility(View.GONE);
                     Intent intent = new Intent(Verification.this, MainActivity.class);
 
-                    if(getIntent().getStringExtra("for")!=null){
-                        intent.putExtra("cart","open");
+                    if (getIntent().getStringExtra("for") != null) {
+                        intent.putExtra("cart", "open");
                     }
 
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -1125,7 +1120,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(Verification.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(Verification.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -1161,7 +1156,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             codeText.setText("");
             mTimer.setText("");
 
-        }else {
+        } else {
             finish();
         }
 

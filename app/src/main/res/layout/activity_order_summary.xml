@@ -22,6 +22,22 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+
+                <fragment
+                    android:id="@+id/mapview"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="6dp" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/add"
                 android:layout_width="wrap_content"
