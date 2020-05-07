@@ -38,7 +38,7 @@
                 android:id="@+id/selectadd"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:visibility="gone"
+
                 android:layout_marginRight="16dp"
                 android:layout_toLeftOf="@+id/cancel"
                 android:background="@drawable/cancel_shape"

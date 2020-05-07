@@ -21,6 +21,7 @@
         tools:context="com.res.chhaatt.MapsActivity" />
 
     <RelativeLayout
+
         android:id="@+id/relLayout1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -62,6 +63,9 @@
 
 
     </RelativeLayout>
+
+
+
 
     <RelativeLayout
         android:layout_width="match_parent"

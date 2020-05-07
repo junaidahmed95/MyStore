@@ -56,7 +56,13 @@ import com.bringo.home.Model.RequestHandlerSingleten;
 import com.bringo.home.Model.Sender;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -95,10 +101,11 @@ import retrofit2.Callback;
 import static com.bringo.home.Adapter.AddressAdapter.cusaddress;
 import static com.bringo.home.CartActivity.mTxtView_TotalPrice;
 import static com.bringo.home.MessagingActivity.unreadListenr;
+import static com.bringo.home.Verification.mylatlng;
 import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 
 
-public class OrderSummaryActivity extends AppCompatActivity {
+public class OrderSummaryActivity extends AppCompatActivity implements OnMapReadyCallback {
     APIService apiService;
     private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
@@ -126,6 +133,9 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     DatabaseReference databaseReference;
     TextView mtotalprice;
+    private GoogleMap mMap;
+
+    boolean flag = false;
 
     private DatabaseReference unreadReference, checkReference, ConversionRef;
 
@@ -136,6 +146,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     static List<Address> addresses;
     static Geocoder geocoder;
     private String addresss = "", city = "";
+    private EditText muserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -394,15 +405,26 @@ public class OrderSummaryActivity extends AppCompatActivity {
                     View promptsView = li.inflate(R.layout.editaddress_dialog, null);
                     final androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(OrderSummaryActivity.this);
                     alertDialogBuilder.setView(promptsView);
-//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                     final ConnectionDetector detector = new ConnectionDetector(OrderSummaryActivity.this);
-                    final EditText muserName = promptsView.findViewById(R.id.userAdd);
+                    muserName = promptsView.findViewById(R.id.userAdd);
                     final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+                    Button mselectadd = promptsView.findViewById(R.id.selectadd);
                     Button mCancel = promptsView.findViewById(R.id.cancel);
                     Button mSave = promptsView.findViewById(R.id.save);
+
+                    mselectadd.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(OrderSummaryActivity.this, MapActivity.class);
+                            flag = true;
+                            intent.putExtra("activity","order");
+                            startActivity(intent);
+                        }
+                    });
 
                     mSave.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -491,23 +513,24 @@ public class OrderSummaryActivity extends AppCompatActivity {
                         Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                         mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
-//                        ((SupportMapFragment) getSupportFragmentManager()
-//                                .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
-//
-//                            @Override
-//                            public void onMapReady(GoogleMap googleMap) {
-//
-//                                Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-//                                mMap = googleMap;
-//                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
-//                                mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
+                                                ((SupportMapFragment) getSupportFragmentManager()
+                                .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
+
+                            @Override
+                            public void onMapReady(GoogleMap googleMap) {
+
+                                Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                                mMap = googleMap;
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
+                                mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
                         muserName.setText(mAddress);
-//                                if (mMap != null) {
-//                                    Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
-//                                }
-//                                // Rest of the stuff you need to do with the map
-//                            }
-//                        });
+                                if (mMap != null) {
+                                    Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
+                                }
+                               // Rest of the stuff you need to do with the map
+                            }
+                        });
+
 
                     } catch (Exception e) {
                         Toast.makeText(OrderSummaryActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -801,6 +824,32 @@ public class OrderSummaryActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
 
+        if (flag) {
+            String[] getvv = mylatlng.split(",");
+            final double latitude = Double.parseDouble(getvv[0]);
+            final double longitude = Double.parseDouble(getvv[1]);
+            Your_Location = new LatLng(latitude, longitude);
+            ((SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
+
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+
+                    mMap = googleMap;
+                    mMap = googleMap;
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
+                    mAddress = getAddress(latitude, longitude);
+                    muserName.setText(mAddress);
+                    if (mMap != null) {
+                        Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
+                    }
+                    // Rest of the stuff you need to do with the map
+                }
+            });
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapview);
+            mapFragment.getMapAsync( OrderSummaryActivity.this);
+        }
+
     }
 
     @Override
@@ -811,4 +860,9 @@ public class OrderSummaryActivity extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+    }
 }
