@@ -42,7 +42,7 @@
         <item
             android:id="@+id/nav_hist"
             android:icon="@drawable/ic_action_history"
-            android:title="Order History" />
+            android:title="Other Orders" />
 
         <item
             android:id="@+id/nav_suppot"

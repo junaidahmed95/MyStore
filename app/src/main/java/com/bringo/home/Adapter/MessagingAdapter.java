@@ -855,7 +855,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.mtxt_address.setText(chat.getAddress());
                 viewHolder.mtxt_total_Price.setText(chat.getTotalPrice());
                 viewHolder.mtxt_total_product.setText("" + chat.getTotalProduct());
-
+                viewHolder.mOrder_ID.setText("" + chat.getOrderID());
                 viewHolder.morder_time.setText(tim);
 
                 if (chat.isSeen()) {
@@ -1201,7 +1201,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
         public CardView voicecrd, morder_CardView;
         ImageButton btn_play;
         public ProgressBar mLoad, vidload;
-        TextView tvAudioLength;
+        TextView tvAudioLength,mOrder_ID;
         SeekBar seekBar;
 
         public ImageView mMap_icon;
@@ -1217,7 +1217,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
             mbtn_cancel = itemView.findViewById(R.id.btn_cancel);
             mbtn_order_detail = itemView.findViewById(R.id.btn_orderdetail);
             mbtn_accept = itemView.findViewById(R.id.btn_accept);
-
+            mOrder_ID = itemView.findViewById(R.id.order_id);
             morder_time = itemView.findViewById(R.id.order_time);
             morder_seen = itemView.findViewById(R.id.order_seen);
             morder_CardView = itemView.findViewById(R.id.order_CardView);

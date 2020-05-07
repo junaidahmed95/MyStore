@@ -129,21 +129,18 @@ public class OrderFragment extends Fragment {
                         for (int j = 0; j < storeOrderDetails.length(); j++) {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
-                            if (!storeObject.getString("status").equals("null")) {
-                                if (!storeObject.getString("status").equals("4")) {
-                                    String pname = storeObject.getString("sp_name");
-                                    String actprice = storeObject.getString("act_prc");
-                                    String address = storeObject.getString("new_address");
-                                    String proimage = storeObject.getString("sp_image");
-                                    String pqty = storeObject.getString("ord_qty");
-                                    String tprice = storeObject.getString("t_price");
-                                    String datetime = storeObject.getString("created_at");
-                                    String uid = storeObject.getString("user_id");
-                                    String tpprice = storeObject.getString("str_prc");
-                                    String status = storeObject.getString("status");
-                                    products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
-
-                                }
+                            if (!storeObject.getString("status").equals("4")) {
+                                String pname = storeObject.getString("sp_name");
+                                String actprice = storeObject.getString("act_prc");
+                                String address = storeObject.getString("new_address");
+                                String proimage = storeObject.getString("sp_image");
+                                String pqty = storeObject.getString("ord_qty");
+                                String tprice = storeObject.getString("t_price");
+                                String datetime = storeObject.getString("created_at");
+                                String uid = storeObject.getString("user_id");
+                                String tpprice = storeObject.getString("str_prc");
+                                String status = storeObject.getString("status");
+                                products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
 
                             }
 
@@ -157,14 +154,14 @@ public class OrderFragment extends Fragment {
                             statusAdapter.notifyDataSetChanged();
                             products_list.clear();
 
-                        } else if (historylist.size() == 0) {
-                            mnoOrder.setVisibility(View.VISIBLE);
                         }
 
 
-                        mProgressDialog.cancel();
                     }
-
+                    mProgressDialog.cancel();
+                    if (historylist.size() == 0) {
+                        mnoOrder.setVisibility(View.VISIBLE);
+                    }
 
                 } catch (JSONException e) {
                     mProgressDialog.cancel();

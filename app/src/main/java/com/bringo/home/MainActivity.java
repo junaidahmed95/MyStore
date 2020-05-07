@@ -70,21 +70,9 @@ public class MainActivity extends AppCompatActivity {
         final CircleImageView mUserImage = navHeaderView.findViewById(R.id.userImage);
         final TextView mUserName = navHeaderView.findViewById(R.id.userName);
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
-            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        minLayout.setVisibility(View.VISIBLE);
-                        Glide.with(getApplicationContext()).asBitmap().load(dataSnapshot.child("picture").getValue().toString()).apply(new RequestOptions().placeholder(R.mipmap.ic_launcher_round)).into(mUserImage);
-                        mUserName.setText(dataSnapshot.child("name").getValue().toString().toUpperCase());
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+            minLayout.setVisibility(View.VISIBLE);
+            Glide.with(getApplicationContext()).asBitmap().load(helpingMethods.GetUImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mUserImage);
+            mUserName.setText(helpingMethods.GetUName().toUpperCase());
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("token").setValue(FirebaseInstanceId.getInstance().getToken());
 
             FirebaseDatabase.getInstance().getReference("Users").child("Owners").child("BrwELMpWZEa057zF77OZdTx63k23").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -208,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CartActivity.class);
         intent.putExtra("StID", helpingMethods.GetStoreID());
         intent.putExtra("catName", "");
+        intent.putExtra("for","finish");
         intent.putExtra("stname", helpingMethods.GetStoreName());
         intent.putExtra("ownerID", helpingMethods.GetStoreUID());
         intent.putExtra("ownerImage", helpingMethods.GetStoreImage());

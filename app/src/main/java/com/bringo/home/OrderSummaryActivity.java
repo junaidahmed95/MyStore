@@ -262,13 +262,13 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                     SaveCartData();
                                                     UnreadMessage("\uD83D\uDCE6 New Order");
                                                     sendNotifiaction(ownerName, "\uD83D\uDCE6 New order has been arrived..");
-                                                    Intent mintent = new Intent(OrderSummaryActivity.this, MessagingActivity.class);
-                                                    mintent.putExtra("user_id", ownerID);
-                                                    mintent.putExtra("check", "one");
-                                                    mintent.putExtra("uName", ownerName);
-                                                    mintent.putExtra("uImage", ownerImage);
-                                                    mintent.putExtra("forward", "one");
-                                                    mintent.putExtra("for", "one");
+                                                    Intent mintent = new Intent(OrderSummaryActivity.this, DummyOrderActivity.class);
+//                                                    mintent.putExtra("user_id", ownerID);
+//                                                    mintent.putExtra("check", "one");
+//                                                    mintent.putExtra("uName", ownerName);
+//                                                    mintent.putExtra("uImage", ownerImage);
+//                                                    mintent.putExtra("forward", "one");
+//                                                    mintent.putExtra("for", "one");
                                                     progressDialog.cancel();
                                                     Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
                                                     startActivity(mintent);
@@ -513,7 +513,10 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                         Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
                         mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
+
                                                 ((SupportMapFragment) getSupportFragmentManager()
+
+
                                 .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
 
                             @Override
@@ -523,11 +526,13 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                 mMap = googleMap;
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
                                 mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
+
                         muserName.setText(mAddress);
                                 if (mMap != null) {
                                     Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
                                 }
                                // Rest of the stuff you need to do with the map
+
                             }
                         });
 
@@ -865,4 +870,6 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
 
     }
+
 }
+
