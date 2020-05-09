@@ -313,7 +313,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
-                if (bitmap == null) {
+               if (bitmap == null) {
                     helpingMethods.SnackBar("Select your image", v);
                 } else if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);

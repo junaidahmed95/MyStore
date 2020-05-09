@@ -502,7 +502,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardBackgroundColor="#9C27B0"
         app:cardCornerRadius="15dip"
         app:cardElevation="5dp">
 
@@ -525,7 +525,6 @@
                 android:textStyle="bold">
 
             </TextView>
-
 
 
             <LinearLayout
@@ -681,7 +680,7 @@
                     android:background="@drawable/new_shape"
                     android:text="Cancel"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary">
+                    android:textColor="#9C27B0">
 
                 </Button>
 
@@ -691,13 +690,13 @@
                     android:layout_height="35dp"
                     android:layout_marginTop="4dp"
                     android:layout_marginRight="6dp"
-                    android:paddingRight="8dp"
-                    android:paddingLeft="8dp"
                     android:layout_marginBottom="4dp"
                     android:background="@drawable/new_shape"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:text="Order Detail"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary">
+                    android:textColor="#9C27B0">
 
                 </Button>
 
@@ -708,7 +707,7 @@
                     android:background="@drawable/new_shape"
                     android:text="Accept"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="#9C27B0"
                     android:visibility="gone">
 
                 </Button>
@@ -719,10 +718,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/btLayout"
-                android:layout_marginRight="6dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="4dp"
                 android:layout_alignParentRight="true"
+                android:layout_marginRight="6dp"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView

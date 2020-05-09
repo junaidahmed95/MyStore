@@ -35,7 +35,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 
-import static com.bringo.home.ProfileActivity.mImage;
 
 public class videoView extends AppCompatActivity {
     Intent intent;
@@ -75,15 +74,15 @@ public class videoView extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mChoose.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mImage.setImageBitmap(bitmapImage);
-                    ProfileActivity.check = false;
-                    finish();
-                    uploadImage(Uri.parse(viewimage), v);
-                }
-            });
+//            mChoose.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mImage.setImageBitmap(bitmapImage);
+//                    ProfileActivity.check = false;
+//                    finish();
+//                    uploadImage(Uri.parse(viewimage), v);
+//                }
+//            });
 
             mCancel.setOnClickListener(new View.OnClickListener() {
                 @Override

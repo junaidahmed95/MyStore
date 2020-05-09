@@ -26,6 +26,12 @@ import com.bringo.home.OrderTrackActivity;
 import com.bringo.home.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,17 +77,29 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
             image = Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg).toString();
             name = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts();
         }
-        if (chkstuts.equals("1")) {
-            holder.mstatus.setText("Accepted");
-        } else if (chkstuts.equals("2")) {
-            holder.mstatus.setText("Assembled");
-        } else if (chkstuts.equals("3")) {
-            holder.mstatus.setText("OnRoute");
-        } else if (chkstuts.equals("4")) {
-            holder.mstatus.setText("Delivered");
-        } else if (chkstuts.equals("null")) {
-            holder.mstatus.setText("Pending");
-        }
+
+
+        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
+                    if (dataSnapshot.child("status").getValue().toString().equals("Deliverd")) {
+                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).removeValue();
+                        historylist.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, historylist.size());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         holder.mcreated.setText(created);
         holder.mstorename.setText(name);
         holder.mclick.setOnClickListener(new View.OnClickListener() {

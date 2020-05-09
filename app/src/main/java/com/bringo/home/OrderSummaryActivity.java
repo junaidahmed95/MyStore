@@ -253,6 +253,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
+                                                    FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
                                                     helpingMethods.SaveCartCount(0, store_ID);
                                                     helpingMethods.SaveCartTotal(0);
                                                     helpingMethods.SaveStoreData(null, null, null, null);
@@ -733,7 +734,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
                 }
 
-                addressAdapter = new AddressAdapter(kuchbhe);
+                addressAdapter = new AddressAdapter(kuchbhe,true);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
                 mProgressDialog.cancel();

@@ -30,6 +30,12 @@ public class HelpingMethods {
         editor.apply();
     }
 
+    public String GetUPhone() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("phone", null);
+        return sid;
+    }
+
     public String GetUImage() {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         String sid = sharedPreferences.getString("photo", null);
