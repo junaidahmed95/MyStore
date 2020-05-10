@@ -83,7 +83,7 @@ public class StoreInfoActivity extends AppCompatActivity {
         mbasketImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (helpingMethods.GetStoreID().equals(stID)) {
+
                     if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
                         Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
                         intent.putExtra("StID", helpingMethods.GetStoreID());
@@ -95,7 +95,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                         startActivity(intent);
                         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     }
-                }
+
 
 
             }

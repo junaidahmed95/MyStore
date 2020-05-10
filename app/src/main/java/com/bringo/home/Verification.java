@@ -60,6 +60,14 @@ import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.RequestHandlerSingleten;
 import com.bringo.home.Model.VolleyMultipartRequest;
 import com.bringo.home.Model.VolleySingleton;
+import com.bringo.home.ui.home.HomeFragment;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -88,6 +96,8 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
@@ -127,9 +137,25 @@ import javax.net.ssl.SSLContext;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.squareup.picasso.Picasso;
+
+
 public class Verification extends AppCompatActivity implements OnMapReadyCallback {
-    private GoogleMap mMap;
+    private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE";
+    public static String mAddress = "";
+    static String mylatlng = "";
+    static Geocoder geocoder;
+    static List<Address> addresses;
+    static LatLng Your_Location = new LatLng(23.81, 90.41);
     Task location;
+    SignInButton signInButton;
+    int PERMISSION_ID = 44;
+    StateProgressBar stateProgressBar;
+    SweetAlertDialog mCreateAlertDialog;
+    boolean flag = false;
+    private GoogleMap mMap;
     private TextView mbtnPrivacyPolicy;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Button mSendCode, mbutton_verify, mResend_button, mButton_selctLocation;
@@ -140,30 +166,18 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private TextView mTextView_phoneno, mTimer, message;
     private CountryCodePicker ccp;
     private FirebaseAuth mAuth;
-    public static String mAddress = "";
-    static String mylatlng = "";
     private String address = "", city = "";
-    SignInButton signInButton;
-    static Geocoder geocoder;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
     private FusedLocationProviderClient mFusedLocationClient;
-    int PERMISSION_ID = 44;
-    static List<Address> addresses;
-    private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE";
     private Animation animBlink;
-    StateProgressBar stateProgressBar;
-    SweetAlertDialog mCreateAlertDialog;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private HelpingMethods helpingMethods;
     private CardView mPhoneContainer, mVerifyContainer, mSigninContainer;
     private ViewGroup viewGroup;
-    boolean flag = false;
     private ConnectionDetector connectionDetector;
     private ImageView icon, tick;
-
-    static LatLng Your_Location = new LatLng(23.81, 90.41);
     private FloatingActionButton mfbpic;
     private CircleImageView musercrimage;
     private Uri imageuri;
@@ -172,9 +186,24 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private Bitmap bitmap = null;
     private String get_user;
     private PhoneAuthCredential credential;
+    private LinearLayout mloginwithother;
+    private EditText muserphoneno;
     private LinearLayout main_screen;
+    private ImageView imageView;
     private RelativeLayout rely;
-
+    private LoginButton fb_login;
+    boolean check = false;
+    String photoUrl;
+    private CallbackManager mcallbackManager;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private AccessTokenTracker accessTokenTracker;
+    private LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+            SetMap(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +212,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_verification);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mbtnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
+        mAuth = FirebaseAuth.getInstance();
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
+
         FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -193,7 +226,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        ImageView imageView = findViewById(R.id.bgHeader);
+         imageView = findViewById(R.id.bgHeader);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ColorStateList stateList = ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary));
             imageView.setBackgroundTintList(stateList);
@@ -259,6 +292,50 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         user = mAuth.getInstance().getCurrentUser();
         signInButton = findViewById(R.id.sign_in_button);
 
+        muserphoneno = findViewById(R.id.user_phoneno);
+        fb_login = findViewById(R.id.login_button);
+        fb_login.setReadPermissions("email", "public_profile");
+        mcallbackManager = CallbackManager.Factory.create();
+        mloginwithother =findViewById(R.id.loginwithother);
+        fb_login.registerCallback(mcallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d("facebookauthencation", "onSuccess" + loginResult);
+                handleFacebookToken(loginResult.getAccessToken());
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    UpdateUi(user);
+                } else {
+                    UpdateUi(null);
+                }
+            }
+        };
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                if (currentAccessToken == null) {
+                    mAuth.signOut();
+                }
+            }
+        };
+
+
         try {
             ProviderInstaller.installIfNeeded(getApplicationContext());
         } catch (GooglePlayServicesRepairableException e) {
@@ -313,8 +390,11 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
-                if (bitmap == null) {
-                    helpingMethods.SnackBar("Select your image", v);
+
+                if(!check){
+                    if (bitmap == null) {
+                        helpingMethods.SnackBar("Select your image", v);
+                    }
                 } else if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);
                 } else if (mEdiText_address.getText().toString().trim().equals("")) {
@@ -340,7 +420,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                         HashMap<String, Object> hashMap = new HashMap<>();
                                         hashMap.put("name", mmusername.getText().toString().trim());
                                         hashMap.put("picture", userImage);
+                                        hashMap.put("picture", photoUrl);
                                         hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                                        hashMap.put("phone", muserphoneno.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                                         hashMap.put("status", 0);
                                         hashMap.put("token", FirebaseInstanceId.getInstance().getToken());
                                         hashMap.put("address", mEdiText_address.getText().toString().trim());
@@ -350,7 +432,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""),muserphoneno.getText().toString().replaceAll(" ", ""));
                                                     Intent intent = new Intent(Verification.this, MainActivity.class);
                                                     if (getIntent().getStringExtra("for") != null) {
                                                         intent.putExtra("cart", "open");
@@ -416,7 +498,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+                                    if(!check){
+                                        params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+                                    }
+
 
                                     return params;
                                 }
@@ -425,9 +510,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 protected Map<String, String> getParams() {
 
                                     HashMap<String, String> hashMap = new HashMap<>();
+
                                     hashMap.put("u_id", mAuth.getUid());
+                                    hashMap.put("image", photoUrl);
                                     hashMap.put("user_name", mmusername.getText().toString().trim());
                                     hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                                    hashMap.put("phone", muserphoneno.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                                     hashMap.put("lat", String.valueOf(Your_Location.latitude));
                                     hashMap.put("lng", String.valueOf(Your_Location.longitude));
                                     hashMap.put("address", mEdiText_address.getText().toString().trim());
@@ -577,8 +665,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mcallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 101) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -628,6 +718,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             hashMap.put("picture", photo);
                             hashMap.put("email", email);
                             hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                            //hashMap.put("phone", .getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                             hashMap.put("latlong", mylatlng);
                             hashMap.put("address", mEdiText_address.getText().toString().trim());
                             hashMap.put("status", 0);
@@ -678,29 +769,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             }
 
         }.start();
-    }
-
-    //kam
-    private void verifyPhoneNumberWithCode(String verificationId, String code) {
-        try {
-            credential = PhoneAuthProvider.getCredential(verificationId, code);
-            signInWithPhoneAuthCredential(credential);
-        } catch (Exception e) {
-            String error = e.getMessage();
-            proBbar.setVisibility(View.GONE);
-            message.setText(error);
-            message.setTextColor(getResources().getColor(R.color.colorRed));
-            if (Build.VERSION.SDK_INT >= 19) {
-                TransitionManager.beginDelayedTransition(viewGroup);
-                message.setVisibility(View.VISIBLE);
-            } else {
-                message.setVisibility(View.VISIBLE);
-            }
-            mbutton_verify.setEnabled(true);
-            proBbar.setVisibility(View.GONE);
-            codeText.setEnabled(true);
-            message.setVisibility(View.VISIBLE);
-        }
     }
 //
 //    private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
@@ -790,6 +858,28 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 //
 //    }
 
+    //kam
+    private void verifyPhoneNumberWithCode(String verificationId, String code) {
+        try {
+            credential = PhoneAuthProvider.getCredential(verificationId, code);
+            signInWithPhoneAuthCredential(credential);
+        } catch (Exception e) {
+            String error = e.getMessage();
+            proBbar.setVisibility(View.GONE);
+            message.setText(error);
+            message.setTextColor(getResources().getColor(R.color.colorRed));
+            if (Build.VERSION.SDK_INT >= 19) {
+                TransitionManager.beginDelayedTransition(viewGroup);
+                message.setVisibility(View.VISIBLE);
+            } else {
+                message.setVisibility(View.VISIBLE);
+            }
+            mbutton_verify.setEnabled(true);
+            proBbar.setVisibility(View.GONE);
+            codeText.setEnabled(true);
+            message.setVisibility(View.VISIBLE);
+        }
+    }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
 
@@ -844,14 +934,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         );
 
     }
-
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-            SetMap(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        }
-    };
 
     private boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -1097,7 +1179,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             String u_name = jsonObject.getString("user_name");
                             String u_address = jsonObject.getString("address");
                             String u_image = jsonObject.getString("user_image");
-                            helpingMethods.saveuser(u_name, u_image, u_address, mPhoneNumber.getText().toString());
+                            helpingMethods.saveuser(u_name, u_image, u_address, mPhoneNumber.getText().toString(),null);
 
                         } catch (Exception e) {
                             Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1160,5 +1242,63 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             finish();
         }
 
+    }
+
+    private void handleFacebookToken(AccessToken token) {
+        Log.d("", "" + token);
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(Verification.this, "signin with credition successfull", Toast.LENGTH_SHORT).show();
+                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
+                    parseJSON();
+                    muserphoneno.setVisibility(View.VISIBLE);
+
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    UpdateUi(user);
+//                    mSigninContainer.setVisibility(View.VISIBLE);
+//                    mloginwithother.setVisibility(View.VISIBLE);
+//                    imageView.setVisibility(View.GONE);
+//                    main_screen.setVisibility(View.GONE);
+                } else {
+
+                }
+            }
+        });
+    }
+
+    private void UpdateUi(FirebaseUser user) {
+        if (user != null) {
+            mmusername.setText(user.getDisplayName());
+check = true;
+            photoUrl = String.valueOf(user.getPhotoUrl());
+            muserphoneno.setText(user.getPhoneNumber());
+            //photoUrl = photoUrl + "?type=large";
+
+            Picasso.get().load(photoUrl).into(musercrimage);
+
+
+
+            //helpingMethods.saveuser( mmusername.setText(user.getDisplayName()), Picasso.get().load(photoUri).into(musercrimage),null,null);
+        }
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (authStateListener != null) {
+            mAuth.removeAuthStateListener(authStateListener);
+        }
     }
 }

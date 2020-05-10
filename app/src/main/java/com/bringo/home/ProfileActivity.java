@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -77,6 +78,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -108,7 +110,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     static List<Address> addresses;
     private Toolbar toolbar;
     private String image, name;
-    public static CircleImageView mImage;
+    private CircleImageView mImage;
     private Uri imageUri;
     static LatLng Your_Location = new LatLng(23.81, 90.41);
     private String mU_id;
@@ -133,12 +135,13 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     static Geocoder geocoder;
     private String address = "", city = "";
     private EditText meditaddress;
-    private JsonArrayRequest request,addressrequest;
-    private RequestQueue requestQueue,addressrequestQueue;
+    private JsonArrayRequest request, addressrequest;
+    private RequestQueue requestQueue, addressrequestQueue;
     private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
 
     private EditText muserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +161,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         addresslist = new ArrayList<>();
         mAddressRecyclerView = findViewById(R.id.addressesRecyclerView);
         mImage = findViewById(R.id.userProfile);
+        helpingMethods = new HelpingMethods(ProfileActivity.this);
+        Glide.with(getApplicationContext()).load(helpingMethods.GetUImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
         mName = findViewById(R.id.userName);
         muser_Name = findViewById(R.id.user_Name);
         mPhone = findViewById(R.id.userPhone);
@@ -171,56 +176,28 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mAddressRecyclerView.setLayoutManager(linearLayoutManager);
-        helpingMethods = new HelpingMethods(ProfileActivity.this);
-        meditaddress = findViewById(R.id.userAdd);
 
-        parseJSON();
 
+        //helpingMethods.saveuser(name, image,null,null,null);
+        SharedPreferences sharedPreferences = getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("name", null);
+        String photo = sharedPreferences.getString("photo", null);
+        String mobile = sharedPreferences.getString("mobile", null);
+        String address = sharedPreferences.getString("address", null);
+
+        Glide.with(ProfileActivity.this).asBitmap().load(photo).into(mImage);
+        mName.setText(username);
+//        meditaddress.setText(address);
+        mPhone.setText(mobile);
+
+
+      
 
         maddAddre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AddAddessDialog(v);
 
-
-            }
-        });
-
-
-        DatabaseReference mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(mU_id);
-        mUserDatabase.keepSynced(true);
-        mUserDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    image = dataSnapshot.child("picture").getValue().toString();
-                    String address = dataSnapshot.child("address").getValue().toString();
-
-                    name = dataSnapshot.child("name").getValue().toString();
-                    if (check) {
-                        Glide.with(getApplicationContext()).load(image).apply(new RequestOptions().placeholder(R.drawable.avatar)).listener(new RequestListener<Drawable>() {
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                mProgressBar.setVisibility(View.GONE);
-                                mAddPicFab.show();
-                                return false;
-                            }
-                        }).into(mImage);
-                    }
-                    mName.setText(name);
-                    mPhone.setText(dataSnapshot.child("phone").getValue().toString());
-                    muser_Name.setText(name);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
@@ -262,9 +239,10 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         final ConnectionDetector detector = new ConnectionDetector(ProfileActivity.this);
         final EditText muserName = promptsView.findViewById(R.id.userName);
-        muserName.setText(name);
+        muserName.setText(helpingMethods.GetUName().toUpperCase());
         Button mCancel = promptsView.findViewById(R.id.cancel);
         Button mSave = promptsView.findViewById(R.id.save);
+
 
         final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -274,9 +252,10 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 if (detector.isConnected()) {
                     if (!muserName.getText().toString().trim().equals("")) {
                         FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mU_id).child("name").setValue(muserName.getText().toString());
+                        helpingMethods.saveuser(muserName.getText().toString(), helpingMethods.GetUImage(), null, helpingMethods.GetUPhone());
                         alertDialog.cancel();
                     } else {
-                        helpingMethods.SnackBar("Enter your name.", v);
+                        helpingMethods.SnackBar("Enter your name.", view);
                     }
 
                 } else {
@@ -411,7 +390,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
                     try {
                         jsonObject = response.getJSONObject(i);
-                        addresslist.add(new AddressClass(jsonObject.get("address").toString(),false));
+                        addresslist.add(new AddressClass(jsonObject.get("address").toString(), false));
 
 
                         mProgressDialog.cancel();
@@ -422,7 +401,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
 
                 }
-                addressAdapter = new AddressAdapter(addresslist);
+                addressAdapter = new AddressAdapter(addresslist,false);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
             }
@@ -493,13 +472,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         if (requestCode == GALLERY_CODE && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
-
-            if (imageUri != null) {
-                Intent intent = new Intent(ProfileActivity.this, videoView.class);
-                intent.putExtra("image", imageUri.toString());
-                intent.putExtra("from", "view");
-                startActivity(intent);
-            }
+            Glide.with(getApplicationContext()).load(String.valueOf(imageUri)).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
+            helpingMethods.saveuser(helpingMethods.GetUName(), String.valueOf(imageUri), null, helpingMethods.GetUPhone());
         }
     }
 
@@ -569,7 +543,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         public void onClick(View v) {
                             Intent intent = new Intent(ProfileActivity.this, MapActivity.class);
                             flag = true;
-                            intent.putExtra("activity","profile");
+                            intent.putExtra("activity", "profile");
                             startActivity(intent);
                         }
                     });
@@ -588,9 +562,9 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                                             mProgressDialog.dismiss();
                                             alertDialog.cancel();
 
-                                            Toast.makeText(ProfileActivity.this, "Address is added" , Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ProfileActivity.this, "Address is added", Toast.LENGTH_SHORT).show();
 
-                                            Intent i = new Intent(ProfileActivity.this,ProfileActivity.class);
+                                            Intent i = new Intent(ProfileActivity.this, ProfileActivity.class);
                                             startActivity(i);
                                             finish();
                                         }
@@ -639,7 +613,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                             }
 
 
-
                         }
 
                     });
@@ -665,7 +638,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                                     Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
                                 }
                             }
-                                // Rest of the stuff you need to do with the map
+                            // Rest of the stuff you need to do with the map
 
                         });
 
@@ -673,8 +646,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                         Log.d("dfg", e.getMessage());
 
                     }
-
-
 
 
 //                    mSave.setOnClickListener(new View.OnClickListener() {
@@ -748,10 +719,12 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 .check();
     }
 
-    public void onResume () {
+    public void onResume() {
         super.onResume();
 
-
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
+        }
         if (flag) {
             String[] getvv = mylatlng.split(",");
             final double latitude = Double.parseDouble(getvv[0]);
@@ -784,6 +757,15 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
     @Override

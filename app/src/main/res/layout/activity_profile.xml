@@ -55,11 +55,6 @@
                         app:fabCustomSize="20dp"
                         app:srcCompat="@drawable/ic_add_black_24dp" />
 
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp" />
-
                 </RelativeLayout>
 
                 <TextView
