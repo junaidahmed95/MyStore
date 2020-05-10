@@ -78,6 +78,14 @@
                     android:textAllCaps="false"
                     android:textColor="@color/colorRed" />
 
+                <com.facebook.login.widget.LoginButton
+                    android:id="@+id/login_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="30dp" />
+
 
             </LinearLayout>
 
@@ -456,7 +464,7 @@
                 android:layout_marginTop="6dp"
                 android:layout_marginRight="13dp"
                 android:layout_marginBottom="10dp"
-                android:visibility="gone"
+               android:visibility="gone"
                 app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="3dp"
@@ -583,6 +591,58 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/loginwithother"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@drawable/border"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:background="@drawable/user"
+                                android:backgroundTint="@color/colorRed">
+
+                            </ImageView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_marginRight="5dp"
+                                android:text="Userphoneno"
+                                android:textColor="@color/colorRed">
+
+                            </TextView>
+
+                        </LinearLayout>
+
+                        <EditText
+                            android:maxLength="13"
+                            android:id="@+id/user_phoneno"
+                            android:inputType="number"
+                            android:autofillHints="03012345678"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginRight="20dp"
+                            android:background="@android:color/transparent"
+                            android:hint="Enter your number" />
+
+                    </LinearLayout>
+
                     <fragment
                         android:id="@+id/mapview"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -643,22 +703,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
                         android:background="@drawable/btn_shape"
                         android:text="Select Your Location"
                         android:textAllCaps="false"
-                        android:layout_marginBottom="16dp"
                         android:textColor="@color/white" />
 
                     <TextView
                         android:id="@+id/btnPrivacyPolicy"
                         android:layout_width="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:textAlignment="center"
-                        android:textColor="@android:color/holo_blue_bright"
-                        android:layout_marginLeft="16dp"
-                        android:text="By proceeding I acknowledge that I have read the Privacy Policy"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal" />
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:gravity="center_horizontal"
+                        android:text="By proceeding I acknowledge that I have read the Privacy Policy"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/holo_blue_bright" />
 
                     <Button
                         android:id="@+id/button_create"
