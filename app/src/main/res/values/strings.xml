@@ -29,4 +29,8 @@
     <string name="home_second">Home Second</string>
     <string name="is_drawer_open">open</string>
     <string name="is_drawer_close">close</string>
+
+    <string name="facebook_app_id">1431203980385621</string>
+    <string name="fb_login_protocol_scheme">fb1431203980385621</string>
+
 </resources>

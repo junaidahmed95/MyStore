@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -174,6 +175,18 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         helpingMethods = new HelpingMethods(ProfileActivity.this);
         meditaddress = findViewById(R.id.userAdd);
 
+        //helpingMethods.saveuser(name, image,null,null,null);
+        SharedPreferences sharedPreferences = getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("name", null);
+        String photo = sharedPreferences.getString("photo", null);
+        String mobile = sharedPreferences.getString("mobile", null);
+        String address = sharedPreferences.getString("address", null);
+
+        Glide.with(ProfileActivity.this).asBitmap().load(photo).into(mImage);
+        mName.setText(username);
+//        meditaddress.setText(address);
+        mPhone.setText(mobile);
+
         parseJSON();
 
 
@@ -265,6 +278,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         muserName.setText(name);
         Button mCancel = promptsView.findViewById(R.id.cancel);
         Button mSave = promptsView.findViewById(R.id.save);
+
 
         final androidx.appcompat.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

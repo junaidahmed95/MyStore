@@ -20,13 +20,14 @@ public class HelpingMethods {
         sb.show();
     }
 
-    public void saveuser(String name, String photo, String address,String phone) {
+    public void saveuser(String name, String photo, String address,String phone,String uphone) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.putString("photo", photo);
         editor.putString("address", address);
         editor.putString("phone", phone);
+        editor.putString("phone", uphone);
         editor.apply();
     }
 
