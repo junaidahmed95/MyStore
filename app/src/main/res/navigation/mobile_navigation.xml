@@ -47,7 +47,11 @@
         android:label="Current Order(s)"
         tools:layout="@layout/fragment_order"/>
 
-
+    <fragment
+        android:id="@+id/nav_hist"
+        android:name="com.bringo.home.ui.OrderHistoryFragment"
+        android:label="Order History"
+        tools:layout="@layout/fragment_order_history"/>
 
     <fragment
         android:id="@+id/nav_contact"

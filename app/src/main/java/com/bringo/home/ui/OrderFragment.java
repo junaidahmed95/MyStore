@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +30,10 @@ import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
 import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +56,8 @@ public class OrderFragment extends Fragment {
     private HelpingMethods helpingMethods;
     List<OrderHistory> products_list;
     RecyclerView mstatus_recycler;
+    private List<String> orderIDList;
+
 
     public OrderFragment() {
         // Required empty public constructor
@@ -66,6 +73,10 @@ public class OrderFragment extends Fragment {
         mProgressDialog.setMessage("Getting orders...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        orderIDList = new ArrayList<>();
+
+
+
         mnoOrder = view.findViewById(R.id.noOrder);
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
@@ -105,7 +116,6 @@ public class OrderFragment extends Fragment {
 
     private void parseJSON() {
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
         // Initialize a new JsonArrayRequest instance
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
             @Override
@@ -129,7 +139,7 @@ public class OrderFragment extends Fragment {
                         for (int j = 0; j < storeOrderDetails.length(); j++) {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
-                            if (!storeObject.getString("status").equals("4")) {
+                            if (!storeObject.get("status").equals("Deliverd")) {
                                 String pname = storeObject.getString("sp_name");
                                 String actprice = storeObject.getString("act_prc");
                                 String address = storeObject.getString("new_address");
@@ -141,7 +151,6 @@ public class OrderFragment extends Fragment {
                                 String tpprice = storeObject.getString("str_prc");
                                 String status = storeObject.getString("status");
                                 products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
-
                             }
 
 
