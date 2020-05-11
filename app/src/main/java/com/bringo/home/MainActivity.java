@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     public static HelpingMethods helpingMethods;
     Button msignupBtn;
-    private TextView mUserName;
+    private TextView mUserName,mtotalAmount;
     private LinearLayout minLayout, moutLayout;
     private String sName, sImage;
     public static TextView textCartItemCount;
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
+        mtotalAmount  =findViewById(R.id.totalAmount);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
         View navHeaderView = navigationView.inflateHeaderView(R.layout.nav_header_bringo);
@@ -256,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(helpingMethods.GetCartTotal()>0){
+            mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal()+"/-");
+            mtotalAmount.setVisibility(View.VISIBLE);
+        }else {
+            mtotalAmount.setVisibility(View.GONE);
+        }
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             minLayout.setVisibility(View.VISIBLE);
             Glide.with(getApplicationContext()).asBitmap().load(helpingMethods.GetUImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mUserImage);

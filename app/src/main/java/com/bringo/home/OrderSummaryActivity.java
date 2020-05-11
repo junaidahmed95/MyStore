@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,8 +31,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -88,8 +96,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +117,11 @@ import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 
 public class OrderSummaryActivity extends AppCompatActivity implements OnMapReadyCallback {
     APIService apiService;
+    DatePicker eReminderTime;
+    private String timebase  = null;
+    private EditText mtimeofdeli;
+    private String self_pick = "1";
+    private LinearLayout mtimeLayout;
     private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
     private static List<CatLvlItemList> orderSummaryList;
@@ -123,7 +138,6 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     private JsonArrayRequest addressrequest;
     private RequestQueue addressrequestQueue, requestQueue;
     private static AddressAdapter addressAdapter;
-    private String address;
     String OrdrerID;
     private String status = "";
     String dayString;
@@ -141,12 +155,16 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     Task location;
+    private ImageButton mTimeChoose;
     static LatLng Your_Location = new LatLng(23.81, 90.41);
     public static String mAddress = "";
     static List<Address> addresses;
+    private RadioGroup radioGroup;
+    private String Type = "Self";
     static Geocoder geocoder;
     private String addresss = "", city = "";
     private EditText muserName;
+    private RadioButton mSelfBtn, mTimeBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,12 +178,64 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         helpingMethods = new HelpingMethods(OrderSummaryActivity.this);
         GetCartData();
         GetCheckData();
+        mtimeLayout = findViewById(R.id.timeLayout);
+        radioGroup = findViewById(R.id.ragroup);
         pTotalPrice = getIntent().getStringExtra("totalP");
         store_ID = helpingMethods.GetStoreID();
         ownerName = helpingMethods.GetStoreName();
         ownerImage = helpingMethods.GetStoreImage();
         ownerID = helpingMethods.GetStoreUID();
+        mTimeChoose = findViewById(R.id.openTimeDialog);
+        mSelfBtn = findViewById(R.id.selfRedio);
+        mtimeofdeli = findViewById(R.id.timeofdeli);
+        mTimeBtn = findViewById(R.id.timeRedio);
+        mSelfBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    mtimeLayout.setVisibility(View.GONE);
+                    self_pick = "1";
+                }
+            }
+        });
 
+        mTimeBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    mtimeLayout.setVisibility(View.VISIBLE);
+                    self_pick = "0";
+                }
+            }
+        });
+
+        mTimeChoose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(OrderSummaryActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        mtimeofdeli.setText(selectedHour + ":" + selectedMinute);
+
+                        Calendar c = Calendar.getInstance();
+                        c.set(Calendar.HOUR, selectedHour);
+                        c.set(Calendar.MINUTE, selectedMinute);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                        timebase = String.valueOf(c.getTimeInMillis() / 1000L);
+                    }
+                }, hour, minute, false);
+                mTimePicker.setTitle("Select Deliver Time");
+                mTimePicker.show();
+
+            }
+        });
 
         mconfirmorder_btn = findViewById(R.id.checkBtn);
         mtotalprice = findViewById(R.id.totalPrice);
@@ -222,133 +292,145 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         mconfirmorder_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                progressDialog.show();
-                                final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                                final String id = reference.child("Chats").push().getKey();
-                                String url = "https://bringo.biz/api/post/up_order";
-                                StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-                                        OrdrerID = response;
-                                        final HashMap<String, Object> hashMap = new HashMap<>();
-                                        hashMap.put("message", "new order");
-                                        hashMap.put("time", ServerValue.TIMESTAMP);
-                                        hashMap.put("seen", false);
-                                        hashMap.put("type", "Order");
-                                        hashMap.put("chatid", id);
-                                        hashMap.put("orderID", OrdrerID);
-                                        hashMap.put("storeID", store_ID);
-                                        hashMap.put("address", cusaddress);
-                                        hashMap.put("totalProduct", preferenceList.size());
-                                        hashMap.put("totalPrice", "Rs." + pTotalPrice);
-                                        hashMap.put("sender", FirebaseAuth.getInstance().getUid());
-                                        hashMap.put("delivery", "not available");
-                                        unreadReference = FirebaseDatabase.getInstance().getReference().child("Unread").child(FirebaseAuth.getInstance().getUid()).child(ownerID);
-                                        reference.child("Chats").child(FirebaseAuth.getInstance().getUid() + ownerID).child(id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
-                                                    helpingMethods.SaveCartCount(0, store_ID);
-                                                    helpingMethods.SaveCartTotal(0);
-                                                    helpingMethods.SaveStoreData(null, null, null, null);
-                                                    mycheckList.clear();
-                                                    SaveCheckData();
-                                                    preferenceList.clear();
-                                                    SaveCartData();
-                                                    UnreadMessage("\uD83D\uDCE6 New Order");
-                                                    sendNotifiaction(ownerName, "\uD83D\uDCE6 New order has been arrived..");
-                                                    Intent mintent = new Intent(OrderSummaryActivity.this, DummyOrderActivity.class);
+
+                if(mtimeofdeli.getVisibility()==View.VISIBLE && mtimeofdeli.getText().toString().trim().equals("")){
+                    Toast.makeText(OrderSummaryActivity.this, "Please sselect delivery time", Toast.LENGTH_SHORT).show();
+                }else {
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+
+
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+
+
+
+                                    progressDialog.show();
+                                    final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                                    final String id = reference.child("Chats").push().getKey();
+                                    String url = "https://bringo.biz/api/post/up_order";
+                                    StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            OrdrerID = response;
+                                            final HashMap<String, Object> hashMap = new HashMap<>();
+                                            hashMap.put("message", "new order");
+                                            hashMap.put("time", ServerValue.TIMESTAMP);
+                                            hashMap.put("seen", false);
+                                            hashMap.put("type", "Order");
+                                            hashMap.put("chatid", id);
+                                            hashMap.put("orderID", OrdrerID);
+                                            hashMap.put("storeID", store_ID);
+                                            hashMap.put("address", cusaddress);
+                                            hashMap.put("totalProduct", preferenceList.size());
+                                            hashMap.put("totalPrice", "Rs." + pTotalPrice);
+                                            hashMap.put("sender", FirebaseAuth.getInstance().getUid());
+                                            hashMap.put("delivery", "not available");
+                                            unreadReference = FirebaseDatabase.getInstance().getReference().child("Unread").child(FirebaseAuth.getInstance().getUid()).child(ownerID);
+                                            reference.child("Chats").child(FirebaseAuth.getInstance().getUid() + ownerID).child(id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
+                                                        helpingMethods.SaveCartCount(0, store_ID);
+                                                        helpingMethods.SaveCartTotal(0);
+                                                        helpingMethods.SaveStoreData(null, null, null, null);
+                                                        mycheckList.clear();
+                                                        SaveCheckData();
+                                                        preferenceList.clear();
+                                                        SaveCartData();
+                                                        UnreadMessage("\uD83D\uDCE6 New Order");
+                                                        sendNotifiaction(ownerName, "\uD83D\uDCE6 New order has been arrived..");
+                                                        Intent mintent = new Intent(OrderSummaryActivity.this, DummyOrderActivity.class);
 //                                                    mintent.putExtra("user_id", ownerID);
 //                                                    mintent.putExtra("check", "one");
 //                                                    mintent.putExtra("uName", ownerName);
 //                                                    mintent.putExtra("uImage", ownerImage);
 //                                                    mintent.putExtra("forward", "one");
 //                                                    mintent.putExtra("for", "one");
-                                                    progressDialog.cancel();
-                                                    Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
-                                                    startActivity(mintent);
-                                                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                                        progressDialog.cancel();
+                                                        Toast.makeText(OrderSummaryActivity.this, "Order has been sent", Toast.LENGTH_SHORT).show();
+                                                        startActivity(mintent);
+                                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
-                                                } else {
-                                                    progressDialog.dismiss();
-                                                    Toast.makeText(OrderSummaryActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        progressDialog.dismiss();
+                                                        Toast.makeText(OrderSummaryActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
                                                 }
-                                            }
-                                        });
-
-
-                                    }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        progressDialog.cancel();
-                                        Toast.makeText(OrderSummaryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-
-
-                                }
-
-
-                                ) {
-                                    @Override
-                                    protected Map<String, String> getParams() {
-                                        Date date = new Date();
-                                        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-                                        String tim = dateFormat.format(date).toUpperCase();
-                                        HashMap hashMap = new HashMap<>();
-
-
-                                        for (int a = 0; a < preferenceList.size(); a++) {
-                                            hashMap.put("str_prc[" + a + "]", preferenceList.get(a).getP_price());
-                                            hashMap.put("ord_qty[" + a + "]", preferenceList.get(a).getP_quantity());
-                                            hashMap.put("sp_id[" + a + "]", preferenceList.get(a).getProductid());
-                                            hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
-                                            hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
-                                            hashMap.put("str_id", store_ID);
-                                            hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
-                                            hashMap.put("new_address", cusaddress);
-                                            hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
-                                            hashMap.put("t_price", pTotalPrice);
-                                            hashMap.put("time", tim);
-                                            hashMap.put("day", dayString);
+                                            });
 
 
                                         }
+                                    }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            progressDialog.cancel();
+                                            Toast.makeText(OrderSummaryActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
 
 
-                                        return hashMap;
                                     }
 
-                                    ;
 
-                                    {
+                                    ) {
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Date date = new Date();
+                                            SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                                            String tim = dateFormat.format(date).toUpperCase();
+                                            HashMap hashMap = new HashMap<>();
+                                            hashMap.put("self_pick", self_pick);
+                                            hashMap.put("pick_time", String.valueOf(timebase));
+                                            for (int a = 0; a < preferenceList.size(); a++) {
+                                                hashMap.put("str_prc[" + a + "]", preferenceList.get(a).getP_price());
+                                                hashMap.put("ord_qty[" + a + "]", preferenceList.get(a).getP_quantity());
+                                                hashMap.put("sp_id[" + a + "]", preferenceList.get(a).getProductid());
+                                                hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
+                                                hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
+                                                hashMap.put("str_id", store_ID);
+                                                hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
+                                                hashMap.put("new_address", cusaddress);
+                                                hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
+                                                hashMap.put("t_price", pTotalPrice);
+                                                hashMap.put("time", tim);
+                                                hashMap.put("day", dayString);
+                                            }
 
-                                    }
-                                };
+
+                                            return hashMap;
+                                        }
+
+                                        ;
+
+                                        {
+
+                                        }
+                                    };
 
 
-                                postdata.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                                RequestHandlerSingleten.getInstance(getBaseContext()).addToRequestQueue(postdata);
+                                    postdata.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                    RequestHandlerSingleten.getInstance(getBaseContext()).addToRequestQueue(postdata);
 
 
-                                break;
+                                    break;
 
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
                         }
-                    }
-                };
+                    };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(OrderSummaryActivity.this);
-                builder.setMessage("Do you want to send order?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(OrderSummaryActivity.this);
+                    builder.setMessage("Do you want to send order?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                }
+
+
+
 
 
             }
@@ -422,7 +504,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                         public void onClick(View v) {
                             Intent intent = new Intent(OrderSummaryActivity.this, MapActivity.class);
                             flag = true;
-                            intent.putExtra("activity","order");
+                            intent.putExtra("activity", "order");
                             startActivity(intent);
                         }
                     });
@@ -515,7 +597,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
                         mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-                                                ((SupportMapFragment) getSupportFragmentManager()
+                        ((SupportMapFragment) getSupportFragmentManager()
 
 
                                 .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {
@@ -528,11 +610,11 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
                                 mAddress = getAddress(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-                        muserName.setText(mAddress);
+                                muserName.setText(mAddress);
                                 if (mMap != null) {
                                     Marker hamburg = mMap.addMarker(new MarkerOptions().position(Your_Location));
                                 }
-                               // Rest of the stuff you need to do with the map
+                                // Rest of the stuff you need to do with the map
 
                             }
                         });
@@ -734,7 +816,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
                 }
 
-                addressAdapter = new AddressAdapter(kuchbhe,true);
+                addressAdapter = new AddressAdapter(kuchbhe, true);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
                 mProgressDialog.cancel();
@@ -853,7 +935,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                 }
             });
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapview);
-            mapFragment.getMapAsync( OrderSummaryActivity.this);
+            mapFragment.getMapAsync(OrderSummaryActivity.this);
         }
 
     }

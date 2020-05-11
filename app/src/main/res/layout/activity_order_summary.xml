@@ -23,10 +23,9 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
+                android:visibility="gone">
 
 
                 <fragment
@@ -39,22 +38,92 @@
             </LinearLayout>
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Delivery Type"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/ragroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
+
+                <RadioButton
+                    android:id="@+id/selfRedio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Self Pick Up" />
+
+                <RadioButton
+                    android:id="@+id/timeRedio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time Based" />
+
+            </RadioGroup>
+
+            <LinearLayout
+                android:id="@+id/timeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/timeofdeli"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:hint="Select time from right button"
+                    android:editable="false"
+                    android:background="@drawable/border" />
+
+                <ImageButton
+                    android:id="@+id/openTimeDialog"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/border"
+                    app:srcCompat="@drawable/ic_action_time" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="8dp"
+                android:background="#d6d6d6" />
+
+            <TextView
                 android:id="@+id/add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Delivery Address"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginRight="8dp"
                 android:background="#d6d6d6" />
-
 
 
             <RelativeLayout
@@ -64,10 +133,10 @@
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/addAddre"
-                    android:layout_marginRight="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
                     app:backgroundTint="@color/colorPrimary"
                     app:fabSize="mini"
                     app:srcCompat="@drawable/ic_add_black_24dp" />
@@ -76,7 +145,7 @@
                     android:id="@+id/addressesRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="19dp" />
+                    android:layout_marginTop="10dp" />
             </RelativeLayout>
 
             <TextView
@@ -84,7 +153,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/addressesRecyclerView"
-                android:layout_margin="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Order Summary"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
@@ -95,14 +165,15 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="6dp"
+                android:layout_marginBottom="8dp"
                 android:background="#d6d6d6" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/summaryRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/summa" />
+                android:layout_below="@+id/summa"
+                android:layout_marginBottom="8dp" />
 
         </LinearLayout>
 
@@ -163,7 +234,6 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/rs"
                 android:textColor="@android:color/black" />
-
 
 
             <Button
