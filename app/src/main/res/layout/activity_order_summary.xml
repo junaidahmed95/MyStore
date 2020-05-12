@@ -41,12 +41,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
+                android:visibility="gone"
                 android:layout_marginTop="8dp"
                 android:text="Delivery Type"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <RadioGroup
+                android:visibility="gone"
                 android:id="@+id/ragroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -100,6 +102,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:visibility="gone"
                 android:layout_alignParentBottom="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="4dp"

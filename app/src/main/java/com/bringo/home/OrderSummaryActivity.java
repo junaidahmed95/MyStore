@@ -293,7 +293,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
             @Override
             public void onClick(View v) {
 
-                if(mtimeofdeli.getVisibility()==View.VISIBLE && mtimeofdeli.getText().toString().trim().equals("")){
+                if(self_pick.equals("0")){
                     Toast.makeText(OrderSummaryActivity.this, "Please sselect delivery time", Toast.LENGTH_SHORT).show();
                 }else {
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -335,7 +335,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                     if (task.isSuccessful()) {
                                                         FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
                                                         helpingMethods.SaveCartCount(0, store_ID);
-                                                        helpingMethods.SaveCartTotal(0);
+                                                        helpingMethods.SaveCartTotal(0,store_ID);
                                                         helpingMethods.SaveStoreData(null, null, null, null);
                                                         mycheckList.clear();
                                                         SaveCheckData();

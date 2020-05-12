@@ -27,6 +27,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -186,14 +187,16 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private Bitmap bitmap = null;
     private String get_user;
     private PhoneAuthCredential credential;
-    private LinearLayout mloginwithother;
-    private EditText muserphoneno;
+    private LinearLayout mloginwithother, mly_email;
+    private EditText muserphoneno, muser_email;
     private LinearLayout main_screen;
     private ImageView imageView;
     private RelativeLayout rely;
     private LoginButton fb_login;
     boolean check = false;
     String photoUrl;
+    private int RC_SIGN_IN = 1;
+
     private CallbackManager mcallbackManager;
     private FirebaseAuth.AuthStateListener authStateListener;
     private AccessTokenTracker accessTokenTracker;
@@ -226,15 +229,15 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-         imageView = findViewById(R.id.bgHeader);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ColorStateList stateList = ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary));
-            imageView.setBackgroundTintList(stateList);
-        } else {
-            imageView.getBackground().getCurrent().setColorFilter(
-                    new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
-                            PorterDuff.Mode.MULTIPLY));
-        }
+        imageView = findViewById(R.id.bgHeader);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            ColorStateList stateList = ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary));
+//            imageView.setBackgroundTintList(stateList);
+//        } else {
+//            imageView.getBackground().getCurrent().setColorFilter(
+//                    new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
+//                            PorterDuff.Mode.MULTIPLY));
+//        }
 
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -275,11 +278,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mCreateAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#008577"));
         mCreateAlertDialog.setTitleText("creating account....");
         mCreateAlertDialog.setCancelable(false);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mResend_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -290,16 +288,27 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mTextView_phoneno = findViewById(R.id.textView_phoneno);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getInstance().getCurrentUser();
+        //google sigin code
         signInButton = findViewById(R.id.sign_in_button);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+//facebook sigin code
         muserphoneno = findViewById(R.id.user_phoneno);
+        muser_email = findViewById(R.id.user_email);
         fb_login = findViewById(R.id.login_button);
         fb_login.setReadPermissions("email", "public_profile");
         mcallbackManager = CallbackManager.Factory.create();
-        mloginwithother =findViewById(R.id.loginwithother);
+        mloginwithother = findViewById(R.id.loginwithother);
+        mly_email = findViewById(R.id.ly_email);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
         fb_login.registerCallback(mcallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+
                 Log.d("facebookauthencation", "onSuccess" + loginResult);
                 handleFacebookToken(loginResult.getAccessToken());
 
@@ -334,6 +343,13 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         };
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                signIn();
+            }
+        });
 
 
         try {
@@ -385,17 +401,24 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-
+//create button
         mbutton_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
+                if (check) {
+                    if (muserphoneno.equals("")) {
+                        helpingMethods.SnackBar("Enter your phone number", v);
+                    } else if (muser_email.equals("")) {
+                        helpingMethods.SnackBar("Enter your email address", v);
+                    }
 
-                if(!check){
+                }else {
                     if (bitmap == null) {
                         helpingMethods.SnackBar("Select your image", v);
                     }
-                } else if (mmusername.getText().toString().trim().equals("")) {
+                }
+                 if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);
                 } else if (mEdiText_address.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your address", v);
@@ -432,7 +455,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                                    if(check == true){
+                                                        helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), muserphoneno.getText().toString().replaceAll(" ", ""));
+                                                    }else {
+                                                        helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""));
+                                                    }
+
                                                     Intent intent = new Intent(Verification.this, MainActivity.class);
                                                     if (getIntent().getStringExtra("for") != null) {
                                                         intent.putExtra("cart", "open");
@@ -498,9 +526,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    if(!check){
-                                        params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
-                                    }
+
+                                    params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+
 
 
                                     return params;
@@ -513,6 +541,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
                                     hashMap.put("u_id", mAuth.getUid());
                                     hashMap.put("image", photoUrl);
+                                    hashMap.put("email", muser_email.getText().toString().trim());
                                     hashMap.put("user_name", mmusername.getText().toString().trim());
                                     hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
                                     hashMap.put("phone", muserphoneno.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
@@ -536,27 +565,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ConnectionDetector detector = new ConnectionDetector(Verification.this);
-                if (mEdiText_address.getText().toString().trim().equals("")) {
-                    helpingMethods.SnackBar("Please enter your address.", v);
-                } else if (detector.isConnected()) {
-                    parseJSON();
-                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                    startActivityForResult(signInIntent, 101);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else {
-                    helpingMethods.SnackBar("Check your internet connection.", v);
-                }
-            }
-        });
+//google sigin button
 
         TextView textView = (TextView) signInButton.getChildAt(0);
-        textView.setText("Corner SignIn");
+        textView.setText("Sign in with Google");
         textView.setTextColor(Color.parseColor("#008577"));
+        textView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER | Gravity.CENTER_VERTICAL);
 
         viewGroup = findViewById(R.id.group_layout);
         ccp = findViewById(R.id.ccp);
@@ -670,21 +684,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mcallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 101) {
+        if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                if (task.isSuccessful()) {
-                    mCreateAlertDialog.show();
-                    GoogleSignInAccount account = task.getResult(ApiException.class);
-                    firebaseAuthWithGoogle(account);
-                } else {
-                    mCreateAlertDialog.dismiss();
-                    helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                }
-            } catch (ApiException e) {
-                mCreateAlertDialog.dismiss();
-                helpingMethods.SnackBar("" + e.getMessage(), mPhoneNumber);
-            }
+            handleSignInResult(task);
         } else if (requestCode == 102) {
             imageuri = data.getData();
             try {
@@ -697,57 +699,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    //junaid
-    private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            mylatlng = Your_Location.latitude + "," + Your_Location.longitude;
-                            user = mAuth.getCurrentUser();
-                            assert user != null;
-                            final String email = account.getEmail();
-                            final String user = account.getDisplayName();
-                            final Uri photouri = account.getPhotoUrl();
-                            final String photo = photouri.toString();
-                            DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers");
-                            HashMap hashMap = new HashMap<>();
-                            hashMap.put("name", user);
-                            hashMap.put("picture", photo);
-                            hashMap.put("email", email);
-                            hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
-                            //hashMap.put("phone", .getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
-                            hashMap.put("latlong", mylatlng);
-                            hashMap.put("address", mEdiText_address.getText().toString().trim());
-                            hashMap.put("status", 0);
-                            hashMap.put("token", FirebaseInstanceId.getInstance().getToken());
-                            hashMap.put("search", user.toLowerCase());
-                            userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Intent intent = new Intent(Verification.this, MainActivity.class);
-                                        if (getIntent().getStringExtra("for") != null) {
-                                            intent.putExtra("cart", "open");
-                                        }
-                                        startActivity(intent);
-                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                    } else {
-                                        mCreateAlertDialog.dismiss();
-                                        helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                                    }
-                                }
-                            });
+    //google
 
-                        } else {
-                            mCreateAlertDialog.dismiss();
-                            helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                        }
-                    }
-                });
-    }
 
     private void ResendCode() {
         //Toast.makeText(this, "Pending", Toast.LENGTH_SHORT).show();
@@ -770,93 +723,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
         }.start();
     }
-//
-//    private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
-//
-//        mAuth.signInWithCredential(phoneAuthCredential)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//
-//                            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                    if (dataSnapshot.exists()) {
-//                                        Intent intent = new Intent(Verification.this, MainActivity.class);
-//                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                        startActivity(intent);
-//                                        finish();
-//                                    } else {
-//
-//
-//                                        ScaleAnimation scaleAnimation = new ScaleAnimation(1, 0, 1, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                                        scaleAnimation.setDuration(100);
-//                                        scaleAnimation.setInterpolator(new AccelerateInterpolator());
-//                                        scaleAnimation.setRepeatMode(Animation.REVERSE);
-//                                        scaleAnimation.setRepeatCount(1);
-//                                        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
-//                                            @Override
-//                                            public void onAnimationStart(Animation animation) {
-//                                                icon.setColorFilter(Verification.this.getResources().getColor(R.color.colorGreen));
-//
-//                                            }
-//
-//                                            @Override
-//                                            public void onAnimationEnd(Animation animation) {
-//
-//                                            }
-//
-//                                            @Override
-//                                            public void onAnimationRepeat(Animation animation) {
-//
-//                                            }
-//                                        });
-//                                        stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
-//                                        mSigninContainer.setVisibility(View.VISIBLE);
-//                                        mVerifyContainer.setVisibility(View.GONE);
-//                                        viewGroup.setVisibility(View.GONE);
-//                                        proBbar.setVisibility(View.GONE);
-//
-//                                        if (ContextCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                                            kamkicheez();
-//                                        } else {
-//                                            getPermisssion();
-//                                        }
-//
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                }
-//                            });
-//
-//
-//
-//
-//                        } else {
-//                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-//                                proBbar.setVisibility(View.GONE);
-//                                message.setText("Invalid Code.");
-//                                message.setTextColor(getResources().getColor(R.color.colorRed));
-//                                if (Build.VERSION.SDK_INT >= 19) {
-//                                    TransitionManager.beginDelayedTransition(viewGroup);
-//                                    message.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    message.setVisibility(View.VISIBLE);
-//                                }
-//                                mbutton_verify.setEnabled(true);
-//                                proBbar.setVisibility(View.GONE);
-//                                codeText.setEnabled(true);
-//                                message.setVisibility(View.VISIBLE);
-//                            }
-//                        }
-//                    }
-//                });
-//
-//    }
+
 
     //kam
     private void verifyPhoneNumberWithCode(String verificationId, String code) {
@@ -1097,7 +964,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }
         checkApi();
         verifyPhoneNumberWithCode(mVerificationId, code);
-        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
+        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
         parseJSON();
     }
 
@@ -1168,9 +1035,16 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
+
                     stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
                     mSigninContainer.setVisibility(View.VISIBLE);
                     mVerifyContainer.setVisibility(View.GONE);
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    UpdateUi(user);
+                    imageView.setVisibility(View.VISIBLE);
+//                    mSigninContainer.setVisibility(View.VISIBLE);
+                    mloginwithother.setVisibility(View.VISIBLE);
+                    mly_email.setVisibility(View.VISIBLE);
 
                 } else {
                     for (int i = 0; i < response.length(); i++) {
@@ -1179,7 +1053,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             String u_name = jsonObject.getString("user_name");
                             String u_address = jsonObject.getString("address");
                             String u_image = jsonObject.getString("user_image");
-                            helpingMethods.saveuser(u_name, u_image, u_address, mPhoneNumber.getText().toString());
+                            String u_phone = jsonObject.getString("phone");
+                            helpingMethods.saveuser(u_name, u_image, u_address, u_phone);
 
                         } catch (Exception e) {
                             Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1247,21 +1122,16 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private void handleFacebookToken(AccessToken token) {
         Log.d("", "" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-
         mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(Verification.this, "signin with credition successfull", Toast.LENGTH_SHORT).show();
-                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
+                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
                     parseJSON();
-                    muserphoneno.setVisibility(View.VISIBLE);
 
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    UpdateUi(user);
-//                    mSigninContainer.setVisibility(View.VISIBLE);
-//                    mloginwithother.setVisibility(View.VISIBLE);
-//                    imageView.setVisibility(View.GONE);
+//
+
 //                    main_screen.setVisibility(View.GONE);
                 } else {
 
@@ -1273,18 +1143,96 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     private void UpdateUi(FirebaseUser user) {
         if (user != null) {
             mmusername.setText(user.getDisplayName());
-check = true;
+            check = true;
             photoUrl = String.valueOf(user.getPhotoUrl());
             muserphoneno.setText(user.getPhoneNumber());
+            muser_email.setText(user.getEmail());
             //photoUrl = photoUrl + "?type=large";
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(photoUrl));
 
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Picasso.get().load(photoUrl).into(musercrimage);
-
 
 
             //helpingMethods.saveuser( mmusername.setText(user.getDisplayName()), Picasso.get().load(photoUri).into(musercrimage),null,null);
         }
 
+
+    }
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+
+            GoogleSignInAccount acc = completedTask.getResult(ApiException.class);
+            Toast.makeText(Verification.this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
+            FirebaseGoogleAuth(acc);
+        } catch (ApiException e) {
+            Toast.makeText(Verification.this, "Sign In Failed", Toast.LENGTH_SHORT).show();
+            FirebaseGoogleAuth(null);
+        }
+    }
+
+    private void FirebaseGoogleAuth(GoogleSignInAccount acct) {
+        //check if the account is null
+        if (acct != null) {
+            AuthCredential authCredential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+            mAuth.signInWithCredential(authCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Verification.this, "Successful", Toast.LENGTH_SHORT).show();
+                        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
+                        parseJSON();
+                        imageView.setVisibility(View.VISIBLE);
+                        mloginwithother.setVisibility(View.VISIBLE);
+                        mly_email.setVisibility(View.VISIBLE);
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        UpdateUi(user);
+                    } else {
+                        Toast.makeText(Verification.this, "Failed", Toast.LENGTH_SHORT).show();
+                        updateUI(null);
+                    }
+                }
+            });
+        } else {
+            Toast.makeText(Verification.this, "acc failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateUI(FirebaseUser fUser) {
+        //btnSignOut.setVisibility(View.VISIBLE);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (account != null) {
+            check = true;
+            String personName = account.getDisplayName();
+
+            String personFamilyName = account.getFamilyName();
+            String personEmail = account.getEmail();
+            String personId = account.getId();
+            Uri personPhoto = account.getPhotoUrl();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), personPhoto);
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            muser_email.setText(personEmail);
+            mmusername.setText(personName);
+            Picasso.get().load(personPhoto).into(musercrimage);
+
+            Toast.makeText(Verification.this, personName + personEmail, Toast.LENGTH_SHORT).show();
+        }
 
     }
 

@@ -50,7 +50,7 @@ public class OrderFragment extends Fragment {
     String get_status = "https://bringo.biz/api/get/order/status?ord_id=9bGqUshRJrS8ZHPk";
     private final String JSON_URL = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     List<OrderHistory> historylist;
-    private Button mbtnSiglo;
+    private Button mbtnSiglo, mbtnRetry;
     private TextView mnoOrder;
     private ProgressDialog mProgressDialog;
     private HelpingMethods helpingMethods;
@@ -75,7 +75,7 @@ public class OrderFragment extends Fragment {
         mProgressDialog.show();
         orderIDList = new ArrayList<>();
 
-
+        mbtnRetry = view.findViewById(R.id.btnRetry);
 
         mnoOrder = view.findViewById(R.id.noOrder);
         historylist = new ArrayList<>();
@@ -102,6 +102,7 @@ public class OrderFragment extends Fragment {
             } else {
                 mProgressDialog.cancel();
                 Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                mbtnRetry.setVisibility(View.VISIBLE);
             }
 
         } else {
@@ -109,6 +110,21 @@ public class OrderFragment extends Fragment {
             mbtnSiglo.setVisibility(View.VISIBLE);
         }
 
+
+        mbtnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                if (connectionDetector.isConnected()) {
+                    mbtnRetry.setVisibility(View.GONE);
+                    parseJSON();
+                } else {
+                    mProgressDialog.cancel();
+                    Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                    mbtnRetry.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         return view;
     }
@@ -175,6 +191,7 @@ public class OrderFragment extends Fragment {
                 } catch (JSONException e) {
                     mProgressDialog.cancel();
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    mbtnRetry.setVisibility(View.VISIBLE);
                 }
             }
         },
@@ -183,6 +200,7 @@ public class OrderFragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         mProgressDialog.cancel();
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        mbtnRetry.setVisibility(View.VISIBLE);
 
                     }
                 }

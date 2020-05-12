@@ -257,8 +257,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(helpingMethods.GetCartTotal()>0){
-            mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal()+"/-");
+        if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>0){
+            mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(helpingMethods.GetStoreID())+"/-");
             mtotalAmount.setVisibility(View.VISIBLE);
         }else {
             mtotalAmount.setVisibility(View.GONE);

@@ -26,22 +26,22 @@ public class ViewAllStoresActivity extends AppCompatActivity {
     private RecyclerView mallStoresRecyclerView;
     private ImageButton mbtnBack;
     private HelpingMethods helpingMethods;
-    private TextView textCartItemCount;
+    private TextView textCartItemCount, mtotalAmount;
     private ImageView mbasketImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_all_stores);
-        helpingMethods  =new HelpingMethods(this);
+        helpingMethods = new HelpingMethods(this);
         mbtnBack = findViewById(R.id.btnBack);
         textCartItemCount = findViewById(R.id.cart_badge);
         mbasketImageView = findViewById(R.id.basketImageView);
-
+        mtotalAmount = findViewById(R.id.totalAmount);
         mbasketImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(helpingMethods.GetCartCount(helpingMethods.GetStoreID())>0){
+                if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
                     Intent intent = new Intent(ViewAllStoresActivity.this, CartActivity.class);
                     intent.putExtra("StID", helpingMethods.GetStoreID());
                     intent.putExtra("catName", "");
@@ -57,8 +57,8 @@ public class ViewAllStoresActivity extends AppCompatActivity {
         });
 
         mallStoresRecyclerView = findViewById(R.id.allStoresRecyclerView);
-        mallStoresRecyclerView.setLayoutManager(new GridLayoutManager(ViewAllStoresActivity.this,3));
-        StoresAdapter storesAdapter = new StoresAdapter(nearesStoresList,ViewAllStoresActivity.this,true);
+        mallStoresRecyclerView.setLayoutManager(new GridLayoutManager(ViewAllStoresActivity.this, 3));
+        StoresAdapter storesAdapter = new StoresAdapter(nearesStoresList, ViewAllStoresActivity.this, true);
         mallStoresRecyclerView.setAdapter(storesAdapter);
         storesAdapter.notifyDataSetChanged();
 
@@ -71,6 +71,7 @@ public class ViewAllStoresActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     public void finish() {
         super.finish();
@@ -81,6 +82,13 @@ public class ViewAllStoresActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         BadgeCounter();
+        if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>0){
+            mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(helpingMethods.GetStoreID())+"/-");
+            mtotalAmount.setVisibility(View.VISIBLE);
+        }else {
+            mtotalAmount.setVisibility(View.GONE);
+        }
+
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
