@@ -20,14 +20,13 @@ public class HelpingMethods {
         sb.show();
     }
 
-    public void saveuser(String name, String photo, String address,String phone,String uphone) {
+    public void saveuser(String name, String photo, String address,String phone) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.putString("photo", photo);
         editor.putString("address", address);
         editor.putString("phone", phone);
-        editor.putString("phone", uphone);
         editor.apply();
     }
 
@@ -98,15 +97,15 @@ public class HelpingMethods {
         return uiD;
     }
 
-    public int GetCartTotal() {
-        SharedPreferences sharedPreferences = activity.getSharedPreferences("CartTotal", Context.MODE_PRIVATE);
+    public int GetCartTotal(String Dbname) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         int sid = sharedPreferences.getInt("amount", 0);
         return sid;
     }
 
 
-    public void SaveCartTotal(int total){
-        SharedPreferences sharedPreferences = activity.getSharedPreferences("CartTotal", Context.MODE_PRIVATE);
+    public void SaveCartTotal(int total,String Dbname){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("amount",total);
         editor.apply();

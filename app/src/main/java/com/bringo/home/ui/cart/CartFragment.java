@@ -76,14 +76,14 @@ public class CartFragment extends Fragment {
             mvAllStore.setVisibility(View.VISIBLE);
         }
 
-        mTxtView_Total.setText("" + helpingMethods.GetCartTotal());
+        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()));
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                     if (connectionDetector.isConnected()) {
-                        if(helpingMethods.GetCartTotal()>=300){
+                        if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>=300){
                             Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
                             sumInt.putExtra("from", "fragement");
                             sumInt.putExtra("totalP", mTxtView_Total.getText().toString());

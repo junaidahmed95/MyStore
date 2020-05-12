@@ -179,8 +179,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) + 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
-                    int total = helpingMethods.GetCartTotal() + Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total);
+                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + Integer.parseInt(subcatproLists.get(position).getP_price());
+                    helpingMethods.SaveCartTotal(total,subcatproLists.get(position).getStoreId());
                     if (isForSearch) {
                         SearchsetupBadge();
                     } else {
@@ -224,8 +224,8 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                         setupBadge();
                     }
                     MainsetupBadge();
-                    int total = helpingMethods.GetCartTotal() - Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total);
+                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
+                    helpingMethods.SaveCartTotal(total,subcatproLists.get(position).getStoreId());
                     int a = mycheckList.indexOf(subcatproLists.get(position).getSimplePID());
                     mycheckList.remove(a);
                     SaveCheckData();

@@ -45,7 +45,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     private HelpingMethods helpingMethods;
-    private TextView mstName, mstAddress;
+    private TextView mstName, mstAddress,mtotalAmount;;
     private Button mretryBtn;
     private TextView textCartItemCount;
     private ProgressDialog mProgressDialog;
@@ -78,6 +78,7 @@ public class StoreInfoActivity extends AppCompatActivity {
         ownerImage = getIntent().getStringExtra("ownerImage");
         ownerID = getIntent().getStringExtra("ownerID");
         helpingMethods = new HelpingMethods(this);
+        mtotalAmount = findViewById(R.id.totalAmount);
         textCartItemCount = findViewById(R.id.cart_badge);
         mbasketImageView = findViewById(R.id.basketImageView);
         mbasketImageView.setOnClickListener(new View.OnClickListener() {
@@ -256,6 +257,19 @@ public class StoreInfoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         MainBadge();
+
+        if (helpingMethods.GetStoreID() != null) {
+            if (helpingMethods.GetStoreID().equals(stID)) {
+                if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>0){
+                    mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(helpingMethods.GetStoreID())+"/-");
+                    mtotalAmount.setVisibility(View.VISIBLE);
+                }else {
+                    mtotalAmount.setVisibility(View.GONE);
+                }
+            }
+        }
+
+
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
