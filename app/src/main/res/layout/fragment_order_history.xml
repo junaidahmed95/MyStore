@@ -54,5 +54,16 @@
         android:background="@drawable/btn_shape"
         android:layout_height="wrap_content"/>
 
+    <Button
+        android:id="@+id/btnRetry"
+        android:layout_width="wrap_content"
+        android:text="Retry"
+        android:textColor="@color/white"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:background="@drawable/btn_shape"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

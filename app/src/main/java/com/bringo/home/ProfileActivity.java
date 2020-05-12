@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,6 +26,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,13 +43,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Model.AppHelper;
+import com.bringo.home.Model.VolleyMultipartRequest;
+import com.bringo.home.Model.VolleySingleton;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -91,6 +99,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +117,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private RecyclerView mAddressRecyclerView;
     static List<Address> addresses;
     private Toolbar toolbar;
-    private String image, name;
+    private Bitmap bitmap = null;
     private CircleImageView mImage;
     private Uri imageUri;
     static LatLng Your_Location = new LatLng(23.81, 90.41);
@@ -204,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         meditFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditNameDialog(v, name);
+                EditNameDialog();
             }
         });
 
@@ -219,7 +228,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
 
-    private void EditNameDialog(final View v, String name) {
+    private void EditNameDialog() {
         LayoutInflater li = LayoutInflater.from(ProfileActivity.this);
         View promptsView = li.inflate(R.layout.editname_dialog, null);
 
@@ -303,7 +312,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProfileActivity.this, videoView.class);
-                intent.putExtra("image", image);
+                intent.putExtra("image", helpingMethods.GetUImage());
                 startActivity(intent);
                 editProfileDialog.dismiss();
             }
@@ -392,7 +401,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
 
                 }
-                addressAdapter = new AddressAdapter(addresslist,false);
+                addressAdapter = new AddressAdapter(addresslist, false);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
             }
@@ -463,8 +472,103 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         if (requestCode == GALLERY_CODE && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Glide.with(getApplicationContext()).load(String.valueOf(imageUri)).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
-            helpingMethods.saveuser(helpingMethods.GetUName(), String.valueOf(imageUri), null, helpingMethods.GetUPhone());
+            mProgressDialog.show();
+            String url = "https://bringo.biz/api/edit/customer/profile?id="+ custID;
+            VolleyMultipartRequest multipartRequest = new
+                    VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
+                        @Override
+                        public void onResponse(NetworkResponse response) {
+                            if (response.statusCode == 200) {
+                                String userImage = null;
+                                try {
+                                    userImage = new String(response.data, "UTF-8");
+                                    DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid());
+                                    userReference.child("picture").setValue(userImage);
+                                    helpingMethods.saveuser(helpingMethods.GetUName(), userImage, null, helpingMethods.GetUPhone());
+                                    mProgressDialog.cancel();
+                                    Toast.makeText(ProfileActivity.this, "Profile picture is updated.", Toast.LENGTH_SHORT).show();
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else {
+                                mProgressDialog.cancel();
+                                Toast.makeText(ProfileActivity.this, "Error founded: " + response.statusCode, Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse networkResponse = error.networkResponse;
+                            String errorMessage = "Unknown error";
+                            if (networkResponse == null) {
+                                if (error.getClass().equals(TimeoutError.class)) {
+                                    errorMessage = "Request timeout";
+                                } else if (error.getClass().equals(NoConnectionError.class)) {
+                                    errorMessage = "Failed to connect server";
+                                }
+                                mProgressDialog.cancel();
+                                Toast.makeText(ProfileActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+                            } else {
+                                String result = new String(networkResponse.data);
+                                try {
+                                    JSONObject response = new JSONObject(result);
+                                    String status = response.getString("status");
+                                    String message = response.getString("message");
+
+                                    Log.e("Error Status", status);
+                                    Log.e("Error Message", message);
+
+                                    if (networkResponse.statusCode == 404) {
+                                        errorMessage = "Resource not found";
+                                    } else if (networkResponse.statusCode == 401) {
+                                        errorMessage = message + " Please login again";
+                                    } else if (networkResponse.statusCode == 400) {
+                                        errorMessage = message + " Check your inputs";
+                                    } else if (networkResponse.statusCode == 500) {
+                                        errorMessage = message + " Something is getting wrong";
+                                    }
+
+                                    mProgressDialog.cancel();
+                                    Toast.makeText(ProfileActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            Log.i("Error", errorMessage);
+                            error.printStackTrace();
+                        }
+                    }) {
+                        @Override
+                        protected Map<String, DataPart> getByteData() {
+                            Map<String, DataPart> params = new HashMap<>();
+                            params.put("thumbnail [" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+
+
+                            return params;
+                        }
+
+                        @Override
+                        protected Map<String, String> getParams() {
+
+                            HashMap<String, String> hashMap = new HashMap<>();
+                            hashMap.put("user_name", muser_Name.getText().toString());
+
+                            return hashMap;
+                        }
+                    };
+            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
+
+
         }
     }
 

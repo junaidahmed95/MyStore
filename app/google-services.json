@@ -8,12 +8,80 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:361078201507:android:f3def60da26e2f0bb8b316",
+        "android_client_info": {
+          "package_name": "com.bringo.biz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361078201507-s8s5qu6hjhvfas368edem9rqlnuhnvp0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.biz",
+            "certificate_hash": "04bf9f5bd9bcca7c731164a47d7b4ecc0597574c"
+          }
+        },
+        {
+          "client_id": "361078201507-um1nj46fqusn04cbher4semf7kd7afpq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.biz",
+            "certificate_hash": "13e6c592fdd307209aba1139af90bc228fb4ff45"
+          }
+        },
+        {
+          "client_id": "361078201507-a54hcqn2nf0p75faq3ocln1tftamcjrb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.biz",
+            "certificate_hash": "0f2f787e73b7f76ca86711139a2b5e4ad4eb5336"
+          }
+        },
+        {
+          "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361078201507-q1a7mgad03i61mm0ijh6ht38bhh5eee7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "361078201507-ikg8kv3qtulio2eiqki0jvns7mlho3g6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.CornerStoreApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:361078201507:android:05de99f32c531f77b8b316",
         "android_client_info": {
           "package_name": "com.bringo.home"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "361078201507-69tvf6vjebfmnu26jm556p10lsr75vpa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.home",
+            "certificate_hash": "5297d6b0ba90dc4853ea45152a2e3ea8fae78f2b"
+          }
+        },
         {
           "client_id": "361078201507-s2s7uant0mqmifttffdi5qbr3ft1kepu.apps.googleusercontent.com",
           "client_type": 1,
@@ -36,7 +104,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_id": "361078201507-q1a7mgad03i61mm0ijh6ht38bhh5eee7.apps.googleusercontent.com",
               "client_type": 3
             },
             {
@@ -80,7 +148,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_id": "361078201507-q1a7mgad03i61mm0ijh6ht38bhh5eee7.apps.googleusercontent.com",
               "client_type": 3
             },
             {
@@ -156,7 +224,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_id": "361078201507-q1a7mgad03i61mm0ijh6ht38bhh5eee7.apps.googleusercontent.com",
               "client_type": 3
             },
             {
@@ -216,7 +284,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "361078201507-n5i8ahtnciapg0k67gm9ehrl746baa1n.apps.googleusercontent.com",
+              "client_id": "361078201507-q1a7mgad03i61mm0ijh6ht38bhh5eee7.apps.googleusercontent.com",
               "client_type": 3
             },
             {

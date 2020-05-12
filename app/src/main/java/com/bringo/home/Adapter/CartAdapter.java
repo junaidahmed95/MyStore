@@ -86,12 +86,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                 preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
 
-                int total = helpingMethods.GetCartTotal() + Integer.parseInt(cartList.get(pos).getP_price());
-                helpingMethods.SaveCartTotal(total);
+                int total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
+                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                 if (fromWhere.equals("activity")) {
-                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal() + "/-");
+                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                 } else {
-                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal() + "/-");
+                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                 }
                 SaveCartData();
             }
@@ -111,18 +111,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     int total = 0;
-                    if (helpingMethods.GetCartTotal() > Integer.parseInt(cartList.get(pos).getP_price())) {
-                        total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getP_price());
+                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getP_price())) {
+                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
                     } else {
-                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal();
+                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
                     }
 
 
-                    helpingMethods.SaveCartTotal(total);
+                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                     if (fromWhere.equals("activity")) {
-                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal() + "/-");
+                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                     } else {
-                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal() + "/-");
+                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                     }
 
                     SaveCartData();
@@ -146,16 +146,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     MainsetupBadge();
 
                                     int total = 0;
-                                    if (helpingMethods.GetCartTotal() > Integer.parseInt(cartList.get(pos).getActual_price())) {
-                                        total = helpingMethods.GetCartTotal() - Integer.parseInt(cartList.get(pos).getActual_price());
+                                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getActual_price())) {
+                                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getActual_price());
                                     } else {
-                                        total = Integer.parseInt(cartList.get(pos).getActual_price()) - helpingMethods.GetCartTotal();
+                                        total = Integer.parseInt(cartList.get(pos).getActual_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
                                     }
-                                    helpingMethods.SaveCartTotal(total);
+                                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                                     if (fromWhere.equals("activity")) {
-                                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal() + "/-");
+                                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                                     } else {
-                                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal() + "/-");
+                                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
                                     }
                                     int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
                                     MecheckList.remove(a);

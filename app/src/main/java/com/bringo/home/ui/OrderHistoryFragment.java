@@ -2,6 +2,7 @@ package com.bringo.home.ui;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -22,8 +23,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.bringo.home.Adapter.HistoryAdapter;
+import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
+import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
@@ -42,7 +46,8 @@ public class OrderHistoryFragment extends Fragment {
     private List<OrderHistory> products_list;
     private ProgressDialog mProgressDialog;
     RecyclerView mhis_recycler;
-    private Button mbtnSiglo;
+    private HelpingMethods helpingMethods;
+    private Button mbtnSiglo,mbtnRetry;
     private TextView mnoOrder;
 
     public OrderHistoryFragment() {
@@ -60,16 +65,55 @@ public class OrderHistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
-
+        helpingMethods = new HelpingMethods(getActivity());
+        mbtnSiglo  =mView.findViewById(R.id.btnSiglo);
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
         mhis_recycler = mView.findViewById(R.id.his_recycler);
-
+        mbtnRetry  =mView.findViewById(R.id.btnRetry);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mhis_recycler.setLayoutManager(linearLayoutManager);
 
-        parseJSON();
+        mbtnSiglo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), Verification.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+            if (connectionDetector.isConnected()) {
+                parseJSON();
+            } else {
+                mProgressDialog.cancel();
+                Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                mbtnRetry.setVisibility(View.VISIBLE);
+            }
+
+        } else {
+            mProgressDialog.cancel();
+            mbtnSiglo.setVisibility(View.VISIBLE);
+        }
+
+
+        mbtnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                if (connectionDetector.isConnected()) {
+                    mbtnRetry.setVisibility(View.GONE);
+                    parseJSON();
+                } else {
+                    mProgressDialog.cancel();
+                    Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                    mbtnRetry.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
         return mView;
 
@@ -135,6 +179,7 @@ public class OrderHistoryFragment extends Fragment {
                     mProgressDialog.cancel();
                     Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                    mbtnRetry.setVisibility(View.VISIBLE);
                 }
             }
         },
@@ -144,6 +189,7 @@ public class OrderHistoryFragment extends Fragment {
                         mProgressDialog.cancel();
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                         Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                        mbtnRetry.setVisibility(View.VISIBLE);
                     }
                 }
         );
