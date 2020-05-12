@@ -147,6 +147,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private RequestQueue requestQueue, addressrequestQueue;
     private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    //private final String Get_URL = " @Junaid Ahmed https://bringo.biz/api/edit/customer/profile?id=4080&user_name=check" + FirebaseAuth.getInstance().getUid();
 
     private EditText muserName;
 

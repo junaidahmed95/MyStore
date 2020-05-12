@@ -413,12 +413,20 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                         helpingMethods.SnackBar("Enter your email address", v);
                     }
 
+
+             
+
                 }else {
+
                     if (bitmap == null) {
                         helpingMethods.SnackBar("Select your image", v);
                     }
                 }
+
+               
+
                  if (mmusername.getText().toString().trim().equals("")) {
+
                     helpingMethods.SnackBar("Enter your name", v);
                 } else if (mEdiText_address.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your address", v);
@@ -455,9 +463,13 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
+
+                                                   
+
                                                     if(check == true){
                                                         helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), muserphoneno.getText().toString().replaceAll(" ", ""));
                                                     }else {
+
                                                         helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(), mPhoneNumber.getText().toString().replaceAll(" ", ""));
                                                     }
 
@@ -531,7 +543,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-                                    return params;
+                                 return params;
                                 }
 
                                 @Override

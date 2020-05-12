@@ -59,10 +59,10 @@
 
                 <Button
                     android:id="@+id/signup"
-                    android:layout_width="275dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/btn_shape"
-                    android:text="Sign Up"
+                    android:text="Sign in with Phone Number"
                     android:textAllCaps="false"
                     android:textColor="@color/white" />
 
@@ -70,6 +70,7 @@
                 <Button
 
                     android:id="@+id/login"
+                    android:visibility="gone"
                     android:layout_width="275dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
