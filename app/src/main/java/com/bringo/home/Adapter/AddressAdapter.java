@@ -110,6 +110,8 @@ private boolean checkthis;
                         }
                     }
                 });
+            }else {
+                madd_checkb.setVisibility(View.GONE);
             }
 
         }

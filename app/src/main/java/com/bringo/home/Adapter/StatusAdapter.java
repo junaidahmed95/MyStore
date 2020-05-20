@@ -26,6 +26,8 @@ import com.bringo.home.OrderTrackActivity;
 import com.bringo.home.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,15 +47,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statusholder> {
     public static List<OrderHistory> historylist;
-    public static List<OrderHistory> list;
     Context mContext;
+    String sImage;
     String name, created;
     String image;
     String chkstuts;
 
     public StatusAdapter(List<OrderHistory> historylist, Context mContext) {
         this.historylist = historylist;
-        list = new ArrayList<>();
         this.mContext = mContext;
     }
 
@@ -61,7 +62,6 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
     @Override
     public statusholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_status, parent, false);
-        list = new ArrayList<>();
         return new statusholder(v);
     }
 
@@ -71,11 +71,15 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
         for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
             chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
             created = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day();
-
             holder.mordid.setText(historylist.get(position).getOrderid());
-            holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-            image = Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg).toString();
+            holder.mtotalprice.setText("Rs." + historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice() + "/-");
+
             name = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts();
+            sImage = historylist.get(position).getStrimg();
+
+            System.out.println();
+            image = sImage.substring(1, sImage.length()-1);
+            Glide.with(mContext).load(image).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
         }
 
 
@@ -84,12 +88,10 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
-                    if (dataSnapshot.child("status").getValue().toString().equals("Deliverd")) {
-                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).removeValue();
-                        historylist.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, historylist.size());
-                    }
+                } else {
+                    historylist.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, historylist.size());
                 }
             }
 

@@ -47,7 +47,7 @@ public class OrderHistoryFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     RecyclerView mhis_recycler;
     private HelpingMethods helpingMethods;
-    private Button mbtnSiglo,mbtnRetry;
+    private Button mbtnSiglo, mbtnRetry;
     private TextView mnoOrder;
 
     public OrderHistoryFragment() {
@@ -65,12 +65,13 @@ public class OrderHistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
+        mnoOrder = mView.findViewById(R.id.noOrder);
         helpingMethods = new HelpingMethods(getActivity());
-        mbtnSiglo  =mView.findViewById(R.id.btnSiglo);
+        mbtnSiglo = mView.findViewById(R.id.btnSiglo);
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
         mhis_recycler = mView.findViewById(R.id.his_recycler);
-        mbtnRetry  =mView.findViewById(R.id.btnRetry);
+        mbtnRetry = mView.findViewById(R.id.btnRetry);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mhis_recycler.setLayoutManager(linearLayoutManager);
@@ -104,6 +105,7 @@ public class OrderHistoryFragment extends Fragment {
             public void onClick(View view) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                 if (connectionDetector.isConnected()) {
+                    mProgressDialog.show();
                     mbtnRetry.setVisibility(View.GONE);
                     parseJSON();
                 } else {
@@ -127,7 +129,6 @@ public class OrderHistoryFragment extends Fragment {
             @Override
             public void onResponse(JSONArray response) {
                 try {
-
                     JSONArray storeOrders = response.getJSONArray(0);
                     JSONObject storeOrdersDetail = response.getJSONObject(1);
 
@@ -139,6 +140,7 @@ public class OrderHistoryFragment extends Fragment {
 
                         String storeName = storeOrder.getString("str_name");
                         String storeOrderId = storeOrder.getString("ord_id");
+                        String storeId = storeOrder.getString("id");
                         String storeimg = storeOrder.getString("user_thumb");
                         JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
 
@@ -146,7 +148,7 @@ public class OrderHistoryFragment extends Fragment {
 
                             JSONObject storeObject = storeOrderDetails.getJSONObject(j);
 
-                            if (storeObject.getString("status").equals("4")){
+                            if (storeObject.getString("status").equals("4")) {
                                 String pname = storeObject.getString("sp_name");
                                 String actprice = storeObject.getString("act_prc");
                                 String address = storeObject.getString("new_address");
@@ -162,24 +164,30 @@ public class OrderHistoryFragment extends Fragment {
                             }
 
                         }
-                        if(products_list.size()>0){
-                            historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
+                        if (products_list.size() > 0) {
+                            historylist.add(new OrderHistory(storeId,storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
                             HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
                             mhis_recycler.setAdapter(historyadp);
                             historyadp.notifyDataSetChanged();
                             products_list.clear();
                             mProgressDialog.cancel();
 
+                        } else {
+                            mnoOrder.setVisibility(View.VISIBLE);
                         }
+
                         mProgressDialog.cancel();
+
                     }
 
 
                 } catch (JSONException e) {
                     mProgressDialog.cancel();
-                    Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
-                    mbtnRetry.setVisibility(View.VISIBLE);
+                    if (e.getMessage().equals("Value [] at 1 of type org.json.JSONArray cannot be converted to JSONObject")) {
+                        mnoOrder.setVisibility(View.VISIBLE);
+                    } else {
+                        Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         },

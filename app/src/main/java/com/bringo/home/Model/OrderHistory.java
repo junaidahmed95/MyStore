@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderHistory {
-    String mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time, p_id, image, title,status,strimg;
+    String mtxt_price, mtxt_qty, mtxt_totalproducts, mtxt_address, mtxt_day, mtxt_time, p_id, image, title, status, strimg;
 
     public String getStrimg() {
         return strimg;
@@ -14,9 +14,8 @@ public class OrderHistory {
         this.strimg = strimg;
     }
 
-    String id, userid, uaddress, day, orderid;
+    String id, userid, uaddress, day, orderid, storeID;
     int qtyplus;
-
 
 
     public void setGetorderbykeylist(List<OrderHistory> getorderbykeylist) {
@@ -86,10 +85,19 @@ public class OrderHistory {
     List<OrderHistory> getorderbykeylist = new ArrayList<>();
 
 
-    public OrderHistory(String orderid,String strimg, List<OrderHistory> getorderbykeylist) {
+    public OrderHistory(String storeID, String orderid, String strimg, List<OrderHistory> getorderbykeylist) {
         this.orderid = orderid;
+        this.storeID = storeID;
         this.getorderbykeylist = getorderbykeylist;
         this.strimg = strimg;
+    }
+
+    public String getStoreID() {
+        return storeID;
+    }
+
+    public void setStoreID(String storeID) {
+        this.storeID = storeID;
     }
 
     public int getQtyplus() {

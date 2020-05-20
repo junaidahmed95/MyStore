@@ -89,6 +89,7 @@ public class PendingOrderFragment extends Fragment {
 
                         String storeName = storeOrder.getString("str_name");
                         String storeOrderId = storeOrder.getString("ord_id");
+                        String storeId = storeOrder.getString("id");
                         String storeimg = storeOrder.getString("user_thumb");
                         JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
 
@@ -113,7 +114,7 @@ public class PendingOrderFragment extends Fragment {
 
                         }
                         if(products_list.size()>0){
-                            historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
+                            historylist.add(new OrderHistory(storeId,storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
                             HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
                             mhis_recycler.setAdapter(historyadp);
                             historyadp.notifyDataSetChanged();
