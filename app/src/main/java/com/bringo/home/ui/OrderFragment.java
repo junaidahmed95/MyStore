@@ -160,7 +160,7 @@ public class OrderFragment extends Fragment {
                             }
 
                             if (historylist.size() > 0) {
-                                StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity());
+                                StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity(),false);
                                 mstatus_recycler.setAdapter(statusAdapter);
                                 statusAdapter.notifyDataSetChanged();
                             } else {

@@ -148,6 +148,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OneSignal;
 import com.squareup.picasso.Picasso;
 
 
@@ -511,6 +513,25 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 protected Map<String, String> getParams() {
 
                                     HashMap<String, String> hashMap = new HashMap<>();
+                                    OSPermissionSubscriptionState status1 = OneSignal.getPermissionSubscriptionState();
+                                    status1.getPermissionStatus().getEnabled();
+                                    status1.getSubscriptionStatus().getSubscribed();
+                                    status1.getSubscriptionStatus().getUserSubscriptionSetting();
+                                    status1.getSubscriptionStatus().getUserId();
+                                    status1.getSubscriptionStatus().getPushToken();
+                                    JSONObject mainObj = new JSONObject();
+
+
+                                    try {
+                                        mainObj.put("permissionStatus", status1.getPermissionStatus().toJSONObject());
+                                        mainObj.put("subscriptionStatus", status1.getSubscriptionStatus().toJSONObject());
+                                        mainObj.put("emailSubscriptionStatus", status1.getEmailSubscriptionStatus().toJSONObject());
+                                        JSONObject jsonObject1 = mainObj.getJSONObject("subscriptionStatus");
+                                        hashMap.put("play_id", String.valueOf(jsonObject1.get("userId")));
+                                    } catch (Throwable t) {
+                                        t.printStackTrace();
+                                    }
+
 
                                     if (hasImage.equals("1")) {
                                         hashMap.put("url", photoUrl);

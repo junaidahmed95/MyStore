@@ -79,13 +79,6 @@ public class MainActivity extends AppCompatActivity {
         vActivityIntent = new Intent(this, Verification.class);
         setContentView(R.layout.activity_main);
 
-       // OneSignal.GetPermissionSubscriptionState ().subscriptionStatus.userId;
-        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
-        status.getPermissionStatus().getEnabled();
-        status.getSubscriptionStatus().getSubscribed();
-        status.getSubscriptionStatus().getUserSubscriptionSetting();
-        status.getSubscriptionStatus().getUserId();
-        status.getSubscriptionStatus().getPushToken();
 
 
 

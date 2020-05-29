@@ -48,9 +48,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statusholder> {
     private List<OrderHistory> historylist;
     Context mContext;
+    private boolean isHistory;
 
-    public StatusAdapter(List<OrderHistory> historylist, Context mContext) {
+    public StatusAdapter(List<OrderHistory> historylist, Context mContext,boolean isHistory) {
         this.historylist = historylist;
+        this.isHistory=isHistory;
         this.mContext = mContext;
     }
 
@@ -70,23 +72,29 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
         holder.mcreated.setText(historylist.get(position).getOrderDate());
         holder.mstorename.setText(historylist.get(position).getStoreName());
 
-        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
-                } else {
-                    historylist.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, historylist.size());
+
+        if(isHistory){
+            holder.mstatus.setText("Deliverd");
+        }else {
+            FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
+                    } else {
+                        historylist.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, historylist.size());
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+
 
 
         holder.mclick.setOnClickListener(new View.OnClickListener() {
