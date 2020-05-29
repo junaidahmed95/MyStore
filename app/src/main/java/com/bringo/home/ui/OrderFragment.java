@@ -154,7 +154,7 @@ public class OrderFragment extends Fragment {
                                 String t_price = data.getString("t_price");
                                 String created_at = data.getString("created_at");
                                 String address = data.getString("ord_id");
-                                String user_thumb = data.getString("user_thumb");
+                                String user_thumb = data.getString("thumbnail");
                                 historylist.add(new OrderHistory(str_name, id, ord_id, t_price, created_at, address, user_thumb));
 
                             }

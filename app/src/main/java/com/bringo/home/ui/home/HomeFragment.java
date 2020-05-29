@@ -233,7 +233,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -254,7 +254,7 @@ public class HomeFragment extends Fragment {
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
-                            String store_image = jsonObject.getString("user_thumb");
+                            String store_image = jsonObject.getString("thumbnail");
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
 
 
@@ -263,7 +263,6 @@ public class HomeFragment extends Fragment {
                             mloadingImage.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
-                            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                         }
                     }
                     allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
@@ -282,7 +281,7 @@ public class HomeFragment extends Fragment {
                 grd_str.setVisibility(View.GONE);
                 mloadingImage.setVisibility(View.GONE);
                 mretryBtn.setVisibility(View.VISIBLE);
-                if(getActivity()!=null){
+                if (getActivity() != null) {
                     Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                     Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
