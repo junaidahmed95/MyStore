@@ -49,7 +49,7 @@ public class OrderHistoryFragment extends Fragment {
     RecyclerView mhis_recycler;
     private HelpingMethods helpingMethods;
     private Button mbtnSiglo, mbtnRetry;
-    private TextView mnoOrder;
+    private TextView  mnoOrder;
 
     public OrderHistoryFragment() {
         // Required empty public constructor
