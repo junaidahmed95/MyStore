@@ -123,7 +123,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     private DatePickerDialog datePickerDialog;
     private String timebase = null;
     private EditText mtimeofdeli, mtxtDate;
-    private String self_pick = "1";
+    private String self_pick = "0";
     private LinearLayout mtimeLayout;
     private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;

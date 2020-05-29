@@ -32,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OneSignal;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
@@ -76,6 +78,17 @@ public class MainActivity extends AppCompatActivity {
         }
         vActivityIntent = new Intent(this, Verification.class);
         setContentView(R.layout.activity_main);
+
+       // OneSignal.GetPermissionSubscriptionState ().subscriptionStatus.userId;
+        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
+        status.getPermissionStatus().getEnabled();
+        status.getSubscriptionStatus().getSubscribed();
+        status.getSubscriptionStatus().getUserSubscriptionSetting();
+        status.getSubscriptionStatus().getUserId();
+        status.getSubscriptionStatus().getPushToken();
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);

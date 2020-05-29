@@ -31,7 +31,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.bringo.home.Adapter.OrderHistoryDetailAdapter;
+import com.bringo.home.Adapter.OrderAdapter;
+import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.OrderHistory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -42,8 +43,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import static com.bringo.home.Adapter.StatusAdapter.historylist;
 
 
 import org.json.JSONArray;
@@ -66,7 +65,7 @@ public class OrderTrackActivity extends AppCompatActivity {
     private String mStatus;
     private int qtycount = 0;
     BottomSheetDialog orderdetailSheetDialog;
-    List<OrderHistory> list;
+    List<CatLvlItemList> list;
     String chkstuts;
     private ProgressDialog progressDialog;
     FloatingActionButton mstepOneFab, mstepTwoFab, mstepThreeFab, mstepFourFab;
@@ -181,30 +180,68 @@ public class OrderTrackActivity extends AppCompatActivity {
         btnhis_detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.show();
+
 
                 View mView = LayoutInflater.from(OrderTrackActivity.this).inflate(R.layout.orderdetail_sheet, null);
                 Toolbar mappBar = mView.findViewById(R.id.appBar);
 
                 mappBar.setTitle("Order Detail");
                 final RecyclerView recyclerView = mView.findViewById(R.id.oorderdetail_gd);
-
-                TextView mtxt_qtys = mView.findViewById(R.id.txt_total_qtys);
-                TextView mtxt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
-                TextView mtxt_addresss = mView.findViewById(R.id.txt_addresss);
-                TextView mtxt_prices = mView.findViewById(R.id.totalitemprice);
+                TextView textView = mView.findViewById(R.id.totalitemprice);
+                TextView txt_addresss = mView.findViewById(R.id.txt_addresss);
+                final TextView txt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
+                TextView txt_total_qtys = mView.findViewById(R.id.txt_total_qtys);
                 TextView mstatus = mView.findViewById(R.id.status);
 
 
-                for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-                    Log.d("Order", historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
-                    mtxt_addresss.setText(historylist.get(position).getGetorderbykeylist().get(a).getUaddress());
-                    mtxt_prices.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-                    chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
-                    list.add(new OrderHistory(historylist.get(position).getGetorderbykeylist().get(a).getMtxt_price(), historylist.get(position).getGetorderbykeylist().get(a).getMtxt_qty(), historylist.get(position).getGetorderbykeylist().get(a).getAct_price(), historylist.get(position).getGetorderbykeylist().get(a).getImage(), historylist.get(position).getGetorderbykeylist().get(a).getTitle()));
-                }
-                mtxt_totalproductss.setText("" + historylist.get(position).getGetorderbykeylist().size());
-                mtxt_qtys.setText("" + historylist.get(position).getOrderid());
+                textView.setText("" + getIntent().getStringExtra("price"));
+                txt_addresss.setText("" + getIntent().getStringExtra("add"));
+
+                txt_total_qtys.setText("" + getIntent().getStringExtra("orderid"));
+                list.clear();
+
+                String url = "https://bringo.biz/api/get/stores/orders?str_id=" + getIntent().getStringExtra("storeid") + "&ord_id=" + getIntent().getStringExtra("orderid");
+                RequestQueue requestQueue = Volley.newRequestQueue(OrderTrackActivity.this);
+                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            txt_totalproductss.setText("" + response.length());
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject storeObject = response.getJSONObject(i);
+
+                                String pname = storeObject.getString("sp_name");
+                                String actprice = storeObject.getString("act_prc");
+                                String proimage = storeObject.getString("sp_image");
+                                String pqty = storeObject.getString("ord_qty");
+
+
+                                list.add(new CatLvlItemList(pname, actprice, pqty, proimage, getIntent().getStringExtra("storeid")));
+
+                            }
+                            OrderAdapter orderAdapter = new OrderAdapter(list, OrderTrackActivity.this, true, false);
+                            recyclerView.setAdapter(orderAdapter);
+                            progressDialog.cancel();
+
+                        } catch (JSONException e) {
+                            orderdetailSheetDialog.cancel();
+                            progressDialog.cancel();
+                            Toast.makeText(OrderTrackActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                orderdetailSheetDialog.cancel();
+                                progressDialog.cancel();
+                                Toast.makeText(OrderTrackActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                );
+                requestQueue.add(jsonArrayRequest);
+
                 if (mStatus.equals("Accepted")) {
                     mstatus.setText("Accepted");
                 } else if (mStatus.equals("Assembled")) {
@@ -223,16 +260,16 @@ public class OrderTrackActivity extends AppCompatActivity {
                 recyclerView.setLayoutManager(linearLayoutManager);
 
 
-                OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(new ArrayList<OrderHistory>(list), getApplicationContext());
-                recyclerView.setAdapter(orderAdapter);
-                progressDialog.cancel();
-                list.clear();
+//                OrderHistoryDetailAdapter orderAdapter = new OrderHistoryDetailAdapter(new ArrayList<OrderHistory>(list), getApplicationContext());
+//                recyclerView.setAdapter(orderAdapter);
+//                progressDialog.cancel();
+//                list.clear();
 
 
                 orderdetailSheetDialog = new BottomSheetDialog(mView.getContext());
                 orderdetailSheetDialog.setContentView(mView);
                 orderdetailSheetDialog.show();
-
+                progressDialog.show();
 
             }
         });

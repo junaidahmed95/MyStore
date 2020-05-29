@@ -46,12 +46,8 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statusholder> {
-    public static List<OrderHistory> historylist;
+    private List<OrderHistory> historylist;
     Context mContext;
-    String sImage;
-    String name, created;
-    String image;
-    String chkstuts;
 
     public StatusAdapter(List<OrderHistory> historylist, Context mContext) {
         this.historylist = historylist;
@@ -68,22 +64,13 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
     @Override
     public void onBindViewHolder(@NonNull final statusholder holder, final int position) {
 
-        for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-            chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
-            created = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day();
-            holder.mordid.setText(historylist.get(position).getOrderid());
-            holder.mtotalprice.setText("Rs." + historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice() + "/-");
+        holder.mordid.setText(historylist.get(position).getOrderID());
+        holder.mtotalprice.setText("Rs." + historylist.get(position).getOrderPrice() + "/-");
+        Glide.with(mContext).load(historylist.get(position).getStoreImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
+        holder.mcreated.setText(historylist.get(position).getOrderDate());
+        holder.mstorename.setText(historylist.get(position).getStoreName());
 
-            name = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts();
-            sImage = historylist.get(position).getStrimg();
-
-            System.out.println();
-            image = sImage.substring(1, sImage.length()-1);
-            Glide.with(mContext).load(image).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
-        }
-
-
-        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -102,18 +89,19 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
         });
 
 
-        holder.mcreated.setText(created);
-        holder.mstorename.setText(name);
         holder.mclick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!holder.mstatus.getText().toString().equals("Pending")) {
                     Intent intent = new Intent(mContext, OrderTrackActivity.class);
                     intent.putExtra("position", position);
-                    intent.putExtra("orderid", historylist.get(position).getOrderid());
-                    intent.putExtra("storename", name);
-                    intent.putExtra("created", created);
-                    intent.putExtra("storeimage", image);
+                    intent.putExtra("price", historylist.get(position).getOrderPrice());
+                    intent.putExtra("add", historylist.get(position).getAddress());
+                    intent.putExtra("orderid", historylist.get(position).getOrderID());
+                    intent.putExtra("storeid", historylist.get(position).getStoreID());
+                    intent.putExtra("storename", historylist.get(position).getStoreName());
+                    intent.putExtra("created", historylist.get(position).getOrderDate());
+                    intent.putExtra("storeimage", historylist.get(position).getStoreImage());
                     mContext.startActivity(intent);
                 } else {
                     Toast.makeText(mContext, "This order is not accepted yet!!", Toast.LENGTH_SHORT).show();
