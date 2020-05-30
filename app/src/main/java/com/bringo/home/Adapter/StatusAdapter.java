@@ -74,7 +74,24 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
 
 
         if(isHistory){
-            holder.mstatus.setText("Deliverd");
+            FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        historylist.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, historylist.size());
+
+                    } else {
+                        holder.mstatus.setText("Deliverd");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }else {
             FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
                 @Override

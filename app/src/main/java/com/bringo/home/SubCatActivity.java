@@ -304,12 +304,16 @@ public class SubCatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
-            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
-            mtotalAmount.setVisibility(View.VISIBLE);
-        } else {
-            mtotalAmount.setVisibility(View.GONE);
-        }
+        if(helpingMethods.GetStoreID()!=null){
+        if(helpingMethods.GetStoreID().equals(store_ID)){
+            if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
+                mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+                mtotalAmount.setVisibility(View.VISIBLE);
+            } else {
+                mtotalAmount.setVisibility(View.GONE);
+            }
+        }}
+
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
