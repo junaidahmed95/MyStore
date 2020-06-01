@@ -25,7 +25,7 @@
         android:textStyle="bold"
         android:layout_centerInParent="true"
         android:textColor="@color/primaryTextColor"
-        android:text="You have not placed any order yet!"
+        android:text="Once your order is deliverd then you will see here"
         android:layout_height="wrap_content"/>
 
     <Button

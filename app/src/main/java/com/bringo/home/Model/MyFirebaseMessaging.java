@@ -29,24 +29,28 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        String sented = remoteMessage.getData().get("sented");
-        String user = remoteMessage.getData().get("user");
+        try{
+            String sented = remoteMessage.getData().get("sented");
+            String user = remoteMessage.getData().get("user");
 
-        SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-        String currentUser = preferences.getString("currentuser", "none");
+            SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+            String currentUser = preferences.getString("currentuser", "none");
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (firebaseUser != null &&
-                sented.equals
-                        (firebaseUser.getUid())) {
-            if (!currentUser.equals(user)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    sendOreoNotification(remoteMessage);
-                } else {
-                    sendNotification(remoteMessage);
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (firebaseUser != null &&
+                    sented.equals
+                            (firebaseUser.getUid())) {
+                if (!currentUser.equals(user)) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        sendOreoNotification(remoteMessage);
+                    } else {
+                        sendNotification(remoteMessage);
+                    }
                 }
             }
+        }
+        catch (Exception e){
+
         }
     }
 

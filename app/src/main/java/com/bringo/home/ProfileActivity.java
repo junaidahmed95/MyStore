@@ -127,8 +127,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private List<AddressClass> addresslist;
     private RelativeLayout mupdateProfile;
     private String custID;
-    private TextView mName, mPhone, mEmail, muser_Name;
-    private ProgressBar mProgressBar;
+    private TextView mName, mPhone, mEmail, muser_Name, mlabelEmail, muserEmail;
     public static boolean check = true;
     private FloatingActionButton mAddPicFab, meditFab;
     private HelpingMethods helpingMethods;
@@ -145,8 +144,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private EditText meditaddress;
     private JsonArrayRequest request, addressrequest;
     private RequestQueue requestQueue, addressrequestQueue;
-    private final String JSON_URL = " https://chhatt.com/Cornstr/grocery/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
-    private final String Get_URL = " https://chhatt.com/Cornstr/grocery/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = " https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = " https://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
     //private final String Get_URL = " @Junaid Ahmed https://bringo.biz/api/edit/customer/profile?id=4080&user_name=check" + FirebaseAuth.getInstance().getUid();
 
     private EditText muserName;
@@ -158,6 +157,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("Please wait...");
+        mProgressDialog.setCancelable(false);
         mProgressDialog.show();
 
         toolbar = findViewById(R.id.appBar);
@@ -171,13 +171,26 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         mAddressRecyclerView = findViewById(R.id.addressesRecyclerView);
         mImage = findViewById(R.id.userProfile);
         helpingMethods = new HelpingMethods(ProfileActivity.this);
-        Glide.with(getApplicationContext()).load(helpingMethods.GetUImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
+
+            Glide.with(getApplicationContext()).asBitmap().load(helpingMethods.GetUImage()).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
+
+
         mName = findViewById(R.id.userName);
         muser_Name = findViewById(R.id.user_Name);
         mPhone = findViewById(R.id.userPhone);
-        //mEmail = findViewById(R.id.userEmail);
+        mlabelEmail = findViewById(R.id.labelEmail);
+        muserEmail = findViewById(R.id.userEmail);
 
-        mProgressBar = findViewById(R.id.progressBar);
+        if (helpingMethods.GetUEmail() != null) {
+            if (!helpingMethods.GetUEmail().equals("")) {
+                if (!helpingMethods.GetUEmail().equals("null")) {
+                    mlabelEmail.setVisibility(View.VISIBLE);
+                    muserEmail.setText(helpingMethods.GetUEmail());
+                    muserEmail.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+
         mAddPicFab = findViewById(R.id.addPic);
         mupdateProfile = findViewById(R.id.updateProfile);
         meditFab = findViewById(R.id.editFab);
@@ -252,7 +265,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 if (detector.isConnected()) {
                     if (!muserName.getText().toString().trim().equals("")) {
                         FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mU_id).child("name").setValue(muserName.getText().toString());
-                        helpingMethods.saveuser(muserName.getText().toString(), helpingMethods.GetUImage(), null, helpingMethods.GetUPhone());
+                        helpingMethods.saveuser(muserName.getText().toString(), helpingMethods.GetUImage(), helpingMethods.GetUPhone(), helpingMethods.GetUEmail());
                         alertDialog.cancel();
                     } else {
                         helpingMethods.SnackBar("Enter your name.", view);
@@ -391,9 +404,6 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                     try {
                         jsonObject = response.getJSONObject(i);
                         addresslist.add(new AddressClass(jsonObject.get("address").toString(), false));
-
-
-                        mProgressDialog.cancel();
                     } catch (JSONException e) {
                         mProgressDialog.cancel();
                         e.printStackTrace();
@@ -404,14 +414,15 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 addressAdapter = new AddressAdapter(addresslist, false);
                 mAddressRecyclerView.setAdapter(addressAdapter);
                 addressAdapter.notifyDataSetChanged();
+                mProgressDialog.cancel();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mProgressDialog.cancel();
+                Toast.makeText(ProfileActivity.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
 
         addressrequestQueue = Volley.newRequestQueue(ProfileActivity.this);
         addressrequestQueue.add(addressrequest);
@@ -479,94 +490,95 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                 e.printStackTrace();
             }
             Glide.with(getApplicationContext()).load(String.valueOf(imageUri)).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(mImage);
-            mProgressDialog.show();
-            String url = "https://bringo.biz/api/edit/customer/profile?id="+ custID;
-            VolleyMultipartRequest multipartRequest = new
-                    VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
-                        @Override
-                        public void onResponse(NetworkResponse response) {
-                            if (response.statusCode == 200) {
-                                String userImage = null;
-                                try {
-                                    userImage = new String(response.data, "UTF-8");
-                                    DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid());
-                                    userReference.child("picture").setValue(userImage);
-                                    helpingMethods.saveuser(helpingMethods.GetUName(), userImage, null, helpingMethods.GetUPhone());
-                                    mProgressDialog.cancel();
-                                    Toast.makeText(ProfileActivity.this, "Profile picture is updated.", Toast.LENGTH_SHORT).show();
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                }
-
-                            } else {
-                                mProgressDialog.cancel();
-                                Toast.makeText(ProfileActivity.this, "Error founded: " + response.statusCode, Toast.LENGTH_SHORT).show();
-
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            NetworkResponse networkResponse = error.networkResponse;
-                            String errorMessage = "Unknown error";
-                            if (networkResponse == null) {
-                                if (error.getClass().equals(TimeoutError.class)) {
-                                    errorMessage = "Request timeout";
-                                } else if (error.getClass().equals(NoConnectionError.class)) {
-                                    errorMessage = "Failed to connect server";
-                                }
-                                mProgressDialog.cancel();
-                                Toast.makeText(ProfileActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
-                            } else {
-                                String result = new String(networkResponse.data);
-                                try {
-                                    JSONObject response = new JSONObject(result);
-                                    String status = response.getString("status");
-                                    String message = response.getString("message");
-
-                                    Log.e("Error Status", status);
-                                    Log.e("Error Message", message);
-
-                                    if (networkResponse.statusCode == 404) {
-                                        errorMessage = "Resource not found";
-                                    } else if (networkResponse.statusCode == 401) {
-                                        errorMessage = message + " Please login again";
-                                    } else if (networkResponse.statusCode == 400) {
-                                        errorMessage = message + " Check your inputs";
-                                    } else if (networkResponse.statusCode == 500) {
-                                        errorMessage = message + " Something is getting wrong";
-                                    }
-
-                                    mProgressDialog.cancel();
-                                    Toast.makeText(ProfileActivity.this, ""+errorMessage, Toast.LENGTH_SHORT).show();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Log.i("Error", errorMessage);
-                            error.printStackTrace();
-                        }
-                    }) {
-                        @Override
-                        protected Map<String, DataPart> getByteData() {
-                            Map<String, DataPart> params = new HashMap<>();
-                            params.put("thumbnail [" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
-
-
-                            return params;
-                        }
-
-                        @Override
-                        protected Map<String, String> getParams() {
-
-                            HashMap<String, String> hashMap = new HashMap<>();
-                            hashMap.put("user_name", muser_Name.getText().toString());
-
-                            return hashMap;
-                        }
-                    };
-            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
+            helpingMethods.saveuser(helpingMethods.GetUName(), String.valueOf(imageUri), helpingMethods.GetUPhone(), helpingMethods.GetUEmail());
+//            mProgressDialog.show();
+//            String url = "https://bringo.biz/api/edit/customer/profile?id=" + custID;
+//            VolleyMultipartRequest multipartRequest = new
+//                    VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
+//                        @Override
+//                        public void onResponse(NetworkResponse response) {
+//                            if (response.statusCode == 200) {
+//                                String userImage = null;
+//                                try {
+//                                    userImage = new String(response.data, "UTF-8");
+//                                    DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid());
+//                                    userReference.child("picture").setValue(userImage);
+//
+//                                    mProgressDialog.cancel();
+//                                    Toast.makeText(ProfileActivity.this, "Profile picture is updated.", Toast.LENGTH_SHORT).show();
+//                                } catch (UnsupportedEncodingException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//                            } else {
+//                                mProgressDialog.cancel();
+//                                Toast.makeText(ProfileActivity.this, "Error founded: " + response.statusCode, Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                        }
+//                    }, new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            NetworkResponse networkResponse = error.networkResponse;
+//                            String errorMessage = "Unknown error";
+//                            if (networkResponse == null) {
+//                                if (error.getClass().equals(TimeoutError.class)) {
+//                                    errorMessage = "Request timeout";
+//                                } else if (error.getClass().equals(NoConnectionError.class)) {
+//                                    errorMessage = "Failed to connect server";
+//                                }
+//                                mProgressDialog.cancel();
+//                                Toast.makeText(ProfileActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+//                            } else {
+//                                String result = new String(networkResponse.data);
+//                                try {
+//                                    JSONObject response = new JSONObject(result);
+//                                    String status = response.getString("status");
+//                                    String message = response.getString("message");
+//
+//                                    Log.e("Error Status", status);
+//                                    Log.e("Error Message", message);
+//
+//                                    if (networkResponse.statusCode == 404) {
+//                                        errorMessage = "Resource not found";
+//                                    } else if (networkResponse.statusCode == 401) {
+//                                        errorMessage = message + " Please login again";
+//                                    } else if (networkResponse.statusCode == 400) {
+//                                        errorMessage = message + " Check your inputs";
+//                                    } else if (networkResponse.statusCode == 500) {
+//                                        errorMessage = message + " Something is getting wrong";
+//                                    }
+//
+//                                    mProgressDialog.cancel();
+//                                    Toast.makeText(ProfileActivity.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            Log.i("Error", errorMessage);
+//                            error.printStackTrace();
+//                        }
+//                    }) {
+//                        @Override
+//                        protected Map<String, DataPart> getByteData() {
+//                            Map<String, DataPart> params = new HashMap<>();
+//                            params.put("thumbnail [" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+//
+//
+//                            return params;
+//                        }
+//
+//                        @Override
+//                        protected Map<String, String> getParams() {
+//
+//                            HashMap<String, String> hashMap = new HashMap<>();
+//                            hashMap.put("user_name", muser_Name.getText().toString());
+//
+//                            return hashMap;
+//                        }
+//                    };
+//            multipartRequest.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//            VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
 
 
         }

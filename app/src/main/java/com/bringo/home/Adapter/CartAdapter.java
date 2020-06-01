@@ -32,10 +32,13 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static com.bringo.home.CartActivity.FCartsetupBadge;
+import static com.bringo.home.CartActivity.mtotalAmount;
 import static com.bringo.home.MainActivity.MainsetupBadge;
 import static com.bringo.home.CartActivity.mTxtView_TotalPrice;
 //import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;
 import static com.bringo.home.CartActivity.mcardview2;
+import static com.bringo.home.MainActivity.UpdatePrice;
 import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 import static com.bringo.home.ui.cart.CartFragment.mcardview1;
 
@@ -90,8 +93,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                 if (fromWhere.equals("activity")) {
                     mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdateTotalPrice();
                 } else {
                     mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdatePrice();
                 }
                 SaveCartData();
             }
@@ -121,8 +126,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                     if (fromWhere.equals("activity")) {
                         mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                        UpdateTotalPrice();
                     } else {
                         mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                        UpdatePrice();
                     }
 
                     SaveCartData();
@@ -154,8 +161,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                                     if (fromWhere.equals("activity")) {
                                         mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                                        FCartsetupBadge();
+                                        UpdateTotalPrice();
                                     } else {
                                         mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                                        UpdatePrice();
                                     }
                                     int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
                                     MecheckList.remove(a);
@@ -303,6 +313,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
         } catch (Exception e) {
             Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void UpdateTotalPrice(){
+        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+            mtotalAmount.setVisibility(View.VISIBLE);
+        } else {
+            mtotalAmount.setVisibility(View.GONE);
         }
     }
 

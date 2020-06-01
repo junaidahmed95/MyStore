@@ -180,7 +180,7 @@ public class HomeFragment extends Fragment {
         return false;
     }
 
-    private void GetNearestStores(){
+    private void GetNearestStores() {
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
             CheckLocationPermission();
@@ -192,10 +192,10 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean isLocationEnabled() {
-            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                    LocationManager.NETWORK_PROVIDER
-            );
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+        );
     }
 
     @Override
@@ -233,7 +233,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172", new Response.Listener<JSONArray>() {
+request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -254,8 +254,8 @@ public class HomeFragment extends Fragment {
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
-                            String store_image = jsonObject.getString("user_thumb");
-                            nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance,storeaddr));
+                            String store_image = jsonObject.getString("thumbnail");
+                            nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
 
 
                         } catch (JSONException e) {
@@ -263,10 +263,9 @@ public class HomeFragment extends Fragment {
                             mloadingImage.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
-                            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(),false);
+                    allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
                     grd_str.setAdapter(allStoreAdapter);
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
@@ -281,9 +280,12 @@ public class HomeFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 grd_str.setVisibility(View.GONE);
                 mloadingImage.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                 mretryBtn.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

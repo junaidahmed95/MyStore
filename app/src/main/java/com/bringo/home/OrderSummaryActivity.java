@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -118,9 +119,11 @@ import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 public class OrderSummaryActivity extends AppCompatActivity implements OnMapReadyCallback {
     APIService apiService;
     DatePicker eReminderTime;
-    private String timebase  = null;
-    private EditText mtimeofdeli;
-    private String self_pick = "1";
+    private int uYear, uDOMo, uMOYear, uMinut, uHour;
+    private DatePickerDialog datePickerDialog;
+    private String timebase = null;
+    private EditText mtimeofdeli, mtxtDate;
+    private String self_pick = "0";
     private LinearLayout mtimeLayout;
     private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
@@ -155,16 +158,15 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     Task location;
-    private ImageButton mTimeChoose;
+    private ImageButton mTimeChoose, mopenDateDialog;
     static LatLng Your_Location = new LatLng(23.81, 90.41);
     public static String mAddress = "";
     static List<Address> addresses;
-    private RadioGroup radioGroup;
     private String Type = "Self";
     static Geocoder geocoder;
     private String addresss = "", city = "";
     private EditText muserName;
-    private RadioButton mSelfBtn, mTimeBtn;
+    private RadioButton mSelfBtn, mTimeBtn, mrunRedio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,10 +180,18 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         helpingMethods = new HelpingMethods(OrderSummaryActivity.this);
         GetCartData();
         GetCheckData();
+        mopenDateDialog = findViewById(R.id.openDateDialog);
+        mtxtDate = findViewById(R.id.txtDate);
         mtimeLayout = findViewById(R.id.timeLayout);
-        radioGroup = findViewById(R.id.ragroup);
+        mopenDateDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DateDia();
+            }
+        });
         pTotalPrice = getIntent().getStringExtra("totalP");
         store_ID = helpingMethods.GetStoreID();
+        mrunRedio = findViewById(R.id.runRedio);
         ownerName = helpingMethods.GetStoreName();
         ownerImage = helpingMethods.GetStoreImage();
         ownerID = helpingMethods.GetStoreUID();
@@ -189,16 +199,27 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         mSelfBtn = findViewById(R.id.selfRedio);
         mtimeofdeli = findViewById(R.id.timeofdeli);
         mTimeBtn = findViewById(R.id.timeRedio);
+
         mSelfBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    mtimeLayout.setVisibility(View.GONE);
+                    mtimeLayout.setVisibility(View.VISIBLE);
                     self_pick = "1";
                 }
             }
         });
-
+        mrunRedio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    mtxtDate.setText("");
+                    mtimeofdeli.setText("");
+                    mtimeLayout.setVisibility(View.GONE);
+                    self_pick = "0";
+                }
+            }
+        });
         mTimeBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -223,12 +244,8 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         mtimeofdeli.setText(selectedHour + ":" + selectedMinute);
 
-                        Calendar c = Calendar.getInstance();
-                        c.set(Calendar.HOUR, selectedHour);
-                        c.set(Calendar.MINUTE, selectedMinute);
-                        c.set(Calendar.SECOND, 0);
-                        c.set(Calendar.MILLISECOND, 0);
-                        timebase = String.valueOf(c.getTimeInMillis() / 1000L);
+                        uMinut = selectedMinute;
+                        uHour = selectedHour;
                     }
                 }, hour, minute, false);
                 mTimePicker.setTitle("Select Deliver Time");
@@ -293,21 +310,29 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
             @Override
             public void onClick(View v) {
 
-                if(self_pick.equals("0")){
-                    Toast.makeText(OrderSummaryActivity.this, "Please sselect delivery time", Toast.LENGTH_SHORT).show();
-                }else {
+                if (mtimeLayout.getVisibility() == View.VISIBLE && mtimeofdeli.getText().toString().trim().equals("")) {
+                    Toast.makeText(OrderSummaryActivity.this, "Please select delivery time", Toast.LENGTH_SHORT).show();
+                } else if (mtimeLayout.getVisibility() == View.VISIBLE && mtxtDate.getText().toString().trim().equals("")) {
+                    Toast.makeText(OrderSummaryActivity.this, "Please select delivery date", Toast.LENGTH_SHORT).show();
+                } else {
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
 
-
                             switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
-
-
-
                                     progressDialog.show();
+
+                                    Calendar c = Calendar.getInstance();
+                                    c.set(Calendar.HOUR, uHour);
+                                    c.set(Calendar.MINUTE, uMinut);
+                                    c.set(Calendar.YEAR, uYear);
+                                    c.set(Calendar.DAY_OF_MONTH, uDOMo);
+                                    c.set(Calendar.SECOND, 0);
+                                    c.set(Calendar.MILLISECOND, 0);
+                                    timebase = String.valueOf(c.getTimeInMillis() / 1000L);
+
                                     final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                                     final String id = reference.child("Chats").push().getKey();
                                     String url = "https://bringo.biz/api/post/up_order";
@@ -335,7 +360,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                     if (task.isSuccessful()) {
                                                         FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
                                                         helpingMethods.SaveCartCount(0, store_ID);
-                                                        helpingMethods.SaveCartTotal(0,store_ID);
+                                                        helpingMethods.SaveCartTotal(0, store_ID);
                                                         helpingMethods.SaveStoreData(null, null, null, null);
                                                         mycheckList.clear();
                                                         SaveCheckData();
@@ -428,9 +453,6 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                     builder.setMessage("Do you want to send order?").setPositiveButton("Yes", dialogClickListener)
                             .setNegativeButton("No", dialogClickListener).show();
                 }
-
-
-
 
 
             }
@@ -953,6 +975,31 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     public void onMapReady(GoogleMap googleMap) {
 
     }
+
+    private void DateDia() {
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(OrderSummaryActivity.this,
+                new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        mtxtDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+
+                        uYear = year;
+                        uDOMo = dayOfMonth;
+                        uMOYear = monthOfYear;
+
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show();
+    }
+
 
 }
 

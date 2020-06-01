@@ -20,14 +20,20 @@ public class HelpingMethods {
         sb.show();
     }
 
-    public void saveuser(String name, String photo, String address,String phone) {
+    public void saveuser(String name, String photo, String phone,String email) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.putString("photo", photo);
-        editor.putString("address", address);
         editor.putString("phone", phone);
+        editor.putString("email", email);
         editor.apply();
+    }
+
+    public String GetUEmail() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("email", null);
+        return sid;
     }
 
     public String GetUPhone() {

@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#F0F0F0"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
 
     <ScrollView
 
@@ -20,7 +20,6 @@
             android:background="#F0F0F0"
             android:orientation="vertical"
             tools:context=".OrderTrackActivity">
-
 
 
             <androidx.cardview.widget.CardView
@@ -53,7 +52,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Order Placed"
+                            android:text="Order Placed At"
                             android:textColor="@color/colorPrimary"
                             android:textStyle="bold">
 
@@ -61,12 +60,11 @@
 
                         <TextView
                             android:id="@+id/txt_ordertime"
-                            android:layout_marginBottom="3dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="3dp"
                             android:maxLength="16"
-                            android:text="05:30 PM"
-                            android:textColor="@android:color/black">
+                            android:textColor="@color/primaryTextColor">
 
                         </TextView>
 
@@ -103,7 +101,7 @@
                             android:id="@+id/txt_Delivertime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="05:30 PM"
+                            android:text="-"
                             android:textColor="@android:color/black">
 
                         </TextView>
@@ -152,6 +150,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/avatar"
+                        app:civ_border_color="@color/colorPrimary"
                         app:civ_border_width="1dp">
 
                     </de.hdodenhof.circleimageview.CircleImageView>
@@ -165,8 +164,7 @@
                         android:layout_marginRight="4dp"
                         android:layout_toLeftOf="@+id/txt_totalrating"
                         android:layout_toRightOf="@+id/storeimg"
-                        android:text="Store Name"
-                        android:textColor="@android:color/black">
+                        android:textColor="@color/primaryTextColor">
 
                     </TextView>
 
@@ -190,8 +188,9 @@
                             android:id="@+id/txt_rating"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="4.9"
-                            android:textColor="@android:color/black">
+                            android:layout_gravity="center_vertical"
+                            android:text="-"
+                            android:textColor="@color/primaryTextColor">
 
                         </TextView>
 
@@ -203,7 +202,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/linear_layout2"
                         android:layout_alignParentRight="true"
-                        android:text="(124 ratings)"
+
                         android:textColor="@android:color/black">
 
                     </TextView>
@@ -218,14 +217,15 @@
             <Button
                 android:id="@+id/btnhis_detail"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/btn_shape"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:text="Order Detail"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white">
 
             </Button>
@@ -245,7 +245,6 @@
                     android:layout_marginTop="8dp"
                     android:src="@drawable/accept"
                     android:tint="@color/white"
-                    app:backgroundTint="@color/colorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -258,8 +257,6 @@
                     android:layout_marginStart="13dp"
                     android:layout_marginLeft="13dp"
                     android:layout_marginTop="16dp"
-                    android:progress="100"
-                    android:progressTint="@color/colorPrimary"
                     android:rotation="90"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/stepOneFab">
@@ -292,7 +289,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Accepted"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/primaryTextColor" />
 
                         <TextView
 
@@ -300,7 +297,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="01:00" />
+                            android:textColor="@color/secondaryTextColor" />
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
@@ -344,15 +341,15 @@
                             android:id="@+id/stepTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Assemble"
-                            android:textColor="@android:color/black" />
+                            android:text="Assembled"
+                            android:textColor="@color/primaryTextColor" />
 
                         <TextView
                             android:id="@+id/stepTwoTextTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="05:00" />
+                            android:textColor="@color/secondaryTextColor" />
 
                     </LinearLayout>
 
@@ -418,14 +415,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="On Route"
-                            android:textColor="@android:color/black" />
+                            android:textColor="@color/primaryTextColor" />
 
                         <TextView
                             android:id="@+id/stepThreeTextTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="02:00" />
+                            android:textColor="@color/secondaryTextColor" />
 
 
                     </LinearLayout>
@@ -486,15 +483,15 @@
                             android:id="@+id/stepFourText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Deliver"
-                            android:textColor="@android:color/black" />
+                            android:text="Deliverd"
+                            android:textColor="@color/primaryTextColor" />
 
                         <TextView
                             android:id="@+id/stepFourTextTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="10:00" />
+                            android:textColor="@color/secondaryTextColor" />
 
                     </LinearLayout>
 
