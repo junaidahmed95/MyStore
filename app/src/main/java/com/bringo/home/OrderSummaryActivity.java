@@ -369,6 +369,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                         UnreadMessage("\uD83D\uDCE6 New Order");
                                                         sendNotifiaction(ownerName, "\uD83D\uDCE6 New order has been arrived..");
                                                         Intent mintent = new Intent(OrderSummaryActivity.this, DummyOrderActivity.class);
+                                                        //Toast.makeText(OrderSummaryActivity.this, "orderid"+OrdrerID, Toast.LENGTH_SHORT).show();
 //                                                    mintent.putExtra("user_id", ownerID);
 //                                                    mintent.putExtra("check", "one");
 //                                                    mintent.putExtra("uName", ownerName);
