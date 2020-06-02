@@ -20,14 +20,32 @@ public class HelpingMethods {
         sb.show();
     }
 
-    public void saveuser(String name, String photo, String address,String phone) {
+    public void saveuser(String name, String photo, String phone,String email) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.putString("photo", photo);
-        editor.putString("address", address);
         editor.putString("phone", phone);
+        editor.putString("email", email);
         editor.apply();
+    }
+
+    public String GetUEmail() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("email", null);
+        return sid;
+    }
+
+    public String GetUPhone() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("phone", null);
+        return sid;
+    }
+
+    public String GetUImage() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+        String sid = sharedPreferences.getString("photo", null);
+        return sid;
     }
 
     public String GetUName() {
@@ -83,6 +101,20 @@ public class HelpingMethods {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
         String uiD = sharedPreferences.getString("uid", null);
         return uiD;
+    }
+
+    public int GetCartTotal(String Dbname) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
+        int sid = sharedPreferences.getInt("amount", 0);
+        return sid;
+    }
+
+
+    public void SaveCartTotal(int total,String Dbname){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("amount",total);
+        editor.apply();
     }
 
 }

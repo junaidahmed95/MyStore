@@ -55,11 +55,6 @@
                         app:fabCustomSize="20dp"
                         app:srcCompat="@drawable/ic_add_black_24dp" />
 
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp" />
-
                 </RelativeLayout>
 
                 <TextView
@@ -159,6 +154,23 @@
                             android:layout_marginTop="2dp"
                             android:layout_marginBottom="2dp"
                             android:background="#d6d6d6" />
+
+                        <TextView
+                            android:id="@+id/labelEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email"
+                            android:visibility="gone"
+                            android:textColor="@android:color/black"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:visibility="gone"
+                            android:id="@+id/userEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@android:color/black" />
 
                     </LinearLayout>
 

@@ -11,9 +11,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -27,6 +29,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -60,6 +63,16 @@ import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.RequestHandlerSingleten;
 import com.bringo.home.Model.VolleyMultipartRequest;
 import com.bringo.home.Model.VolleySingleton;
+import com.bringo.home.ui.home.HomeFragment;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -88,6 +101,8 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
@@ -114,7 +129,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -122,67 +140,90 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OneSignal;
+import com.squareup.picasso.Picasso;
+
+
 public class Verification extends AppCompatActivity implements OnMapReadyCallback {
-    private GoogleMap mMap;
+    private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE";
+    public static String mAddress = "";
+    static String mylatlng = "";
+    static Geocoder geocoder;
+    private String hasImage = "0";
+    private String signInOption = "Main";
+    private String userImage = null;
+    static List<Address> addresses;
+    static LatLng Your_Location = new LatLng(23.81, 90.41);
     Task location;
+    SignInButton signInButton;
+    int PERMISSION_ID = 44;
+    StateProgressBar stateProgressBar;
+    boolean flag = false;
+    private GoogleMap mMap;
     private TextView mbtnPrivacyPolicy;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Button mSendCode, mbutton_verify, mResend_button, mButton_selctLocation;
-    private ProgressBar mProgressBar, proBbar;
     private ProgressDialog mProgressDialog;
     private EditText mPhoneNumber, codeText, mEdiText_address;
     private String mVerificationId;
-    private TextView mTextView_phoneno, mTimer, message;
+    private TextView mTextView_phoneno, mTimer;
     private CountryCodePicker ccp;
     private FirebaseAuth mAuth;
-    public static String mAddress = "";
-    static String mylatlng = "";
     private String address = "", city = "";
-    SignInButton signInButton;
-    static Geocoder geocoder;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
     private FusedLocationProviderClient mFusedLocationClient;
-    int PERMISSION_ID = 44;
-    static List<Address> addresses;
-    private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyCQamg8g6ZMTjQqGnu4iFYLW4WrnTJZjNE";
     private Animation animBlink;
-    StateProgressBar stateProgressBar;
-    SweetAlertDialog mCreateAlertDialog;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private HelpingMethods helpingMethods;
     private CardView mPhoneContainer, mVerifyContainer, mSigninContainer;
-    private ViewGroup viewGroup;
-    boolean flag = false;
     private ConnectionDetector connectionDetector;
-    private ImageView icon, tick;
-
-    static LatLng Your_Location = new LatLng(23.81, 90.41);
     private FloatingActionButton mfbpic;
     private CircleImageView musercrimage;
     private Uri imageuri;
-    private Button mbutton_create,login,signup;
-    private EditText mmusername;
-    private  Bitmap bitmap = null;
+    private Button mbutton_create, signup;
+    private EditText mmusername, moptional_number, moptional_email;
+    private Bitmap bitmap = null;
     private String get_user;
     private PhoneAuthCredential credential;
-    private LinearLayout main_screen;
-    private RelativeLayout rely;
+    private LinearLayout mmainLayout, mphoneLayout, moptionalPhoneLayout, moptionalEmailLayout;
+    private ImageView imageView;
+    private CardView mcardVew1;
+    private LoginButton fb_login;
+    String photoUrl;
+    private int RC_SIGN_IN = 1;
 
+    private CallbackManager mcallbackManager;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private AccessTokenTracker accessTokenTracker;
+    private LocationCallback mLocationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+            SetMap(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_verification);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setContentView(R.layout.verification_activity);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mbtnPrivacyPolicy = findViewById(R.id.btnPrivacyPolicy);
+        mAuth = FirebaseAuth.getInstance();
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.getApplicationSignature(getApplicationContext());
         FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -193,16 +234,16 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        ImageView imageView = findViewById(R.id.bgHeader);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ColorStateList stateList = ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary));
-            imageView.setBackgroundTintList(stateList);
-        } else {
-            imageView.getBackground().getCurrent().setColorFilter(
-                    new PorterDuffColorFilter(getResources().getColor(R.color.colorPrimary),
-                            PorterDuff.Mode.MULTIPLY));
-        }
-
+        moptional_number = findViewById(R.id.optional_number);
+        moptional_email = findViewById(R.id.optional_email);
+        moptionalEmailLayout = findViewById(R.id.optionalEmailLayout);
+        moptionalPhoneLayout = findViewById(R.id.optionalPhoneLayout);
+        mcardVew1 = findViewById(R.id.cardVew1);
+        mphoneLayout = findViewById(R.id.phoneLayout);
+        mmainLayout = findViewById(R.id.mainLayout);
+        imageView = findViewById(R.id.bgHeader);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(false);
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,25 +253,17 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        login = findViewById(R.id.login);
         signup = findViewById(R.id.signup);
-        main_screen = findViewById(R.id.main_screen);
-        rely = findViewById(R.id.rely);
         mmusername = findViewById(R.id.username);
         mbutton_create = findViewById(R.id.button_create);
         musercrimage = findViewById(R.id.usercrimage);
         mfbpic = findViewById(R.id.fbpic);
-        mProgressBar = findViewById(R.id.pbar);
+
         mSendCode = findViewById(R.id.button_sendcode);
         mTimer = findViewById(R.id.timer_TextView);
         mPhoneNumber = findViewById(R.id.editText_phoneNumber);
-        proBbar = findViewById(R.id.progressBar);
-        viewGroup = findViewById(R.id.group_layout);
         mButton_selctLocation = findViewById(R.id.button_selctLocation);
         mEdiText_address = findViewById(R.id.ediText_address);
-        icon = findViewById(R.id.emailicon);
-        tick = findViewById(R.id.tickicon);
-        message = findViewById(R.id.sms);
         mPhoneContainer = findViewById(R.id.step1_container);
         //mEditText_location = findViewById(R.id.editText_location);
         stateProgressBar = findViewById(R.id.your_state_progress_bar_id);
@@ -238,15 +271,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         connectionDetector = new ConnectionDetector(Verification.this);
         mSigninContainer = findViewById(R.id.step3_container);
         mResend_button = findViewById(R.id.button_resend);
-        mCreateAlertDialog = new SweetAlertDialog(Verification.this, SweetAlertDialog.PROGRESS_TYPE);
-        mCreateAlertDialog.getProgressHelper().setBarColor(Color.parseColor("#008577"));
-        mCreateAlertDialog.setTitleText("creating account....");
-        mCreateAlertDialog.setCancelable(false);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mResend_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,7 +281,49 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mTextView_phoneno = findViewById(R.id.textView_phoneno);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getInstance().getCurrentUser();
+        //google sigin code
         signInButton = findViewById(R.id.sign_in_button);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        fb_login = findViewById(R.id.login_button);
+        SetUpFB();
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
+//                if (user != null) {
+//                    mProgressDialog.setMessage("Please wait...");
+//                    mProgressDialog.show();
+//                    signInOption = "FB";
+//                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+//                    parseJSON();
+//                } else {
+//                    //Toast.makeText(Verification.this, "Failed!", Toast.LENGTH_SHORT).show();
+//                }
+            }
+        };
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+//                if (currentAccessToken == null) {
+//                    mAuth.signOut();
+//                }
+            }
+        };
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mProgressDialog.setMessage("Please wait...");
+                mProgressDialog.show();
+                signInOption = "Google";
+                signIn();
+            }
+        });
+
 
         try {
             ProviderInstaller.installIfNeeded(getApplicationContext());
@@ -279,17 +345,15 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckLocationPermission();
-            }
-        });
-
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckLocationPermission();
+                mmainLayout.setVisibility(View.GONE);
+                mphoneLayout.setVisibility(View.VISIBLE);
+                mcardVew1.setVisibility(View.VISIBLE);
+                mPhoneContainer.setVisibility(View.VISIBLE);
+                signInOption = "Phone";
+
             }
         });
 
@@ -297,70 +361,88 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mfbpic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent galery = new Intent();
                 galery.setType("image/*");
                 galery.setAction(Intent.ACTION_GET_CONTENT);
-
                 startActivityForResult(Intent.createChooser(galery, "Select image"), 102);
-
-
             }
         });
 
-
+//create button
         mbutton_create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
-                if (bitmap == null) {
+                if (hasImage.equals("0") && bitmap == null) {
                     helpingMethods.SnackBar("Select your image", v);
                 } else if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);
+                } else if (moptionalPhoneLayout.getVisibility() == View.VISIBLE && moptional_number.getText().toString().trim().equals("")) {
+                    helpingMethods.SnackBar("Enter your phone number", v);
+                } else if (moptionalPhoneLayout.getVisibility() == View.VISIBLE && !moptional_number.getText().toString().trim().equals("") && moptional_number.getText().toString().length() < 11) {
+                    helpingMethods.SnackBar("Invalid phone number", v);
+                } else if (moptionalEmailLayout.getVisibility() == View.VISIBLE && moptional_email.getText().toString().trim().equals("")) {
+                    helpingMethods.SnackBar("Enter your email", v);
                 } else if (mEdiText_address.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your address", v);
                 } else if (con.isConnected()) {
-                    mCreateAlertDialog.show();
-                    ////////////////////////////////////////////////////////////////////////
+                    mProgressDialog.setMessage("Creating account...");
+                    mProgressDialog.show();
                     String url = "https://bringo.biz/api/reg";
                     VolleyMultipartRequest multipartRequest = new
                             VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
                                 @Override
                                 public void onResponse(NetworkResponse response) {
                                     if (response.statusCode == 200) {
-                                        String userImage = null;
                                         try {
                                             userImage = new String(response.data, "UTF-8");
                                         } catch (UnsupportedEncodingException e) {
                                             e.printStackTrace();
                                         }
-                                        //junaid
 
                                         DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mAuth.getUid());
                                         HashMap<String, Object> hashMap = new HashMap<>();
-                                        hashMap.put("name", mmusername.getText().toString().trim());
+                                        hashMap.put("name", mmusername.getText().toString());
+
                                         hashMap.put("picture", userImage);
-                                        hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+
+                                        if (signInOption.equals("Phone")) {
+                                            hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                                        } else {
+                                            hashMap.put("phone", moptional_number.getText().toString());
+                                        }
+                                        hashMap.put("email", moptional_email.getText().toString());
                                         hashMap.put("status", 0);
                                         hashMap.put("token", FirebaseInstanceId.getInstance().getToken());
                                         hashMap.put("address", mEdiText_address.getText().toString().trim());
                                         hashMap.put("search", mmusername.getText().toString().trim().toLowerCase());
-                                        final String finalUserImage = userImage;
+
                                         userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    helpingMethods.saveuser(mmusername.getText().toString().trim(), finalUserImage, mEdiText_address.getText().toString().trim(),mPhoneNumber.getText().toString().replaceAll(" ", ""));
-                                                    Intent intent = new Intent(Verification.this, BringoActivity.class);
-                                                    if(getIntent().getStringExtra("for")!=null){
-                                                        intent.putExtra("cart","open");
+                                                    String email = null;
+                                                    if (!moptional_email.getText().toString().trim().equals("")) {
+                                                        email = moptional_email.getText().toString();
+                                                    }
+
+                                                    if (signInOption.equals("Phone")) {
+                                                        helpingMethods.saveuser(mmusername.getText().toString(), userImage, mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""), email);
+                                                    } else {
+                                                        helpingMethods.saveuser(mmusername.getText().toString(), userImage, moptional_number.getText().toString(), email);
+                                                    }
+
+
+                                                    Intent intent = new Intent(Verification.this, MainActivity.class);
+                                                    if (getIntent().getStringExtra("for") != null) {
+                                                        intent.putExtra("cart", "open");
                                                     }
                                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                     startActivity(intent);
                                                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                                                     finish();
                                                 } else {
-                                                    mCreateAlertDialog.dismiss();
+                                                    mProgressDialog.cancel();
                                                     helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
                                                 }
                                             }
@@ -371,8 +453,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
 
                                     } else {
+                                        mProgressDialog.cancel();
                                         Toast.makeText(Verification.this, "Error founded: " + response.statusCode, Toast.LENGTH_SHORT).show();
-                                        mProgressDialog.dismiss();
                                     }
                                 }
                             }, new Response.ErrorListener() {
@@ -386,6 +468,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                         } else if (error.getClass().equals(NoConnectionError.class)) {
                                             errorMessage = "Failed to connect server";
                                         }
+                                        mProgressDialog.cancel();
+                                        Toast.makeText(Verification.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
                                     } else {
                                         String result = new String(networkResponse.data);
                                         try {
@@ -405,6 +489,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             } else if (networkResponse.statusCode == 500) {
                                                 errorMessage = message + " Something is getting wrong";
                                             }
+                                            mProgressDialog.cancel();
+                                            Toast.makeText(Verification.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -416,7 +502,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+                                    if (hasImage.equals("0")) {
+                                        params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
+                                    }
 
                                     return params;
                                 }
@@ -425,9 +513,42 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 protected Map<String, String> getParams() {
 
                                     HashMap<String, String> hashMap = new HashMap<>();
+                                    OSPermissionSubscriptionState status1 = OneSignal.getPermissionSubscriptionState();
+                                    status1.getPermissionStatus().getEnabled();
+                                    status1.getSubscriptionStatus().getSubscribed();
+                                    status1.getSubscriptionStatus().getUserSubscriptionSetting();
+                                    status1.getSubscriptionStatus().getUserId();
+                                    status1.getSubscriptionStatus().getPushToken();
+                                    JSONObject mainObj = new JSONObject();
+
+
+                                    try {
+                                        mainObj.put("permissionStatus", status1.getPermissionStatus().toJSONObject());
+                                        mainObj.put("subscriptionStatus", status1.getSubscriptionStatus().toJSONObject());
+                                        mainObj.put("emailSubscriptionStatus", status1.getEmailSubscriptionStatus().toJSONObject());
+                                        JSONObject jsonObject1 = mainObj.getJSONObject("subscriptionStatus");
+                                        hashMap.put("play_id", String.valueOf(jsonObject1.get("userId")));
+                                    } catch (Throwable t) {
+                                        t.printStackTrace();
+                                    }
+
+
+                                    if (hasImage.equals("1")) {
+                                        hashMap.put("url", photoUrl);
+                                    }
+
+                                    hashMap.put("auth", hasImage);
+
+
+                                    hashMap.put("email", moptional_email.getText().toString());
                                     hashMap.put("u_id", mAuth.getUid());
+                                    hashMap.put("image", userImage);
                                     hashMap.put("user_name", mmusername.getText().toString().trim());
-                                    hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                                    if (signInOption.equals("Phone")) {
+                                        hashMap.put("phone", mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
+                                    } else {
+                                        hashMap.put("phone", moptional_number.getText().toString());
+                                    }
                                     hashMap.put("lat", String.valueOf(Your_Location.latitude));
                                     hashMap.put("lng", String.valueOf(Your_Location.longitude));
                                     hashMap.put("address", mEdiText_address.getText().toString().trim());
@@ -439,6 +560,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     VolleySingleton.getInstance(getBaseContext()).addToRequestQueue(multipartRequest);
 
                 } else {
+                    mProgressDialog.cancel();
                     helpingMethods.SnackBar("Check your Internet connection", v);
                 }
 
@@ -448,29 +570,13 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ConnectionDetector detector = new ConnectionDetector(Verification.this);
-                if (mEdiText_address.getText().toString().trim().equals("")) {
-                    helpingMethods.SnackBar("Please enter your address.", v);
-                } else if (detector.isConnected()) {
-                    parseJSON();
-                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                    startActivityForResult(signInIntent, 101);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } else {
-                    helpingMethods.SnackBar("Check your internet connection.", v);
-                }
-            }
-        });
+//google sigin button
 
         TextView textView = (TextView) signInButton.getChildAt(0);
-        textView.setText("Corner SignIn");
-        textView.setTextColor(Color.parseColor("#008577"));
+        textView.setText("Continue with Google");
+        textView.setTextColor(Color.parseColor("#FFE00D0D"));
+        textView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER | Gravity.CENTER_VERTICAL);
 
-        viewGroup = findViewById(R.id.group_layout);
         ccp = findViewById(R.id.ccp);
         ccp.registerCarrierNumberEditText(mPhoneNumber);
         animBlink = AnimationUtils.loadAnimation(Verification.this, R.anim.blink);
@@ -479,9 +585,15 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mSendCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSendCode.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.VISIBLE);
-                SendCode(v);
+                if (mPhoneNumber.getText().toString().trim().equals("")) {
+                    helpingMethods.SnackBar("Please enter your phone number.", v);
+                } else if (connectionDetector.isConnected()) {
+                    mProgressDialog.setMessage("Sending code...");
+                    mProgressDialog.show();
+                    startPhoneNumberVerification(ccp.getFullNumberWithPlus());
+                } else {
+                    helpingMethods.SnackBar("Check your internet connection.", v);
+                }
 
 
             }
@@ -493,13 +605,13 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
 
             public void onClick(View v) {
-
                 ConnectionDetector detector = new ConnectionDetector(Verification.this);
                 if (codeText.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Please enter verification code.", codeText);
                 } else if (detector.isConnected()) {
+                    mProgressDialog.setMessage("Verifying code...");
+                    mProgressDialog.show();
                     VerifyPhone();
-
                 } else {
                     helpingMethods.SnackBar("Check your internet connection.", v);
                 }
@@ -508,7 +620,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
                 String code = phoneAuthCredential.getSmsCode();
@@ -516,6 +627,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 if (code != null) {
                     codeText.setText(code);
                     if (detector.isConnected()) {
+                        mProgressDialog.setMessage("Verifying code...");
+                        mProgressDialog.show();
                         VerifyPhone();
                     } else {
                         helpingMethods.SnackBar("Check your internet connection.", mbutton_verify);
@@ -526,11 +639,11 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onVerificationFailed(FirebaseException e) {
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                    mProgressBar.setVisibility(View.GONE);
-                    mSendCode.setVisibility(View.VISIBLE);
-                    helpingMethods.SnackBar("Invalid phone number.", mProgressBar);
+                    mProgressDialog.cancel();
+                    Toast.makeText(Verification.this, "Invalid phone number", Toast.LENGTH_SHORT).show();
                 } else if (e instanceof FirebaseTooManyRequestsException) {
-
+                    mProgressDialog.cancel();
+                    Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -553,12 +666,11 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                 }.start();
-                mVerifyContainer.setVisibility(View.VISIBLE);
                 mPhoneContainer.setVisibility(View.GONE);
+                mVerifyContainer.setVisibility(View.VISIBLE);
+                mProgressDialog.cancel();
                 mVerificationId = s;
                 mResendToken = forceResendingToken;
-                mProgressBar.setVisibility(View.GONE);
-                mSendCode.setVisibility(View.VISIBLE);
 
             }
         };
@@ -566,7 +678,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mButton_selctLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(Verification.this, MapActivity.class);
+                intent.putExtra("activity", "verification");
                 flag = true;
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -575,24 +689,44 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void SetUpFB() {
+        fb_login.setReadPermissions("email", "public_profile");
+        mcallbackManager = CallbackManager.Factory.create();
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        fb_login.registerCallback(mcallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                mProgressDialog.setMessage("Please wait...");
+                mProgressDialog.show();
+                signInOption = "FB";
+                handleFacebookToken(loginResult.getAccessToken());
+
+            }
+
+            @Override
+            public void onCancel() {
+                mProgressDialog.cancel();
+                Toast.makeText(Verification.this, "Canceled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                mProgressDialog.cancel();
+                Toast.makeText(Verification.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mcallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 101) {
+        if (requestCode == RC_SIGN_IN) {
+            mProgressDialog.setMessage("Signing In...");
+            mProgressDialog.show();
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                if (task.isSuccessful()) {
-                    mCreateAlertDialog.show();
-                    GoogleSignInAccount account = task.getResult(ApiException.class);
-                    firebaseAuthWithGoogle(account);
-                } else {
-                    mCreateAlertDialog.dismiss();
-                    helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                }
-            } catch (ApiException e) {
-                mCreateAlertDialog.dismiss();
-                helpingMethods.SnackBar("" + e.getMessage(), mPhoneNumber);
-            }
+            handleSignInResult(task);
         } else if (requestCode == 102) {
             imageuri = data.getData();
             try {
@@ -603,57 +737,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 e.printStackTrace();
             }
         }
-    }
-
-    //junaid
-    private void firebaseAuthWithGoogle(final GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            mylatlng = Your_Location.latitude + "," + Your_Location.longitude;
-                            user = mAuth.getCurrentUser();
-                            assert user != null;
-                            final String email = account.getEmail();
-                            final String user = account.getDisplayName();
-                            final Uri photouri = account.getPhotoUrl();
-                            final String photo = photouri.toString();
-                            DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child("Customers");
-                            HashMap hashMap = new HashMap<>();
-                            hashMap.put("name", user);
-                            hashMap.put("picture", photo);
-                            hashMap.put("email", email);
-                            hashMap.put("phone",mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", ""));
-                            hashMap.put("latlong", mylatlng);
-                            hashMap.put("address", mEdiText_address.getText().toString().trim());
-                            hashMap.put("status", 0);
-                            hashMap.put("token", FirebaseInstanceId.getInstance().getToken());
-                            hashMap.put("search", user.toLowerCase());
-                            userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Intent intent = new Intent(Verification.this, BringoActivity.class);
-                                        if(getIntent().getStringExtra("for")!=null){
-                                            intent.putExtra("cart","open");
-                                        }
-                                        startActivity(intent);
-                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                    } else {
-                                        mCreateAlertDialog.dismiss();
-                                        helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                                    }
-                                }
-                            });
-
-                        } else {
-                            mCreateAlertDialog.dismiss();
-                            helpingMethods.SnackBar("" + task.getException().getMessage(), mPhoneNumber);
-                        }
-                    }
-                });
     }
 
     private void ResendCode() {
@@ -678,143 +761,39 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         }.start();
     }
 
+
     //kam
     private void verifyPhoneNumberWithCode(String verificationId, String code) {
         try {
             credential = PhoneAuthProvider.getCredential(verificationId, code);
             signInWithPhoneAuthCredential(credential);
         } catch (Exception e) {
+            mProgressDialog.cancel();
             String error = e.getMessage();
-            proBbar.setVisibility(View.GONE);
-            message.setText(error);
-            message.setTextColor(getResources().getColor(R.color.colorRed));
-            if (Build.VERSION.SDK_INT >= 19) {
-                TransitionManager.beginDelayedTransition(viewGroup);
-                message.setVisibility(View.VISIBLE);
-            } else {
-                message.setVisibility(View.VISIBLE);
-            }
-            mbutton_verify.setEnabled(true);
-            proBbar.setVisibility(View.GONE);
-            codeText.setEnabled(true);
-            message.setVisibility(View.VISIBLE);
+            Toast.makeText(Verification.this, "" + error, Toast.LENGTH_SHORT).show();
+
         }
     }
-//
-//    private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
-//
-//        mAuth.signInWithCredential(phoneAuthCredential)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//
-//                            FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                    if (dataSnapshot.exists()) {
-//                                        Intent intent = new Intent(Verification.this, MainActivity.class);
-//                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                        startActivity(intent);
-//                                        finish();
-//                                    } else {
-//
-//
-//                                        ScaleAnimation scaleAnimation = new ScaleAnimation(1, 0, 1, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                                        scaleAnimation.setDuration(100);
-//                                        scaleAnimation.setInterpolator(new AccelerateInterpolator());
-//                                        scaleAnimation.setRepeatMode(Animation.REVERSE);
-//                                        scaleAnimation.setRepeatCount(1);
-//                                        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
-//                                            @Override
-//                                            public void onAnimationStart(Animation animation) {
-//                                                icon.setColorFilter(Verification.this.getResources().getColor(R.color.colorGreen));
-//
-//                                            }
-//
-//                                            @Override
-//                                            public void onAnimationEnd(Animation animation) {
-//
-//                                            }
-//
-//                                            @Override
-//                                            public void onAnimationRepeat(Animation animation) {
-//
-//                                            }
-//                                        });
-//                                        stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
-//                                        mSigninContainer.setVisibility(View.VISIBLE);
-//                                        mVerifyContainer.setVisibility(View.GONE);
-//                                        viewGroup.setVisibility(View.GONE);
-//                                        proBbar.setVisibility(View.GONE);
-//
-//                                        if (ContextCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                                            kamkicheez();
-//                                        } else {
-//                                            getPermisssion();
-//                                        }
-//
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                }
-//                            });
-//
-//
-//
-//
-//                        } else {
-//                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-//                                proBbar.setVisibility(View.GONE);
-//                                message.setText("Invalid Code.");
-//                                message.setTextColor(getResources().getColor(R.color.colorRed));
-//                                if (Build.VERSION.SDK_INT >= 19) {
-//                                    TransitionManager.beginDelayedTransition(viewGroup);
-//                                    message.setVisibility(View.VISIBLE);
-//                                } else {
-//                                    message.setVisibility(View.VISIBLE);
-//                                }
-//                                mbutton_verify.setEnabled(true);
-//                                proBbar.setVisibility(View.GONE);
-//                                codeText.setEnabled(true);
-//                                message.setVisibility(View.VISIBLE);
-//                            }
-//                        }
-//                    }
-//                });
-//
-//    }
-
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
-
         mAuth.signInWithCredential(phoneAuthCredential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
-
-
+                            get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                            ConnectionDetector detector = new ConnectionDetector(Verification.this);
+                            if (detector.isConnected()) {
+                                parseJSON();
+                            } else {
+                                mProgressDialog.cancel();
+                                Toast.makeText(Verification.this, "Check your ineternet,", Toast.LENGTH_SHORT).show();
+                            }
 
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                proBbar.setVisibility(View.GONE);
-                                message.setText("Invalid Code.");
-                                message.setTextColor(getResources().getColor(R.color.colorRed));
-                                if (Build.VERSION.SDK_INT >= 19) {
-
-                                    message.setVisibility(View.VISIBLE);
-                                } else {
-                                    message.setVisibility(View.VISIBLE);
-                                }
-                                mbutton_verify.setEnabled(true);
-                                proBbar.setVisibility(View.GONE);
-                                codeText.setEnabled(true);
-                                message.setVisibility(View.VISIBLE);
+                                mProgressDialog.cancel();
+                                Toast.makeText(Verification.this, "Invalid code!", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -845,14 +824,6 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-            SetMap(mLastLocation.getLatitude(),mLastLocation.getLongitude());
-        }
-    };
-
     private boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(Verification.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -871,13 +842,9 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                             public void onComplete(@NonNull Task<Location> task) {
                                 final Location location = task.getResult();
                                 if (location == null) {
-                                    main_screen.setVisibility(View.GONE);
-                                    rely.setVisibility(View.VISIBLE);
                                     requestNewLocationData();
                                 } else {
-                                    main_screen.setVisibility(View.GONE);
-                                    rely.setVisibility(View.VISIBLE);
-                                    SetMap(location.getLatitude(),location.getLongitude());
+                                    SetMap(location.getLatitude(), location.getLongitude());
                                 }
                             }
                         }
@@ -966,15 +933,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
-
     private void resendVerificationCode(String fullNumberWithPlus, PhoneAuthProvider.ForceResendingToken mResendToken) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 fullNumberWithPlus, 60, TimeUnit.SECONDS, this, mCallbacks, mResendToken);
     }
-
-
-
 
 
     public String getAddress(Double lat, Double lng) {
@@ -996,50 +958,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void checkApi() {
-        if (Build.VERSION.SDK_INT >= 19) {
-            TransitionManager.beginDelayedTransition(viewGroup);
-        }
-        icon.setVisibility(View.VISIBLE);
-        proBbar.setVisibility(View.VISIBLE);
-        mbutton_verify.setEnabled(false);
-        codeText.setEnabled(false);
-    }
 
     private void VerifyPhone() {
         String code = codeText.getText().toString();
-        if (Build.VERSION.SDK_INT >= 19) {
-            TransitionManager.beginDelayedTransition(viewGroup);
-            icon.setVisibility(View.GONE);
-            codeText.setEnabled(true);
-            message.setVisibility(View.GONE);
-        } else {
-            codeText.setEnabled(true);
-            icon.setVisibility(View.GONE);
-            message.setVisibility(View.GONE);
-        }
-        checkApi();
         verifyPhoneNumberWithCode(mVerificationId, code);
-        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
-        parseJSON();
+
+
     }
 
-
-    public void SendCode(View view) {
-        String phoneno = mPhoneNumber.getText().toString().replaceAll(" ", "").replaceFirst("^[0]+|^[+92]+", "");
-        if (phoneno.equals("")) {
-            mProgressBar.setVisibility(View.GONE);
-            mSendCode.setVisibility(View.VISIBLE);
-            helpingMethods.SnackBar("Please enter your phone number.", view);
-        } else if (connectionDetector.isConnected()) {
-            startPhoneNumberVerification(ccp.getFullNumberWithPlus());
-        } else {
-            mProgressBar.setVisibility(View.GONE);
-            mSendCode.setVisibility(View.VISIBLE);
-            helpingMethods.SnackBar("Check your internet connection.", view);
-        }
-
-    }
 
     private void startPhoneNumberVerification(String fullNumberWithPlus) {
 
@@ -1048,9 +974,14 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
+
+
+        CheckLocationPermission();
+
         if (flag) {
             String[] getvv = mylatlng.split(",");
             final double latitude = Double.parseDouble(getvv[0]);
@@ -1085,47 +1016,60 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void parseJSON() {
-        FirebaseUser user = mAuth.getCurrentUser();
         final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(get_user, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
-                    stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
-                    mSigninContainer.setVisibility(View.VISIBLE);
-                    mVerifyContainer.setVisibility(View.GONE);
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (signInOption.equals("Google")) {
+                        mfbpic.hide();
+                        updateUI();
+                    } else if (signInOption.equals("FB")) {
+                        mfbpic.hide();
+                        UpdateUi(user);
+                    } else if (signInOption.equals("Phone")) {
+                        mfbpic.show();
+                        stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.THREE);
+                        hasImage = "0";
+                        mVerifyContainer.setVisibility(View.GONE);
+                        mSigninContainer.setVisibility(View.VISIBLE);
+                        mProgressDialog.cancel();
+                    }
+
 
                 } else {
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
                             String u_name = jsonObject.getString("user_name");
-                            String u_address = jsonObject.getString("address");
                             String u_image = jsonObject.getString("user_image");
-                            helpingMethods.saveuser(u_name,u_image,u_address,mPhoneNumber.getText().toString());
+                            String u_phone = jsonObject.getString("phone");
+                            String u_email = jsonObject.getString("email");
+
+
+                            helpingMethods.saveuser(u_name, u_image, u_phone, u_email);
 
                         } catch (Exception e) {
-                            Toast.makeText(Verification.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
-
-                    mSigninContainer.setVisibility(View.GONE);
-                    Intent intent = new Intent(Verification.this, BringoActivity.class);
-
-                    if(getIntent().getStringExtra("for")!=null){
-                        intent.putExtra("cart","open");
+                    Intent intent = new Intent(Verification.this, MainActivity.class);
+                    if (getIntent().getStringExtra("for") != null) {
+                        intent.putExtra("cart", "open");
                     }
-
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    mProgressDialog.cancel();
                     finish();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(Verification.this, ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                mProgressDialog.cancel();
+                Toast.makeText(Verification.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -1136,34 +1080,195 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onBackPressed() {
+        if (mPhoneContainer.getVisibility() == View.VISIBLE) {
+            mphoneLayout.setVisibility(View.GONE);
+            mcardVew1.setVisibility(View.GONE);
+            mPhoneContainer.setVisibility(View.GONE);
+            mmainLayout.setVisibility(View.VISIBLE);
+            signInOption = "Main";
+        } else if (mVerifyContainer.getVisibility() == View.VISIBLE) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.ONE);
+                            mPhoneNumber.setText("");
+                            codeText.setText("");
+                            mVerifyContainer.setVisibility(View.GONE);
+                            mPhoneContainer.setVisibility(View.VISIBLE);
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
+                    }
+                }
+            };
 
-        if (mVerifyContainer.getVisibility() == View.VISIBLE) {
-            mPhoneContainer.setVisibility(View.VISIBLE);
-            mVerifyContainer.setVisibility(View.GONE);
+            AlertDialog.Builder builder = new AlertDialog.Builder(Verification.this);
+            builder.setMessage("Do you want to go back?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
 
-            proBbar.setVisibility(View.GONE);
-            icon.setVisibility(View.GONE);
-            codeText.setEnabled(true);
-            mbutton_verify.setEnabled(true);
-            codeText.setText("");
-            mTimer.setText("");
+        } else if (signInOption.equals("Phone") && mSigninContainer.getVisibility() == View.VISIBLE) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            stateProgressBar.setCurrentStateNumber(StateProgressBar.StateNumber.ONE);
+                            mPhoneNumber.setText("");
+                            codeText.setText("");
+                            mSigninContainer.setVisibility(View.GONE);
+                            mPhoneContainer.setVisibility(View.VISIBLE);
+                            signInOption = "Main";
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
+                    }
+                }
+            };
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(Verification.this);
+            builder.setMessage("Do you want to go back?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
 
         } else if (mSigninContainer.getVisibility() == View.VISIBLE) {
-            mPhoneContainer.setVisibility(View.VISIBLE);
-            mSigninContainer.setVisibility(View.GONE);
+            if (signInOption.equals("Google") || signInOption.equals("FB")) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                if (signInOption.equals("FB")) {
+                                    SetUpFB();
+                                }
+                                moptional_number.setText("");
+                                moptionalPhoneLayout.setVisibility(View.GONE);
+                                mSigninContainer.setVisibility(View.GONE);
+                                mmainLayout.setVisibility(View.VISIBLE);
+                                signInOption = "Main";
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
 
-            mbutton_verify.setEnabled(true);
-            proBbar.setVisibility(View.GONE);
-            icon.setVisibility(View.GONE);
-            codeText.setEnabled(true);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Verification.this);
+                builder.setMessage("Do you want to go back?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
 
-            codeText.setText("");
-            mTimer.setText("");
 
-        }else {
+        } else if (mmainLayout.getVisibility() == View.VISIBLE) {
             finish();
         }
 
+
+    }
+
+    private void handleFacebookToken(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                    parseJSON();
+                } else {
+                    mProgressDialog.cancel();
+                    Toast.makeText(Verification.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void UpdateUi(FirebaseUser user) {
+        if (user != null) {
+            mmusername.setText(user.getDisplayName());
+            photoUrl = String.valueOf(user.getPhotoUrl());
+            moptional_number.setText(user.getPhoneNumber());
+            moptional_email.setText(user.getEmail());
+            Glide.with(this).load(photoUrl).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(musercrimage);
+            mmainLayout.setVisibility(View.GONE);
+            hasImage = "1";
+            moptionalPhoneLayout.setVisibility(View.VISIBLE);
+            mSigninContainer.setVisibility(View.VISIBLE);
+            mProgressDialog.cancel();
+
+        }
+
+
+    }
+
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount acc = completedTask.getResult(ApiException.class);
+            FirebaseGoogleAuth(acc);
+        } catch (ApiException e) {
+            mProgressDialog.cancel();
+            Toast.makeText(Verification.this, "Sign In Failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void FirebaseGoogleAuth(GoogleSignInAccount acct) {
+        if (acct != null) {
+            AuthCredential authCredential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+            mAuth.signInWithCredential(authCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
+                        parseJSON();
+                    } else {
+                        mProgressDialog.cancel();
+                        Toast.makeText(Verification.this, "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } else {
+            mProgressDialog.cancel();
+            Toast.makeText(Verification.this, "acc failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateUI() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (account != null) {
+            String personName = account.getDisplayName();
+            String personEmail = account.getEmail();
+            photoUrl = String.valueOf(account.getPhotoUrl());
+            moptional_email.setText(personEmail);
+            mmusername.setText(personName);
+            Glide.with(this).load(photoUrl).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(musercrimage);
+            hasImage = "1";
+            mmainLayout.setVisibility(View.GONE);
+            moptionalPhoneLayout.setVisibility(View.VISIBLE);
+            mSigninContainer.setVisibility(View.VISIBLE);
+            mProgressDialog.cancel();
+
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(authStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (authStateListener != null) {
+            mAuth.removeAuthStateListener(authStateListener);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.bringo.home.ui;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -18,10 +21,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.bringo.home.Adapter.HistoryAdapter;
+import com.bringo.home.Adapter.StatusAdapter;
+import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.OrderHistory;
 import com.bringo.home.R;
+import com.bringo.home.Verification;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONArray;
@@ -40,6 +47,9 @@ public class OrderHistoryFragment extends Fragment {
     private List<OrderHistory> products_list;
     private ProgressDialog mProgressDialog;
     RecyclerView mhis_recycler;
+    private HelpingMethods helpingMethods;
+    private Button mbtnSiglo, mbtnRetry;
+    private TextView  mnoOrder;
 
     public OrderHistoryFragment() {
         // Required empty public constructor
@@ -56,96 +66,118 @@ public class OrderHistoryFragment extends Fragment {
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
-
+        mnoOrder = mView.findViewById(R.id.noOrder);
+        helpingMethods = new HelpingMethods(getActivity());
+        mbtnSiglo = mView.findViewById(R.id.btnSiglo);
         historylist = new ArrayList<>();
         products_list = new ArrayList<>();
         mhis_recycler = mView.findViewById(R.id.his_recycler);
-
+        mbtnRetry = mView.findViewById(R.id.btnRetry);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mhis_recycler.setLayoutManager(linearLayoutManager);
 
-        parseJSON();
+        mbtnSiglo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), Verification.class));
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
+            ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+            if (connectionDetector.isConnected()) {
+                parseJSON();
+            } else {
+                mProgressDialog.cancel();
+                Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                mbtnRetry.setVisibility(View.VISIBLE);
+            }
+
+        } else {
+            mProgressDialog.cancel();
+            mbtnSiglo.setVisibility(View.VISIBLE);
+        }
+
+
+        mbtnRetry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
+                if (connectionDetector.isConnected()) {
+                    mProgressDialog.show();
+                    mbtnRetry.setVisibility(View.GONE);
+                    parseJSON();
+                } else {
+                    mProgressDialog.cancel();
+                    Toast.makeText(getActivity(), "Check your internet", Toast.LENGTH_SHORT).show();
+                    mbtnRetry.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
 
         return mView;
 
     }
 
     private void parseJSON() {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        RequestQueue requestQueue = Volley.newRequestQueue(getContext());
+        String url = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-        // Initialize a new JsonArrayRequest instance
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                try {
+                        try {
 
-                    JSONArray storeOrders = response.getJSONArray(0);
-                    JSONObject storeOrdersDetail = response.getJSONObject(1);
+                            JSONArray array = response.getJSONArray("Data");
+                            for (int i = 0; i < array.length(); i++) {
 
-
-                    for (int i = 0; i < storeOrders.length(); i++) {
-
-                        JSONObject storeOrder = storeOrders.getJSONObject(i);
+                                JSONObject data = array.getJSONObject(i);
 
 
-                        String storeName = storeOrder.getString("str_name");
-                        String storeOrderId = storeOrder.getString("ord_id");
-                        String storeimg = storeOrder.getString("user_thumb");
-                        JSONArray storeOrderDetails = storeOrdersDetail.getJSONArray(storeOrderId);
-
-                        for (int j = 0; j < storeOrderDetails.length(); j++) {
-
-                            JSONObject storeObject = storeOrderDetails.getJSONObject(j);
-
-                            if (storeObject.getString("status").equals("4")){
-                                String pname = storeObject.getString("sp_name");
-                                String actprice = storeObject.getString("act_prc");
-                                String address = storeObject.getString("new_address");
-                                String proimage = storeObject.getString("sp_image");
-                                String pqty = storeObject.getString("ord_qty");
-                                String tprice = storeObject.getString("t_price");
-                                String datetime = storeObject.getString("created_at");
-                                String uid = storeObject.getString("user_id");
-                                String tpprice = storeObject.getString("str_prc");
-                                String status = storeObject.getString("status");
-                                products_list.add(new OrderHistory(actprice, pqty, storeName, datetime, proimage, pname, uid, address, status, tprice, tpprice));
+                                String str_name = data.getString("str_name");
+                                String id = data.getString("id");
+                                String ord_id = data.getString("ord_id");
+                                String t_price = data.getString("t_price");
+                                String created_at = data.getString("created_at");
+                                String address = data.getString("ord_id");
+                                String user_thumb = data.getString("thumbnail");
+                                historylist.add(new OrderHistory(str_name, id, ord_id, t_price, created_at, address, user_thumb));
 
                             }
 
-                        }
-                        if(products_list.size()>0){
-                            historylist.add(new OrderHistory(storeOrderId, storeimg, new ArrayList<OrderHistory>(products_list)));
-                            HistoryAdapter historyadp = new HistoryAdapter(historylist, getActivity());
-                            mhis_recycler.setAdapter(historyadp);
-                            historyadp.notifyDataSetChanged();
-                            products_list.clear();
+                            if (historylist.size() > 0) {
+                                StatusAdapter statusAdapter = new StatusAdapter(historylist, getActivity(),true);
+                                mhis_recycler.setAdapter(statusAdapter);
+                                statusAdapter.notifyDataSetChanged();
+                            } else {
+                                mnoOrder.setVisibility(View.VISIBLE);
+                            }
                             mProgressDialog.cancel();
 
+                        } catch (JSONException e) {
+                            mProgressDialog.cancel();
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        mProgressDialog.cancel();
                     }
-
-
-                } catch (JSONException e) {
-                    mProgressDialog.cancel();
-                    Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        },
+                },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+
+
                         mProgressDialog.cancel();
-                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Error" + error, Toast.LENGTH_SHORT).show();
+                        mbtnRetry.setVisibility(View.VISIBLE);
+
                     }
                 }
         );
 
-        // Add JsonArrayRequest to the RequestQueue
-        requestQueue.add(jsonArrayRequest);
-    }
 
+        requestQueue.add(jsonObjectRequest);
+    }
 }

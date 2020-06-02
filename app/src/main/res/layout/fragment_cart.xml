@@ -7,38 +7,90 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/cartRecyclerView"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/cardVew1" />
+        android:layout_above="@+id/cardVew1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardVew2"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#A0ADB8"
+                app:cardElevation="3dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+
+                    <TextView
+                        android:id="@+id/stName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/imn"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:layout_alignParentLeft="true"
+                        android:text="My Store" />
+
+                    <ImageView
+                        android:id="@+id/imn"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
+                        android:tint="#C90A1B"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        app:srcCompat="@drawable/ic_action_info" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cartRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/cardVew2" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <TextView
         android:id="@+id/placeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_margin="16dp"
         android:text="Your cart is empty! click on the below button to place a order thanks"
         android:textAlignment="center"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
         android:textColor="@color/primaryTextColor"
         android:textStyle="bold"
-        />
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/vAllStore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/placeText"
+        android:layout_centerHorizontal="true"
         android:background="@drawable/btn_shape"
         android:paddingLeft="8dp"
-        android:visibility="gone"
         android:paddingRight="8dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/placeText"
         android:text="Place Order"
         android:textAllCaps="false"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardVew1"

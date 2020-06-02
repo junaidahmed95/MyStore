@@ -72,10 +72,9 @@
                         android:id="@+id/txt_addresss"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="42dp"
+                        android:layout_marginLeft="59dp"
                         android:layout_marginBottom="4dp"
-
-                        android:textColor="@android:color/black">
+                        android:textColor="@color/secondaryTextColor">
 
                     </TextView>
 
@@ -100,7 +99,7 @@
 
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Product:"
+                        android:text="Total Product(s):"
                         android:textColor="@android:color/black"
                         android:textStyle="bold">
 
@@ -111,8 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-
-                        android:textColor="@android:color/black">
+                        android:textColor="@color/secondaryTextColor">
 
                     </TextView>
                 </LinearLayout>
@@ -144,9 +142,8 @@
                         android:id="@+id/txt_total_qtys"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="6dp"
-
-                        android:textColor="@android:color/black">
+                        android:layout_marginLeft="59dp"
+                        android:textColor="@color/secondaryTextColor">
 
                     </TextView>
                 </LinearLayout>
@@ -178,9 +175,9 @@
                         android:id="@+id/status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="55dp"
-                        android:text="Pending"
-                        android:textColor="@android:color/black">
+                        android:layout_marginLeft="72dp"
+                        android:text="-"
+                        android:textColor="@color/secondaryTextColor">
 
                     </TextView>
                 </LinearLayout>
@@ -213,9 +210,9 @@
                         android:id="@+id/totalitemprice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-
-                        android:textColor="@android:color/black">
+                        android:layout_marginLeft="45dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/secondaryTextColor">
 
                     </TextView>
                 </LinearLayout>

@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -77,6 +78,7 @@ public class HomeFragment extends Fragment {
     // ProgressBar mprogressbar;
     private RecyclerView categoryRecyclerView;
     private ScrollView mScrollView;
+    private Location mLastLocation;
 
     public static String forWhat = "All";
     List<GirdListView> list;
@@ -93,11 +95,13 @@ public class HomeFragment extends Fragment {
     private StoresAdapter allStoreAdapter;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
+  SwipeRefreshLayout pullToRefresh;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         mloadingImage = root.findViewById(R.id.spin_kit);
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
@@ -109,6 +113,16 @@ public class HomeFragment extends Fragment {
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         grd_str.setLayoutManager(layoutManager);
         nearesStoresList = new ArrayList<>();
+
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
@@ -125,6 +139,7 @@ public class HomeFragment extends Fragment {
                 ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                 if (connectionDetector.isConnected()) {
                     mloadingImage.setVisibility(View.VISIBLE);
+                    mcdv_dialog.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.GONE);
                     CheckLocationPermission();
                 } else {
@@ -179,7 +194,7 @@ public class HomeFragment extends Fragment {
         return false;
     }
 
-    private void GetNearestStores(){
+    private void GetNearestStores() {
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
             CheckLocationPermission();
@@ -191,15 +206,16 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean isLocationEnabled() {
-            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                    LocationManager.NETWORK_PROVIDER
-            );
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+        );
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
     }
 
@@ -222,16 +238,18 @@ public class HomeFragment extends Fragment {
     private LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
+            mLastLocation = locationResult.getLastLocation();
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
 
-    //String url = "http://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172
+
+    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8133&longitude=67.0707", new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -252,8 +270,8 @@ public class HomeFragment extends Fragment {
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
                             String distance = jsonObject.getString("distance");
-                            String store_image = jsonObject.getString("user_thumb");
-                            nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance,storeaddr));
+                            String store_image = jsonObject.getString("thumbnail");
+                            nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
 
 
                         } catch (JSONException e) {
@@ -261,10 +279,9 @@ public class HomeFragment extends Fragment {
                             mloadingImage.setVisibility(View.GONE);
                             Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
-                            Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(),false);
+                    allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
                     grd_str.setAdapter(allStoreAdapter);
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
@@ -279,9 +296,12 @@ public class HomeFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 grd_str.setVisibility(View.GONE);
                 mloadingImage.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                 mretryBtn.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -304,6 +324,7 @@ public class HomeFragment extends Fragment {
                                 if (location == null) {
                                     requestNewLocationData();
                                 } else {
+                                    mLastLocation = location;
                                     GetNearByStores(location.getLatitude(), location.getLongitude());
 
                                 }

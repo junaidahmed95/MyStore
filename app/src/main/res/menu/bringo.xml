@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_action_searchwhite"
-        android:title="Search"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_cart"
         app:actionLayout="@layout/cart_batch_count"
         android:icon="@drawable/ic_action_basketwhite"

@@ -58,7 +58,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
 
     @Override
     public void onBindViewHolder(@NonNull OrderHolder holder, final int position) {
-        Glide.with(context).asBitmap().load(OrderList.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.logo)).into(holder.mitem_image);
+        Glide.with(context).asBitmap().load(OrderList.get(position).getP_img()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mitem_image);
         holder.mtxt_item_name.setText(OrderList.get(position).getP_name());
         holder.mtxt_item_price.setText("Rs."+OrderList.get(position).getP_price()+"/-");
 
@@ -96,16 +96,16 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderHolder>
             }
         });
 
-        holder.mcdv_buttomsheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, ProductDetailActivity.class);
-                intent.putExtra("image",OrderList.get(position).getP_img());
-                intent.putExtra("name",OrderList.get(position).getP_name());
-                intent.putExtra("price",OrderList.get(position).getP_price());
-                context.startActivity(intent);
-            }
-        });
+//        holder.mcdv_buttomsheet.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(context, ProductDetailActivity.class);
+//                intent.putExtra("image",OrderList.get(position).getP_img());
+//                intent.putExtra("name",OrderList.get(position).getP_name());
+//                intent.putExtra("price",OrderList.get(position).getP_price());
+//                context.startActivity(intent);
+//            }
+//        });
 
     }
 

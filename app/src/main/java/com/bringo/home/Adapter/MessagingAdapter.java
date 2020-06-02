@@ -855,7 +855,8 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                 viewHolder.mtxt_address.setText(chat.getAddress());
                 viewHolder.mtxt_total_Price.setText(chat.getTotalPrice());
                 viewHolder.mtxt_total_product.setText("" + chat.getTotalProduct());
-
+                viewHolder.mOrder_ID.setText("" + chat.getOrderID());
+                viewHolder.mtxtn.setText("New Order - (" + receiver_name + ")");
                 viewHolder.morder_time.setText(tim);
 
                 if (chat.isSeen()) {
@@ -872,7 +873,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
                         progressDialog.setCancelable(false);
                         View mView = LayoutInflater.from(mContext).inflate(R.layout.orderdetail_sheet, null);
                         Toolbar mappBar = mView.findViewById(R.id.appBar);
-                        mappBar.setTitle("Order Detail");
+                        mappBar.setTitle("Order Detail - (" + receiver_name + ")");
                         final RecyclerView recyclerView = mView.findViewById(R.id.oorderdetail_gd);
                         TextView textView = mView.findViewById(R.id.totalitemprice);
                         TextView txt_addresss = mView.findViewById(R.id.txt_addresss);
@@ -1201,12 +1202,12 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
         public CardView voicecrd, morder_CardView;
         ImageButton btn_play;
         public ProgressBar mLoad, vidload;
-        TextView tvAudioLength;
+        TextView tvAudioLength, mOrder_ID;
         SeekBar seekBar;
 
         public ImageView mMap_icon;
         private Button mbtn_cancel, mbtn_order_detail, mbtn_accept;
-        private TextView mtxt_address, mtxt_total_product, mtxt_total_Price;
+        private TextView mtxt_address, mtxt_total_product, mtxt_total_Price, mtxtn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -1217,12 +1218,12 @@ public class MessagingAdapter extends RecyclerView.Adapter<MessagingAdapter.View
             mbtn_cancel = itemView.findViewById(R.id.btn_cancel);
             mbtn_order_detail = itemView.findViewById(R.id.btn_orderdetail);
             mbtn_accept = itemView.findViewById(R.id.btn_accept);
-
+            mOrder_ID = itemView.findViewById(R.id.order_id);
             morder_time = itemView.findViewById(R.id.order_time);
             morder_seen = itemView.findViewById(R.id.order_seen);
             morder_CardView = itemView.findViewById(R.id.order_CardView);
             checking = itemView.findViewById(R.id.checking);
-
+            mtxtn = itemView.findViewById(R.id.txtn);
             p_price = itemView.findViewById(R.id.pro_price);
             p_bed = itemView.findViewById(R.id.pro_bedqt);
             p_bath = itemView.findViewById(R.id.pro_bathqt);

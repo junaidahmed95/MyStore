@@ -21,7 +21,7 @@
         android:textStyle="bold"
         android:layout_centerInParent="true"
         android:textColor="@color/primaryTextColor"
-        android:text="Currently your order is not active yet! or place any order thanks"
+        android:text="There are no on going orders for you!!!"
         android:layout_height="wrap_content"/>
 
     <Button
@@ -42,6 +42,18 @@
         android:id="@+id/btnSiglo"
         android:layout_width="wrap_content"
         android:text="Sign Up / Sign In"
+        android:textColor="@color/white"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:background="@drawable/btn_shape"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btnRetry"
+        android:layout_width="wrap_content"
+        android:text="Retry"
         android:textColor="@color/white"
         android:paddingRight="8dp"
         android:paddingLeft="8dp"

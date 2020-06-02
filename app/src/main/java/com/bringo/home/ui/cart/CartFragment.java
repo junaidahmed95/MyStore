@@ -22,6 +22,7 @@ import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.OrderSummaryActivity;
 import com.bringo.home.R;
+import com.bringo.home.StoreInfoActivity;
 import com.bringo.home.Verification;
 import com.bringo.home.ViewAllStoresActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,10 +40,11 @@ public class CartFragment extends Fragment {
 
     private RecyclerView mCartRecyclerView, mAddressRecyclerView;
     public static TextView mTxtView_Total;
-    private TextView mplaceText;
+    private TextView mplaceText, mstName;
+    private CardView mStcard;
     private HelpingMethods helpingMethods;
     public static CardView mcardview1;
-    private Button mcheckBtn,mvAllStore;
+    private Button mcheckBtn, mvAllStore;
     private List<CatLvlItemList> preferenceList;
 
     public View onCreateView(@NonNull final LayoutInflater inflater,
@@ -51,6 +53,8 @@ public class CartFragment extends Fragment {
         helpingMethods = new HelpingMethods(getActivity());
         mvAllStore = root.findViewById(R.id.vAllStore);
         mplaceText = root.findViewById(R.id.placeText);
+        mstName = root.findViewById(R.id.stName);
+        mStcard = root.findViewById(R.id.cardVew2);
         mvAllStore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,26 +78,47 @@ public class CartFragment extends Fragment {
             mcardview1.setVisibility(View.GONE);
             mplaceText.setVisibility(View.VISIBLE);
             mvAllStore.setVisibility(View.VISIBLE);
+        } else {
+//            mstName.setText("Shopped from : " + helpingMethods.GetStoreName());
+//            mStcard.setVisibility(View.VISIBLE);
+//            mStcard.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Intent intent = new Intent(getActivity(), StoreInfoActivity.class);
+//                    intent.putExtra("storeid", helpingMethods.GetStoreID());
+//                    intent.putExtra("stname", helpingMethods.GetStoreName());
+//                    intent.putExtra("ownerID", helpingMethods.GetStoreUID());
+//                    intent.putExtra("address", "");
+//                    intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
+//                    getActivity().startActivity(intent);
+//                    getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//                }
+//            });
         }
 
-
+        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()));
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                     if (connectionDetector.isConnected()) {
-                        Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
-                        sumInt.putExtra("from", "fragement");
-                        sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
-                        startActivity(sumInt);
-                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) >= 300) {
+                            Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
+                            sumInt.putExtra("from", "fragement");
+                            sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
+                            startActivity(sumInt);
+                            getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        } else {
+                            Toast.makeText(getActivity(), "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
+                        }
+
                     } else {
                         Toast.makeText(getActivity(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Intent intent = new Intent(getActivity(), Verification.class);
-                    intent.putExtra("for","cart");
+                    intent.putExtra("for", "cart");
                     getActivity().startActivity(intent);
                     getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 }

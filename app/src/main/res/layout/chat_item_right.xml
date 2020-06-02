@@ -502,7 +502,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardBackgroundColor="#9C27B0"
         app:cardCornerRadius="15dip"
         app:cardElevation="5dp">
 
@@ -515,22 +515,58 @@
 
             <TextView
                 android:id="@+id/txtn"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
-                android:text="New order"
-
+                android:gravity="center"
+                android:paddingLeft="13dp"
+                android:paddingRight="13dp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold">
 
             </TextView>
 
+
+            <LinearLayout
+                android:id="@+id/o_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtn"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/ordd_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text="Order ID:"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold">
+
+                </TextView>
+
+                <TextView
+                    android:id="@+id/order_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="54dp"
+                    android:layout_marginRight="5dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@android:color/white">
+
+                </TextView>
+
+
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/l_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtn"
+                android:layout_below="@+id/o_layout"
                 android:orientation="horizontal">
 
                 <TextView
@@ -548,7 +584,7 @@
                     android:id="@+id/txt_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="37dp"
+                    android:layout_marginLeft="54dp"
                     android:layout_marginRight="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -586,7 +622,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="5dp"
-
                     android:textColor="@android:color/white">
 
                 </TextView>
@@ -617,9 +652,8 @@
                     android:id="@+id/txt_total_Price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
+                    android:layout_marginLeft="38dp"
                     android:layout_marginRight="5dp"
-
                     android:textColor="@android:color/white">
 
                 </TextView>
@@ -645,7 +679,7 @@
                     android:background="@drawable/new_shape"
                     android:text="Cancel"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary">
+                    android:textColor="#9C27B0">
 
                 </Button>
 
@@ -657,9 +691,11 @@
                     android:layout_marginRight="6dp"
                     android:layout_marginBottom="4dp"
                     android:background="@drawable/new_shape"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:text="Order Detail"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary">
+                    android:textColor="#9C27B0">
 
                 </Button>
 
@@ -670,7 +706,7 @@
                     android:background="@drawable/new_shape"
                     android:text="Accept"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="#9C27B0"
                     android:visibility="gone">
 
                 </Button>
@@ -681,10 +717,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/btLayout"
-                android:layout_marginRight="6dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="4dp"
                 android:layout_alignParentRight="true"
+                android:layout_marginRight="6dp"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView

@@ -19,12 +19,13 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
 
     private int selectedPosition;
     public static String cusaddress;
-
+private boolean checkthis;
     List<AddressClass> addressLIST;
     int pre = 0;
 
-    public AddressAdapter(List<AddressClass> address) {
+    public AddressAdapter(List<AddressClass> address , boolean checkthis) {
         this.addressLIST = address;
+        this.checkthis=checkthis;
     }
 
     @NonNull
@@ -96,18 +97,23 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
                 madd_checkb.setChecked(false);
             }
 
-            madd_checkb.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (pre != pos) {
-                        cusaddress = addressLIST.get(pos).getUserAddress();
-                        addressLIST.get(pos).setCurrentAddress(true);
-                        addressLIST.get(pre).setCurrentAddress(false);
-                        refresh(pre, pos);
-                        pre = pos;
+            if(checkthis){
+                madd_checkb.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (pre != pos) {
+                            cusaddress = addressLIST.get(pos).getUserAddress();
+                            addressLIST.get(pos).setCurrentAddress(true);
+                            addressLIST.get(pre).setCurrentAddress(false);
+                            refresh(pre, pos);
+                            pre = pos;
+                        }
                     }
-                }
-            });
+                });
+            }else {
+                madd_checkb.setVisibility(View.GONE);
+            }
+
         }
 
 

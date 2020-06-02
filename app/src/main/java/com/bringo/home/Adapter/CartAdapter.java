@@ -32,10 +32,13 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import static com.bringo.home.BringoActivity.MainsetupBadge;
+import static com.bringo.home.CartActivity.FCartsetupBadge;
+import static com.bringo.home.CartActivity.mtotalAmount;
+import static com.bringo.home.MainActivity.MainsetupBadge;
 import static com.bringo.home.CartActivity.mTxtView_TotalPrice;
 //import static com.example.mystore.ui.cart.CartFragment.mTxtView_TotalPrice;
 import static com.bringo.home.CartActivity.mcardview2;
+import static com.bringo.home.MainActivity.UpdatePrice;
 import static com.bringo.home.ui.cart.CartFragment.mTxtView_Total;
 import static com.bringo.home.ui.cart.CartFragment.mcardview1;
 
@@ -45,7 +48,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private List<CatLvlItemList> cartList;
     private Context mContext;
     private List<String> MecheckList;
-    private boolean flag = false;
     private List<CatLvlItemList> preferenceList;
     private String fromWhere;
     private boolean isUpdate;
@@ -56,6 +58,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         this.cartList = cartList;
         this.fromWhere = fromWhere;
         this.mContext = mContext;
+        Activity activity = (Activity) mContext;
+        helpingMethods = new HelpingMethods(activity);
         GetCartData();
         GetCheckData();
     }
@@ -63,8 +67,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @NonNull
     @Override
     public CartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        Activity activity = (Activity) mContext;
-        helpingMethods = new HelpingMethods(activity);
+
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cart_item, viewGroup, false);
         return new ViewHolder(view);
     }
@@ -72,18 +75,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
         viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
-
-        if (!flag) {
-            mTotalPrice += Integer.parseInt(cartList.get(pos).getActual_price());
-            if (fromWhere.equals("activity")) {
-                mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
-                mcardview2.setVisibility(View.VISIBLE);
-            } else {
-                mTxtView_Total.setText("" + mTotalPrice + "/-");
-                mcardview1.setVisibility(View.VISIBLE);
-            }
-
-        }
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -98,11 +89,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                 preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
 
-                mTotalPrice += Integer.parseInt(cartList.get(pos).getP_price());
+                int total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
+                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
                 if (fromWhere.equals("activity")) {
-                    mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdateTotalPrice();
                 } else {
-                    mTxtView_Total.setText("" + mTotalPrice + "/-");
+                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdatePrice();
                 }
                 SaveCartData();
             }
@@ -121,11 +115,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     viewHolder.Mul();
                     cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                     preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getP_price());
-                    if (fromWhere.equals("activity")) {
-                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+                    int total = 0;
+                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getP_price())) {
+                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
                     } else {
-                        mTxtView_Total.setText("" + mTotalPrice + "/-");
+                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
+                    }
+
+
+                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+                    if (fromWhere.equals("activity")) {
+                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                        UpdateTotalPrice();
+                    } else {
+                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                        UpdatePrice();
                     }
 
                     SaveCartData();
@@ -144,14 +148,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                 try {
-                                    mTotalPrice -= Integer.parseInt(cartList.get(pos).getActual_price());
                                     int finalCount = helpingMethods.GetCartCount(cartList.get(pos).getStoreId()) - 1;
                                     helpingMethods.SaveCartCount(finalCount, cartList.get(pos).getStoreId());
                                     MainsetupBadge();
-                                    if (fromWhere.equals("activity")) {
-                                        mTxtView_TotalPrice.setText("" + mTotalPrice + "/-");
+
+                                    int total = 0;
+                                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getActual_price())) {
+                                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getActual_price());
                                     } else {
-                                        mTxtView_Total.setText("" + mTotalPrice + "/-");
+                                        total = Integer.parseInt(cartList.get(pos).getActual_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
+                                    }
+                                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+                                    if (fromWhere.equals("activity")) {
+                                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                                        FCartsetupBadge();
+                                        UpdateTotalPrice();
+                                    } else {
+                                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                                        UpdatePrice();
                                     }
                                     int a = MecheckList.indexOf(cartList.get(pos).getSimplePID());
                                     MecheckList.remove(a);
@@ -161,7 +175,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     cartList.remove(pos);
                                     notifyItemRemoved(pos);
                                     notifyItemRangeChanged(pos, cartList.size());
-                                    flag = true;
 
 
                                     if (cartList.size() == 0) {
@@ -300,6 +313,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
         } catch (Exception e) {
             Toast.makeText(mContext, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void UpdateTotalPrice(){
+        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+            mtotalAmount.setVisibility(View.VISIBLE);
+        } else {
+            mtotalAmount.setVisibility(View.GONE);
         }
     }
 

@@ -422,6 +422,7 @@ if(dataSnapshot.exists()){
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        receiver_name = getIntent().getStringExtra("uName");
         setContentView(R.layout.activity_messaging);
         setupUI(findViewById(R.id.messagerelative));
 //        if (ContextCompat.checkSelfPermission(MessagingActivity.this,
@@ -514,7 +515,7 @@ if(dataSnapshot.exists()){
         profileimage = findViewById(R.id.custom_bar_image);
 
         receiver_image = getIntent().getStringExtra("uImage");
-        receiver_name = getIntent().getStringExtra("uName");
+
         if(receiver_name!=null && receiver_image!=null){
             username.setText(receiver_name);
             Glide.with(getApplicationContext()).asBitmap().load(receiver_image).apply(new RequestOptions().placeholder(R.drawable.avatar)).into(profileimage);
@@ -739,7 +740,7 @@ if(dataSnapshot.exists()){
                 }if (userRef != null) {
                     userRef.removeEventListener(userDataListener);
                 } if (getIntent().getStringExtra("for") != null) {
-                    Intent intent = new Intent(MessagingActivity.this, BringoActivity.class);
+                    Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 }
@@ -2541,7 +2542,7 @@ if(dataSnapshot.exists()){
         if (userRef != null) {
             userRef.removeEventListener(userDataListener);
         }if (getIntent().getStringExtra("for") != null) {
-            Intent intent = new Intent(MessagingActivity.this, BringoActivity.class);
+            Intent intent = new Intent(MessagingActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }

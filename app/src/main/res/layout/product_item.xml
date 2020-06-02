@@ -113,7 +113,7 @@
             <Button
                 android:id="@+id/btn_add_cart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_below="@+id/priceLayout"
                 android:background="@drawable/button_shape"
                 android:drawableRight="@drawable/addcartwhite"
@@ -126,7 +126,7 @@
             <Button
                 android:id="@+id/btn_remove_cart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_below="@+id/priceLayout"
                 android:background="@drawable/button_shape"
                 android:drawableRight="@drawable/ic_action_remcart"

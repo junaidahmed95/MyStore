@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bringo.home.BringoActivity;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Verification;
 import com.bumptech.glide.Glide;
@@ -98,7 +97,6 @@ public class MessagesFragment extends Fragment {
         helpingMethods = new HelpingMethods(getActivity());
         user_id = mAuth.getUid();
         if (user_id != null && helpingMethods.GetUName()!=null) {
-            msmsPBar.setVisibility(View.VISIBLE);
             mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chatlist");
             mConvDatabase.keepSynced(true);
             mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");

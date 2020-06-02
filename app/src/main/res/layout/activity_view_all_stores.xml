@@ -27,35 +27,43 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="8dp">
 
                 <ImageButton
                     android:id="@+id/btnBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
                     android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:background="@android:color/transparent"
                     app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
 
-                <ImageButton
-                    android:id="@+id/btnSearch"
+                <TextView
+                    android:id="@+id/totalAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="16dp"
-                    android:layout_toLeftOf="@+id/btnCart"
-                    android:background="@android:color/transparent"
-                    app:srcCompat="@drawable/ic_search_black_24dp" />
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/cart"
+                    android:background="@drawable/strip_totalshape"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="6dp"
+                    android:paddingRight="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="Rs:500/-"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
-                <ImageButton
-                    android:id="@+id/btnCart"
+                <include
+                    android:id="@+id/cart"
+                    layout="@layout/cart_batch_count"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="16dp"
-                    android:tint="@color/white"
-                    android:background="@android:color/transparent"
-                    app:srcCompat="@drawable/ic_action_basket" />
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp" />
 
             </RelativeLayout>
 
