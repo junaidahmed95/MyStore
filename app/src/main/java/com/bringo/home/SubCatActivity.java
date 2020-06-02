@@ -46,10 +46,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class SubCatActivity extends AppCompatActivity {
 
-public static TextView textCartItemCount;
+    public static TextView textCartItemCount, mtotalAmount;
     private String mJSON_URL = "";
     private String[] tabTitles;
     private JsonArrayRequest mrequest;
@@ -60,7 +59,7 @@ public static TextView textCartItemCount;
     int position;
     private Button mretryBtn;
     public static ProgressBar mloadingImage;
-public static String checkSID;
+    public static String checkSID;
     public static List<CatLvlItemList> list, real;
     private List<String> store;
     public static List<ShowStores> storelist;
@@ -74,12 +73,12 @@ public static String checkSID;
     public static List<CatLvlItemList> prolist;
     public static FloatingActionButton mfbcart;
     int no_of_categories = -1;
-    private String cat_Name, store_ID,ownerID,ownerImage,ownerName;
+    private String cat_Name, store_ID, ownerID, ownerImage, ownerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_sub_cat);
 
         mloadingImage = findViewById(R.id.spin_kit);
@@ -87,9 +86,9 @@ public static String checkSID;
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = findViewById(R.id.retryBtn);
 
-
+        mtotalAmount = findViewById(R.id.totalAmount);
         cat_Name = getIntent().getStringExtra("catName");
-        checkSID= getIntent().getStringExtra("storeid");
+        checkSID = getIntent().getStringExtra("storeid");
         store_ID = getIntent().getStringExtra("storeid");
         ownerName = getIntent().getStringExtra("stname");
         ownerImage = getIntent().getStringExtra("ownerImage");
@@ -100,7 +99,7 @@ public static String checkSID;
         dummyList = new ArrayList<>();
         helpingMethods = new HelpingMethods(SubCatActivity.this);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Grocery");
+        toolbar.setTitle(cat_Name);
         //toolbar.setTitleMargin(0,0,5,0);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -110,12 +109,10 @@ public static String checkSID;
         mviewpager = findViewById(R.id.viewpager);
 
 
-
-
         ConnectionDetector connectionDetector = new ConnectionDetector(SubCatActivity.this);
-        if(connectionDetector.isConnected()){
+        if (connectionDetector.isConnected()) {
             GetStoreData();
-        }else {
+        } else {
             mloadingImage.setVisibility(View.GONE);
             mretryBtn.setVisibility(View.VISIBLE);
             Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
@@ -125,11 +122,11 @@ public static String checkSID;
             @Override
             public void onClick(View v) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(SubCatActivity.this);
-                if(connectionDetector.isConnected()){
+                if (connectionDetector.isConnected()) {
                     mloadingImage.setVisibility(View.VISIBLE);
                     mretryBtn.setVisibility(View.GONE);
                     GetStoreData();
-                }else {
+                } else {
                     Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -187,9 +184,9 @@ public static String checkSID;
                 intent.putExtra("StID", store_ID);
                 intent.putExtra("for", "subcart");
                 intent.putExtra("catName", cat_Name);
-                intent.putExtra("stname",ownerName);
-                intent.putExtra("ownerID",ownerID);
-                intent.putExtra("ownerImage",ownerImage);
+                intent.putExtra("stname", ownerName);
+                intent.putExtra("ownerID", ownerID);
+                intent.putExtra("ownerImage", ownerImage);
                 startActivity(intent);
                 finish();
             }
@@ -213,7 +210,7 @@ public static String checkSID;
             for (int i = 0; i < tabTitles.length; i++) {
                 if (i == position) {
 
-                    fragment = new CatLvlFragment(store_ID,ownerID,ownerImage,ownerName,cat_Name);
+                    fragment = new CatLvlFragment(store_ID, ownerID, ownerImage, ownerName, cat_Name);
 
 
                     break;
@@ -259,13 +256,13 @@ public static String checkSID;
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
                             String desc = jsonObject.getString("product_unit");
-                            prolist.add(new CatLvlItemList(mTitle, mprice,mimage,product_id,str_id,mCat,sim_id,mprice,desc));
+                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc));
                         }
 
                     } catch (JSONException e) {
                         mloadingImage.setVisibility(View.GONE);
                         mretryBtn.setVisibility(View.VISIBLE);
-                        Toast.makeText(SubCatActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SubCatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -307,7 +304,17 @@ public static String checkSID;
     @Override
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if(helpingMethods.GetStoreID()!=null){
+        if(helpingMethods.GetStoreID().equals(store_ID)){
+            if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
+                mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+                mtotalAmount.setVisibility(View.VISIBLE);
+            } else {
+                mtotalAmount.setVisibility(View.GONE);
+            }
+        }}
+
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(0);
         }
 
@@ -316,7 +323,7 @@ public static String checkSID;
     @Override
     protected void onPause() {
         super.onPause();
-        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName()!=null) {
+        if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }

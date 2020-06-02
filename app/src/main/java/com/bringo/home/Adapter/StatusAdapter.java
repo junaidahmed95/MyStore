@@ -26,6 +26,8 @@ import com.bringo.home.OrderTrackActivity;
 import com.bringo.home.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,16 +46,13 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statusholder> {
-    public static List<OrderHistory> historylist;
-    public static List<OrderHistory> list;
+    private List<OrderHistory> historylist;
     Context mContext;
-    String name, created;
-    String image;
-    String chkstuts;
+    private boolean isHistory;
 
-    public StatusAdapter(List<OrderHistory> historylist, Context mContext) {
+    public StatusAdapter(List<OrderHistory> historylist, Context mContext,boolean isHistory) {
         this.historylist = historylist;
-        list = new ArrayList<>();
+        this.isHistory=isHistory;
         this.mContext = mContext;
     }
 
@@ -61,57 +60,73 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
     @Override
     public statusholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_status, parent, false);
-        list = new ArrayList<>();
         return new statusholder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final statusholder holder, final int position) {
 
-        for (int a = 0; a < historylist.get(position).getGetorderbykeylist().size(); a++) {
-            chkstuts = historylist.get(position).getGetorderbykeylist().get(a).getStatus();
-            created = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_day();
-
-            holder.mordid.setText(historylist.get(position).getOrderid());
-            holder.mtotalprice.setText(historylist.get(position).getGetorderbykeylist().get(a).getPtotalprice());
-            image = Glide.with(mContext).load(historylist.get(position).getStrimg().replaceAll("^\"|\"$", "")).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg).toString();
-            name = historylist.get(position).getGetorderbykeylist().get(a).getMtxt_totalproducts();
-        }
+        holder.mordid.setText(historylist.get(position).getOrderID());
+        holder.mtotalprice.setText("Rs." + historylist.get(position).getOrderPrice() + "/-");
+        Glide.with(mContext).load(historylist.get(position).getStoreImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mstrimg);
+        holder.mcreated.setText(historylist.get(position).getOrderDate());
+        holder.mstorename.setText(historylist.get(position).getStoreName());
 
 
-        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
-                    if (dataSnapshot.child("status").getValue().toString().equals("Deliverd")) {
-                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderid()).removeValue();
+        if(isHistory){
+            FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        historylist.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, historylist.size());
+
+                    } else {
+                        holder.mstatus.setText("Deliverd");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }else {
+            FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
+                    } else {
                         historylist.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, historylist.size());
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
 
 
-        holder.mcreated.setText(created);
-        holder.mstorename.setText(name);
+
         holder.mclick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!holder.mstatus.getText().toString().equals("Pending")) {
                     Intent intent = new Intent(mContext, OrderTrackActivity.class);
                     intent.putExtra("position", position);
-                    intent.putExtra("orderid", historylist.get(position).getOrderid());
-                    intent.putExtra("storename", name);
-                    intent.putExtra("created", created);
-                    intent.putExtra("storeimage", image);
+                    intent.putExtra("price", historylist.get(position).getOrderPrice());
+                    intent.putExtra("add", historylist.get(position).getAddress());
+                    intent.putExtra("orderid", historylist.get(position).getOrderID());
+                    intent.putExtra("storeid", historylist.get(position).getStoreID());
+                    intent.putExtra("storename", historylist.get(position).getStoreName());
+                    intent.putExtra("created", historylist.get(position).getOrderDate());
+                    intent.putExtra("storeimage", historylist.get(position).getStoreImage());
                     mContext.startActivity(intent);
                 } else {
                     Toast.makeText(mContext, "This order is not accepted yet!!", Toast.LENGTH_SHORT).show();

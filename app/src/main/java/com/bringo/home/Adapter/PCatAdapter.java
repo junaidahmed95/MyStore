@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bringo.home.SubCatActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -155,7 +156,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                 intent.putExtra("proLists", position);
                 intent.putExtra("from", "subcart");
                 intent.putExtra("sID", subcatproLists.get(position).getStoreId());
-                intent.putExtra("isSearch",isForSearch);
+                intent.putExtra("isSearch", isForSearch);
                 intent.putExtra("pID", subcatproLists.get(position).getProductid());
                 intent.putExtra("spID", subcatproLists.get(position).getSimplePID());
                 intent.putExtra("desc", subcatproLists.get(position).getDesc());
@@ -180,7 +181,9 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) + 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
                     int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total,subcatproLists.get(position).getStoreId());
+                    helpingMethods.SaveCartTotal(total, subcatproLists.get(position).getStoreId());
+                    SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
+                    SubCatActivity.mtotalAmount.setVisibility(View.VISIBLE);
                     if (isForSearch) {
                         SearchsetupBadge();
                     } else {
@@ -218,14 +221,16 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     holder.mbtn_add_cart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) - 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
+                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
+                    helpingMethods.SaveCartTotal(total, subcatproLists.get(position).getStoreId());
+                    SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
                     if (isForSearch) {
                         SearchsetupBadge();
                     } else {
                         setupBadge();
                     }
                     MainsetupBadge();
-                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total,subcatproLists.get(position).getStoreId());
+
                     int a = mycheckList.indexOf(subcatproLists.get(position).getSimplePID());
                     mycheckList.remove(a);
                     SaveCheckData();

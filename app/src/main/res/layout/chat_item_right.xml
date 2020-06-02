@@ -515,12 +515,13 @@
 
             <TextView
                 android:id="@+id/txtn"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
-                android:text="New order"
-
+                android:gravity="center"
+                android:paddingLeft="13dp"
+                android:paddingRight="13dp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold">
 
@@ -549,7 +550,7 @@
                     android:id="@+id/order_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="37dp"
+                    android:layout_marginLeft="54dp"
                     android:layout_marginRight="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -583,7 +584,7 @@
                     android:id="@+id/txt_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="37dp"
+                    android:layout_marginLeft="54dp"
                     android:layout_marginRight="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
@@ -621,7 +622,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="5dp"
-
                     android:textColor="@android:color/white">
 
                 </TextView>
@@ -652,9 +652,8 @@
                     android:id="@+id/txt_total_Price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
+                    android:layout_marginLeft="38dp"
                     android:layout_marginRight="5dp"
-
                     android:textColor="@android:color/white">
 
                 </TextView>

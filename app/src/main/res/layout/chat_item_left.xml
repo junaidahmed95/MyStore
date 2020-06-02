@@ -443,6 +443,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/order_CardView"
         android:layout_width="300dp"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         app:cardBackgroundColor="@color/white"
@@ -485,7 +486,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
-                android:text="New order"
+                android:gravity="center"
+                android:paddingLeft="13dp"
+                android:paddingRight="13dp"
 
                 android:textColor="@android:color/black"
                 android:textStyle="bold">
@@ -514,12 +517,11 @@
                     android:id="@+id/order_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="37dp"
+                    android:layout_marginLeft="54dp"
                     android:layout_marginRight="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="Dha phase 6 khaya e ban rahatDha phase 6 khaya e ban rahat"
                     android:textColor="@android:color/black">
 
                 </TextView>
@@ -549,12 +551,11 @@
                     android:id="@+id/txt_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="37dp"
+                    android:layout_marginLeft="54dp"
                     android:layout_marginRight="5dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="Dha phase 6 khaya e ban rahatDha phase 6 khaya e ban rahat"
                     android:textColor="@android:color/black">
 
                 </TextView>
@@ -588,7 +589,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="5dp"
-                    android:text="10"
                     android:textColor="@android:color/black">
 
                 </TextView>
@@ -619,9 +619,8 @@
                     android:id="@+id/txt_total_Price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
                     android:layout_marginRight="5dp"
-                    android:text="Rs.50/-"
+                    android:layout_marginLeft="38dp"
                     android:textColor="@android:color/black">
 
                 </TextView>
