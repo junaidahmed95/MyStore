@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -77,6 +78,7 @@ public class HomeFragment extends Fragment {
     // ProgressBar mprogressbar;
     private RecyclerView categoryRecyclerView;
     private ScrollView mScrollView;
+    private Location mLastLocation;
 
     public static String forWhat = "All";
     List<GirdListView> list;
@@ -93,11 +95,13 @@ public class HomeFragment extends Fragment {
     private StoresAdapter allStoreAdapter;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
+  SwipeRefreshLayout pullToRefresh;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         mloadingImage = root.findViewById(R.id.spin_kit);
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
@@ -109,6 +113,16 @@ public class HomeFragment extends Fragment {
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         grd_str.setLayoutManager(layoutManager);
         nearesStoresList = new ArrayList<>();
+
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
@@ -224,16 +238,19 @@ public class HomeFragment extends Fragment {
     private LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
+            mLastLocation = locationResult.getLastLocation();
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
+
 
     //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 //
     private void GetNearByStores(double latitude, double longitude) {
-request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717", new Response.Listener<JSONArray>() {
+request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+
+  
             @Override
             public void onResponse(JSONArray response) {
 
@@ -308,6 +325,7 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                                 if (location == null) {
                                     requestNewLocationData();
                                 } else {
+                                    mLastLocation = location;
                                     GetNearByStores(location.getLatitude(), location.getLongitude());
 
                                 }
