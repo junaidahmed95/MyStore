@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "361078201507-bsp8l6dkr18dodg8qmcia88ku01rmr77.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.biz",
+            "certificate_hash": "3b83bada5161541f9fa0b03ce0c270a76735dbd9"
+          }
+        },
+        {
+          "client_id": "361078201507-1dbd3t2ikh3jglilgaru5rjcudjjrcds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.biz",
+            "certificate_hash": "e417be71632bf169dd8d5680fd1500a441fd2cb3"
+          }
+        },
+        {
           "client_id": "361078201507-s8s5qu6hjhvfas368edem9rqlnuhnvp0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -74,6 +90,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "361078201507-bt7d7himbs6cp183i5459nv1j0bbgh3u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.home",
+            "certificate_hash": "3b83bada5161541f9fa0b03ce0c270a76735dbd9"
+          }
+        },
+        {
+          "client_id": "361078201507-65oc1sf02c08osv42geudupdhl57admh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bringo.home",
+            "certificate_hash": "a248aee1be0de662a1e4ed164e362b71fbd9269f"
+          }
+        },
         {
           "client_id": "361078201507-69tvf6vjebfmnu26jm556p10lsr75vpa.apps.googleusercontent.com",
           "client_type": 1,

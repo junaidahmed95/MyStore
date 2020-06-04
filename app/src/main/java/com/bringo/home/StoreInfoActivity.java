@@ -87,10 +87,10 @@ public class StoreInfoActivity extends AppCompatActivity {
 
                     if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
                         Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
-                        intent.putExtra("StID", helpingMethods.GetStoreID());
+                        intent.putExtra("StID",stID);
                         intent.putExtra("catName", "");
                         intent.putExtra("for", "finish");
-                        intent.putExtra("stname", helpingMethods.GetStoreName());
+                        intent.putExtra("stname", ownerName);
                         intent.putExtra("ownerID", helpingMethods.GetStoreUID());
                         intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
                         startActivity(intent);
@@ -234,14 +234,12 @@ public class StoreInfoActivity extends AppCompatActivity {
     }
 
     private void MainBadge() {
-        if (helpingMethods.GetStoreID() != null) {
-            if (helpingMethods.GetStoreID().equals(stID)) {
-                if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) == 0) {
+                if (helpingMethods.GetCartCount(stID) == 0) {
                     if (textCartItemCount.getVisibility() != View.GONE) {
                         textCartItemCount.setVisibility(View.GONE);
                     }
                 } else {
-                    textCartItemCount.setText("" + helpingMethods.GetCartCount(helpingMethods.GetStoreID()));
+                    textCartItemCount.setText("" + helpingMethods.GetCartCount(stID));
                     //textCartItemCount.setText(""+2);
                     if (textCartItemCount.getVisibility() != View.VISIBLE) {
                         textCartItemCount.setVisibility(View.VISIBLE);
@@ -249,8 +247,7 @@ public class StoreInfoActivity extends AppCompatActivity {
 
                 }
 
-            }
-        }
+
     }
 
     @Override
@@ -258,16 +255,13 @@ public class StoreInfoActivity extends AppCompatActivity {
         super.onResume();
         MainBadge();
 
-        if (helpingMethods.GetStoreID() != null) {
-            if (helpingMethods.GetStoreID().equals(stID)) {
-                if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>0){
-                    mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(helpingMethods.GetStoreID())+"/-");
+                if(helpingMethods.GetCartTotal(stID)>0){
+                    mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(stID)+"/-");
                     mtotalAmount.setVisibility(View.VISIBLE);
                 }else {
                     mtotalAmount.setVisibility(View.GONE);
                 }
-            }
-        }
+
 
 
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {

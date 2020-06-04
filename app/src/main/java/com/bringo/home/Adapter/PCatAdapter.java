@@ -335,7 +335,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     }
 
     private void SaveCheckData() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(mycheckList);
@@ -346,7 +346,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
     private void GetCheckData() {
         try {
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("checklist", null);
             Type type = new TypeToken<ArrayList<String>>() {
@@ -367,7 +367,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
 
     private void SaveCartData() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(preferenceList);
@@ -378,7 +378,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

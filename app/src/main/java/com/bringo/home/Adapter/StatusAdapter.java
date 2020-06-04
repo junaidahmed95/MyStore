@@ -93,15 +93,23 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                 }
             });
         }else {
+
             FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(historylist.get(position).getOrderID()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
                     } else {
-                        historylist.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, historylist.size());
+
+                        try {
+                            historylist.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, historylist.size());
+                        }catch (Exception e){
+
+                        }
+
+
                     }
                 }
 
