@@ -178,6 +178,9 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
         helpingMethods = new HelpingMethods(OrderSummaryActivity.this);
+        ownerName = helpingMethods.GetStoreName();
+        store_ID = helpingMethods.GetStoreID();
+
         GetCartData();
         GetCheckData();
         mopenDateDialog = findViewById(R.id.openDateDialog);
@@ -190,9 +193,9 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
             }
         });
         pTotalPrice = getIntent().getStringExtra("totalP");
-        store_ID = helpingMethods.GetStoreID();
+
         mrunRedio = findViewById(R.id.runRedio);
-        ownerName = helpingMethods.GetStoreName();
+
         ownerImage = helpingMethods.GetStoreImage();
         ownerID = helpingMethods.GetStoreUID();
         mTimeChoose = findViewById(R.id.openTimeDialog);
@@ -872,7 +875,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     }
 
     public void SaveCartData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(store_ID+""+ownerName, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(preferenceList);
@@ -881,7 +884,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void SaveCheckData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(store_ID+"Checkcart", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(mycheckList);
@@ -892,7 +895,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
     private void GetCheckData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(store_ID+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("checklist", null);
             Type type = new TypeToken<ArrayList<String>>() {
@@ -911,7 +914,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(store_ID+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

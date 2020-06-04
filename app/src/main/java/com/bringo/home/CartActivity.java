@@ -76,12 +76,12 @@ public class CartActivity extends AppCompatActivity {
 
         mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(store_ID));
 
-        cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity");
+        cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity",ownerName);
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+        mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(store_ID) + "/-");
 
 
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
@@ -213,7 +213,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(store_ID+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

@@ -62,7 +62,7 @@ public class OrderTrackActivity extends AppCompatActivity {
     CircleImageView mstoreimg;
     Button btnhis_detail;
     int position = 0;
-    private String mStatus;
+    private String mStatus = "";
     private int qtycount = 0;
     BottomSheetDialog orderdetailSheetDialog;
     List<CatLvlItemList> list;
@@ -192,7 +192,9 @@ public class OrderTrackActivity extends AppCompatActivity {
                 final TextView txt_totalproductss = mView.findViewById(R.id.txt_totalproductss);
                 TextView txt_total_qtys = mView.findViewById(R.id.txt_total_qtys);
                 TextView mstatus = mView.findViewById(R.id.status);
-
+                if (!mStatus.equals("")) {
+                    mstatus.setText(mStatus);
+                }
 
                 textView.setText("" + getIntent().getStringExtra("price"));
                 txt_addresss.setText("" + getIntent().getStringExtra("add"));
@@ -241,16 +243,6 @@ public class OrderTrackActivity extends AppCompatActivity {
                         }
                 );
                 requestQueue.add(jsonArrayRequest);
-
-                if (mStatus.equals("Accepted")) {
-                    mstatus.setText("Accepted");
-                } else if (mStatus.equals("Assembled")) {
-                    mstatus.setText("Assembled");
-                } else if (mStatus.equals("On Route")) {
-                    mstatus.setText("On Route");
-                } else if (mStatus.equals("Deliverd")) {
-                    mstatus.setText("Deliverd");
-                }
 
 
                 FloatingActionButton mfabClose = mView.findViewById(R.id.fabClose);
@@ -307,6 +299,9 @@ public class OrderTrackActivity extends AppCompatActivity {
             mstepThreeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
             mstepThreeBar.setProgress(100);
             mstepThreeBar.getProgressDrawable().setColorFilter(
+                    Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+            mstepFourBar.setProgress(100);
+            mstepFourBar.getProgressDrawable().setColorFilter(
                     Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
             mstepFourFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
         }

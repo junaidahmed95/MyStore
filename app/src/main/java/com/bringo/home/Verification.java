@@ -462,6 +462,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 public void onErrorResponse(VolleyError error) {
                                     NetworkResponse networkResponse = error.networkResponse;
                                     String errorMessage = "Unknown error";
+                                    mProgressDialog.cancel();
+                                    Toast.makeText(Verification.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
                                     if (networkResponse == null) {
                                         if (error.getClass().equals(TimeoutError.class)) {
                                             errorMessage = "Request timeout";
@@ -492,7 +494,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                             mProgressDialog.cancel();
                                             Toast.makeText(Verification.this, "" + errorMessage, Toast.LENGTH_SHORT).show();
                                         } catch (JSONException e) {
-                                            e.printStackTrace();
+                                            mProgressDialog.cancel();
+                                            Toast.makeText(Verification.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                     Log.i("Error", errorMessage);
@@ -1214,7 +1217,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             FirebaseGoogleAuth(acc);
         } catch (ApiException e) {
             mProgressDialog.cancel();
-            Toast.makeText(Verification.this, "Sign In Failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Verification.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1229,7 +1232,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                         parseJSON();
                     } else {
                         mProgressDialog.cancel();
-                        Toast.makeText(Verification.this, "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Verification.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
