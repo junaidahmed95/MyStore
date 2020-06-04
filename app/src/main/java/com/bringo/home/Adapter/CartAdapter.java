@@ -49,14 +49,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private Context mContext;
     private List<String> MecheckList;
     private List<CatLvlItemList> preferenceList;
-    private String fromWhere;
+    private String fromWhere,ownerName;
     private boolean isUpdate;
     private HelpingMethods helpingMethods;
     private int mTotalPrice = 0;
 
-    public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere) {
+    public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere,String ownerName) {
         this.cartList = cartList;
         this.fromWhere = fromWhere;
+        this.ownerName=ownerName;
         this.mContext = mContext;
         Activity activity = (Activity) mContext;
         helpingMethods = new HelpingMethods(activity);
@@ -259,7 +260,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
     private void SaveCartData() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(cartList.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(preferenceList);
@@ -270,7 +271,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(cartList.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
@@ -288,7 +289,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
     private void SaveCheckData() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(cartList.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(MecheckList);
@@ -299,7 +300,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     private void GetCheckData() {
         try {
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences("Checkcart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(cartList.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("checklist", null);
             Type type = new TypeToken<ArrayList<String>>() {
@@ -317,8 +318,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
     private void UpdateTotalPrice(){
-        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
-            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+        if (helpingMethods.GetCartTotal(cartList.get(0).getStoreId()) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(cartList.get(0).getStoreId()) + "/-");
             mtotalAmount.setVisibility(View.VISIBLE);
         } else {
             mtotalAmount.setVisibility(View.GONE);

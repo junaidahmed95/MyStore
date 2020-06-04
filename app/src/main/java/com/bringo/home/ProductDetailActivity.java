@@ -206,7 +206,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void SaveCheckData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(mycheckList);
@@ -217,7 +217,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void GetCheckData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("checklist", null);
             Type type = new TypeToken<ArrayList<String>>() {
@@ -244,7 +244,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void SaveCartData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(preferenceList);
@@ -255,7 +255,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

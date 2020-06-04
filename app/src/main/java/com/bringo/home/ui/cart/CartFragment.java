@@ -70,7 +70,7 @@ public class CartFragment extends Fragment {
         mCartRecyclerView.setLayoutManager(layoutManager);
         mcardview1 = root.findViewById(R.id.cardVew1);
         GetCartData();
-        CartAdapter cartAdapter = new CartAdapter(preferenceList, getActivity(), "fragment");
+        CartAdapter cartAdapter = new CartAdapter(preferenceList, getActivity(), "fragment",helpingMethods.GetStoreName());
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
 
