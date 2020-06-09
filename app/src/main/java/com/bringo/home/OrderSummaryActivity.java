@@ -365,7 +365,13 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).child("status").setValue("Pending");
+
+                                                        final HashMap<String, Object> statusmap = new HashMap<>();
+                                                        statusmap.put("time1", ServerValue.TIMESTAMP);
+                                                        statusmap.put("status1","Pending");
+                                                        FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(OrdrerID).setValue(statusmap);
+
+
                                                         helpingMethods.SaveCartCount(0, store_ID);
                                                         helpingMethods.SaveCartTotal(0, store_ID);
                                                         helpingMethods.SaveStoreData(null, null, null, null);
@@ -903,6 +909,12 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         editor.apply();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
+    }
 
     private void GetCheckData() {
         try {

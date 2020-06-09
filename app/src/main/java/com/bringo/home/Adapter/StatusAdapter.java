@@ -78,6 +78,25 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
+
+
+                        if(dataSnapshot.hasChild("status5")){
+
+                            holder.mstatus.setText(dataSnapshot.child("status5").getValue().toString());
+
+
+                        }else {
+                            try {
+                                historylist.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeChanged(position, historylist.size());
+                            }catch (Exception e){
+                                Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+
+                    }else {
                         try {
                             historylist.remove(position);
                             notifyItemRemoved(position);
@@ -86,10 +105,6 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                             Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
 
                         }
-
-
-                    } else {
-                        holder.mstatus.setText("Deliverd");
                     }
                 }
 
@@ -104,21 +119,37 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                    if (dataSnapshot.exists()) {
-                        holder.mstatus.setText(dataSnapshot.child("status").getValue().toString());
-                    } else {
 
 
-                        try {
-                            historylist.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, historylist.size());
-                        }catch (Exception e){
-                            Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                       if(dataSnapshot.hasChild("status5")){
+                           try {
+                               historylist.remove(position);
+                               notifyItemRemoved(position);
+                               notifyItemRangeChanged(position, historylist.size());
+                           }catch (Exception e){
+                               Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
 
+                           }
+                       }else if(dataSnapshot.hasChild("status4")){
+                           holder.mstatus.setText(dataSnapshot.child("status4").getValue().toString());
+                       }else if(dataSnapshot.hasChild("status3")){
+                           holder.mstatus.setText(dataSnapshot.child("status3").getValue().toString());
+                       }else if(dataSnapshot.hasChild("status2")){
+                           holder.mstatus.setText(dataSnapshot.child("status2").getValue().toString());
+                       }
+                       else if(dataSnapshot.hasChild("status1")){
+                           holder.mstatus.setText(dataSnapshot.child("status1").getValue().toString());
+                       }
+                    }else {
+                       try {
+                           historylist.remove(position);
+                           notifyItemRemoved(position);
+                           notifyItemRangeChanged(position, historylist.size());
+                       }catch (Exception e){
+                           Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
 
-
-                    }
+                       }
+                   }
                 }
 
                 @Override
