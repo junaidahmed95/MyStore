@@ -75,7 +75,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
-        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
+        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getDesc(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {

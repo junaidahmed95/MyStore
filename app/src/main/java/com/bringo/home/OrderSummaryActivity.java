@@ -110,6 +110,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 import static com.bringo.home.Adapter.AddressAdapter.cusaddress;
+import static com.bringo.home.Adapter.AddressAdapter.cuslat;
+import static com.bringo.home.Adapter.AddressAdapter.cuslng;
 import static com.bringo.home.CartActivity.mTxtView_TotalPrice;
 import static com.bringo.home.MessagingActivity.unreadListenr;
 import static com.bringo.home.Verification.mylatlng;
@@ -151,6 +153,8 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     DatabaseReference databaseReference;
     TextView mtotalprice;
     private GoogleMap mMap;
+    private double latitude;
+    private double longitude;
 
     boolean flag = false;
 
@@ -420,19 +424,19 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                                 hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
                                                 hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
                                                 hashMap.put("str_id", store_ID);
-                                                hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
-                                                hashMap.put("new_address", cusaddress);
+                                                hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getDesc());
+
                                                 hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
                                                 hashMap.put("t_price", pTotalPrice);
                                                 hashMap.put("time", tim);
                                                 hashMap.put("day", dayString);
                                             }
 
-
+                                            hashMap.put("new_address", cusaddress);
+                                            hashMap.put("lat", cuslat);
+                                            hashMap.put("lng", cuslng);
                                             return hashMap;
-                                        }
-
-                                        ;
+                                        };
 
                                         {
 
@@ -588,6 +592,8 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                             hashMap.put("address", muserName.getText().toString().trim());
                                             hashMap.put("cs_id", custID);
                                             hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
+                                            hashMap.put("lat", String.valueOf(latitude));
+                                            hashMap.put("lng", String.valueOf(longitude));
 
 
                                             return hashMap;
@@ -630,7 +636,8 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
-
+                                latitude = currentLocation.getLatitude();
+                                longitude = currentLocation.getLongitude();
                                 Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                                 mMap = googleMap;
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
@@ -828,10 +835,13 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                     try {
                         jsonObject = response.getJSONObject(i);
                         if (i == 0) {
-                            kuchbhe.add(new AddressClass(jsonObject.get("address").toString(), true));
+                            kuchbhe.add(new AddressClass(jsonObject.get("address").toString(), true,jsonObject.get("lat").toString(),jsonObject.get("lng").toString()));
                             cusaddress = jsonObject.get("address").toString();
+                            cuslat=jsonObject.get("lat").toString();
+                            cuslng=jsonObject.get("lng").toString();
+
                         } else {
-                            kuchbhe.add(new AddressClass(jsonObject.get("address").toString(), false));
+                            kuchbhe.add(new AddressClass(jsonObject.get("address").toString(), false,jsonObject.get("lat").toString(),jsonObject.get("lng").toString()));
                         }
 
 
@@ -940,8 +950,8 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
         if (flag) {
             String[] getvv = mylatlng.split(",");
-            final double latitude = Double.parseDouble(getvv[0]);
-            final double longitude = Double.parseDouble(getvv[1]);
+            latitude = Double.parseDouble(getvv[0]);
+            longitude = Double.parseDouble(getvv[1]);
             Your_Location = new LatLng(latitude, longitude);
             ((SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {

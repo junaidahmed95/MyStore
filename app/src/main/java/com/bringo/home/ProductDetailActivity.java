@@ -162,7 +162,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     mycheckList.add(spID);
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID));
+                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID,getIntent().getStringExtra("desc")));
                     SaveCartData();
                 }
 

@@ -107,7 +107,7 @@ public class SearchActivity extends AppCompatActivity {
         ArrayList<CatLvlItemList> filteredList = new ArrayList<>();
 
         for (CatLvlItemList item : prolist) {
-            if (item.getP_name().toLowerCase().contains(text.toLowerCase()) || item.getP_price().contains(text.toLowerCase())) {
+            if (item.getDesc().toString().toLowerCase().contains(text.toLowerCase()) ||item.getCatName().toString().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
             }
         }
@@ -174,8 +174,8 @@ public class SearchActivity extends AppCompatActivity {
 
                     }
                 });
-                if (!meditText.getText().toString().trim().equals("")) {
-                    filter(meditText.getText().toString().trim());
+                if (!meditText.getText().toString().equals("")) {
+                    filter(meditText.getText().toString());
                 }
 
 
