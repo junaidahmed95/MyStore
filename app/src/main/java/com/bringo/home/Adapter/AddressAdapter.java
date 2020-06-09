@@ -18,7 +18,7 @@ import static com.bringo.home.OrderSummaryActivity.refresh;
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHolder> {
 
     private int selectedPosition;
-    public static String cusaddress;
+    public static String cusaddress,cuslat,cuslng;
 private boolean checkthis;
     List<AddressClass> addressLIST;
     int pre = 0;
@@ -103,6 +103,8 @@ private boolean checkthis;
                     public void onClick(View v) {
                         if (pre != pos) {
                             cusaddress = addressLIST.get(pos).getUserAddress();
+                            cuslat = addressLIST.get(pos).getLat();
+                            cuslng = addressLIST.get(pos).getLng();
                             addressLIST.get(pos).setCurrentAddress(true);
                             addressLIST.get(pre).setCurrentAddress(false);
                             refresh(pre, pos);

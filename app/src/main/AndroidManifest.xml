@@ -41,7 +41,8 @@
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
@@ -63,21 +64,44 @@
 
 
 
-        <activity android:name=".DummyOrderActivity"></activity>
+        <activity android:name=".DummyOrderActivity"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".OrderTrackActivity" />
-        <activity android:name=".StoreInfoActivity" />
-        <activity android:name=".ViewAllStoresActivity" />
-        <activity android:name=".ViewImage" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".CartActivity" />
-        <activity android:name=".SubCatActivity" />
-        <activity android:name=".Sub_categories" />
-        <activity android:name=".OrderSummaryActivity" />
-        <activity android:name=".ProfileActivity" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".OrderTrackActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".StoreInfoActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ViewAllStoresActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ViewImage"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".SearchActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".CartActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".SubCatActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".Sub_categories"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".OrderSummaryActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ProfileActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

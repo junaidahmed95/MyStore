@@ -78,9 +78,15 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        historylist.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, historylist.size());
+                        try {
+                            historylist.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, historylist.size());
+                        }catch (Exception e){
+                            Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+
 
                     } else {
                         holder.mstatus.setText("Deliverd");
@@ -107,7 +113,7 @@ public class StatusAdapter extends RecyclerView.Adapter<StatusAdapter.statushold
                             notifyItemRemoved(position);
                             notifyItemRangeChanged(position, historylist.size());
                         }catch (Exception e){
-
+                            Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
 

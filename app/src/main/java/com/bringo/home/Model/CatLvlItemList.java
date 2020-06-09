@@ -51,10 +51,11 @@ public class CatLvlItemList {
         this.p_img = p_img;
     }
 
-    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price,String simplePID) {
+    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price,String simplePID,String desc) {
         this.p_name = p_name;
         this.simplePID=simplePID;
         this.actual_price=actual_price;
+        this.desc=desc;
         this.pos=pos;
         this.p_quantity = p_quantity;
         this.p_price = p_price;

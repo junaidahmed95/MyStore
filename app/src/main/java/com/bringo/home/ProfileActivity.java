@@ -137,6 +137,9 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     Task location;
     boolean flag = false;
     private ProgressDialog mProgressDialog;
+    private double latitude;
+    private double longitude;
+
 
 
     static Geocoder geocoder;
@@ -403,7 +406,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
                     try {
                         jsonObject = response.getJSONObject(i);
-                        addresslist.add(new AddressClass(jsonObject.get("address").toString(), false));
+                        addresslist.add(new AddressClass(jsonObject.get("address").toString(), false,jsonObject.get("lat").toString(),jsonObject.get("lng").toString()));
                     } catch (JSONException e) {
                         mProgressDialog.cancel();
                         e.printStackTrace();
@@ -662,7 +665,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://chhatt.com/Cornstr/grocery/api/post/address";
+                                    String url = "https://bringo.biz/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {
@@ -696,6 +699,9 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                                             hashMap.put("address", muserName.getText().toString().trim());
                                             hashMap.put("cs_id", custID);
                                             hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
+                                            hashMap.put("lat", String.valueOf(latitude));
+                                            hashMap.put("lng", String.valueOf(longitude));
+
 
 
                                             return hashMap;
@@ -735,7 +741,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
 
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
-
+                                latitude = currentLocation.getLatitude();
+                                longitude = currentLocation.getLongitude();
                                 Your_Location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                                 mMap = googleMap;
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Your_Location, 15));  //move camera to location
@@ -834,8 +841,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
         }
         if (flag) {
             String[] getvv = mylatlng.split(",");
-            final double latitude = Double.parseDouble(getvv[0]);
-            final double longitude = Double.parseDouble(getvv[1]);
+             latitude = Double.parseDouble(getvv[0]);
+             longitude = Double.parseDouble(getvv[1]);
             Your_Location = new LatLng(latitude, longitude);
             ((SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.mapview)).getMapAsync(new OnMapReadyCallback() {

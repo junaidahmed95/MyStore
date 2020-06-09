@@ -142,7 +142,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                             ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.colorRed)));
                     myWishList.add(subcatproLists.get(position).getSimplePID());
                     SaveWishData();
-                    myFavList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID()));
+                    myFavList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc()));
                     SaveFavData();
                 }
             }
@@ -162,6 +162,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                 intent.putExtra("desc", subcatproLists.get(position).getDesc());
                 intent.putExtra("oName", ownerName);
                 intent.putExtra("catName", catName);
+                intent.putExtra("desc", subcatproLists.get(position).getDesc());
                 intent.putExtra("oImage", ownerImage);
                 intent.putExtra("oID", ownerID);
                 intent.putExtra("name", subcatproLists.get(position).getP_name());
@@ -205,7 +206,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     mycheckList.add(subcatproLists.get(position).getSimplePID());
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID()));
+                    preferenceList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc()));
                     SaveCartData();
                     notifyDataSetChanged();
                 }
