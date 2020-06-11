@@ -233,7 +233,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     }
 
                 }
-
                 else{
                      quan = (Double.parseDouble(viewHolder.mProQuantity.getText().toString()) + 0.25);
                 }
