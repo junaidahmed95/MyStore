@@ -226,7 +226,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
                 if (minus.equals("minus")){
                     if(viewHolder.mProQuantity.getText().equals("0.25")){
-
+///asdasdasdad
                     }
                     else{
                         quan = (Double.parseDouble(viewHolder.mProQuantity.getText().toString()) - 0.25);
