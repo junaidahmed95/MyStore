@@ -71,8 +71,8 @@ public class CatLvlFragment extends Fragment {
                     originalList.clear();
                     for (int i = 0; i < prolist.size(); i++) {
                         if (prolist.get(i).getCatName().equals(tab.getText())) {
-                            //mTitle, mprice,mimage,product_id,str_id,mCat,sim_id
-                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price(),prolist.get(i).getDesc()));
+                          originalList.add(prolist.get(i));
+                            //originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price(),prolist.get(i).getDesc()));
                         }
                     }
                     PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName,catName,false);

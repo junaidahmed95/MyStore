@@ -251,6 +251,7 @@ public class SubCatActivity extends AppCompatActivity {
                             if (!dummyList.contains(jsonObject.getString("p_name"))) {
                                 dummyList.add(jsonObject.getString("p_name"));
                             }
+                            String cat_id = jsonObject.getString("cat_a_id");
                             String mCat = jsonObject.getString("p_name");
                             String str_id = jsonObject.getString("str_id");
                             String mTitle = jsonObject.getString("product_name");
@@ -259,7 +260,7 @@ public class SubCatActivity extends AppCompatActivity {
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
                             String desc = jsonObject.getString("product_unit");
-                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc));
+                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc,cat_id));
                         }
 
                     } catch (JSONException e) {

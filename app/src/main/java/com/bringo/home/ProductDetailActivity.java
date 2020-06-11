@@ -49,7 +49,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage, mdesc;
+    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage, mdesc,cat_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +84,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         ownerImage = getIntent().getStringExtra("oImage");
         StID = getIntent().getStringExtra("StID");
         catName = getIntent().getStringExtra("catName");
+        cat_id = getIntent().getStringExtra("cat_id");
+
 
         Glide.with(this).asBitmap().load(pImage).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mpImage);
         GetCartData();
@@ -162,7 +164,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     mycheckList.add(spID);
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID,getIntent().getStringExtra("desc")));
+                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID,getIntent().getStringExtra("desc"),cat_id));
                     SaveCartData();
                 }
 

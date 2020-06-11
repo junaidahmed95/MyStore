@@ -127,8 +127,9 @@ public class SearchActivity extends AppCompatActivity {
 
                 for (int i = 0; i < response.length(); i++) {
                     try {
-                        jsonObject = response.getJSONObject(i);
 
+                        jsonObject = response.getJSONObject(i);
+                        String cat_id = jsonObject.getString("cat_a_id");
                         String mCat = jsonObject.getString("p_name");
                         String str_id = jsonObject.getString("str_id");
                         String mTitle = jsonObject.getString("product_name");
@@ -137,7 +138,7 @@ public class SearchActivity extends AppCompatActivity {
                         String product_id = jsonObject.getString("p_id");
                         String sim_id = jsonObject.getString("id");
                         String desc = jsonObject.getString("product_unit");
-                        prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc));
+                        prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc,cat_id));
 
                     } catch (JSONException e) {
                         e.printStackTrace();
