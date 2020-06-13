@@ -53,6 +53,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private boolean isUpdate;
     private HelpingMethods helpingMethods;
     private int mTotalPrice = 0;
+    double quan = 0.0 ,getadded = 0.0;
+    int total = 0;
 
     public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere,String ownerName) {
         this.cartList = cartList;
@@ -82,67 +84,84 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
 
-                calculate("plus",pos,viewHolder);
+
+                if(cartList.get(pos).getCat_id().equals("10") || cartList.get(pos).getCat_id().equals("9") || cartList.get(pos).getCat_id().equals("11")) {
+
+                    calculate("plus", pos, viewHolder);
+                    int parseint = (int) getadded;
+                     total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) +parseint;
+                }
+                else{
+                    int q = Integer.parseInt(cartList.get(pos).getP_quantity());
+                    q += 1;
+                    viewHolder.mProQuantity.setText("" + q);
+                    cartList.get(pos).setP_quantity("" + q);
+                    total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
+                    preferenceList.get(pos).setP_quantity("" + q);
+                    viewHolder.Mul();
+                }
+                cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+                preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
 
 
-
-//                int q = Integer.parseInt(cartList.get(pos).getP_quantity());
-//                q += 1;
-//                viewHolder.mProQuantity.setText("" + q);
-//                cartList.get(pos).setP_quantity("" + q);
-//                preferenceList.get(pos).setP_quantity("" + q);
-//                viewHolder.Mul();
-//                cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-//                preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-//
-//                int total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
-//                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
-//                if (fromWhere.equals("activity")) {
-//                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-//                    UpdateTotalPrice();
-//                } else {
-//                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-//                    UpdatePrice();
-//                }
-//                SaveCartData();
+                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+                if (fromWhere.equals("activity")) {
+                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdateTotalPrice();
+                } else {
+                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdatePrice();
+                }
+                SaveCartData();
             }
 
         });
-
         viewHolder.mRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-              calculate("minus",pos,viewHolder);
+                if(cartList.get(pos).getCat_id().equals("10") || cartList.get(pos).getCat_id().equals("9") || cartList.get(pos).getCat_id().equals("11")) {
 
-//                if (!viewHolder.mProQuantity.getText().toString().equals("1")) {
-//                    int q = Integer.parseInt(cartList.get(pos).getP_quantity());
-//                    q -= 1;
-//                    viewHolder.mProQuantity.setText("" + q);
-//                    cartList.get(pos).setP_quantity("" + q);
-//                    preferenceList.get(pos).setP_quantity("" + q);
-//                    viewHolder.Mul();
-//                    cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-//                    preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-//                    int total = 0;
-//                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getP_price())) {
-//                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
-//                    } else {
-//                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
-//                    }
-//
-//
-//                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
-//                    if (fromWhere.equals("activity")) {
-//                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-//                        UpdateTotalPrice();
-//                    } else {
-//                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-//                        UpdatePrice();
-//                    }
-//
-//                    SaveCartData();
-//                }
+                    if(viewHolder.mProQuantity.getText().equals("0.25")){
+                        return;
+                    }
+                    else{
+                        calculate("minus", pos, viewHolder);
+                        int parseint = (int) getadded;
+                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) -parseint;
+                    }
+
+                }
+                else {
+
+                    if (!viewHolder.mProQuantity.getText().toString().equals("1")) {
+                        int q = Integer.parseInt(cartList.get(pos).getP_quantity());
+                        q -= 1;
+                        viewHolder.mProQuantity.setText("" + q);
+                        cartList.get(pos).setP_quantity("" + q);
+                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
+                        preferenceList.get(pos).setP_quantity("" + q);
+                        viewHolder.Mul();
+
+                    }else{
+                        return;
+                    }
+
+                    }
+
+                cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+                preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+
+
+                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+                if (fromWhere.equals("activity")) {
+                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdateTotalPrice();
+                } else {
+                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    UpdatePrice();
+                }
+                SaveCartData();
 
             }
         });
@@ -220,13 +239,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
     }
     private void calculate(String minus, int pos, ViewHolder viewHolder) {
-        double quan = 0.0;
-        if(cartList.get(pos).getCat_id().equals("10") || cartList.get(pos).getCat_id().equals("9") || cartList.get(pos).getCat_id().equals("11")){
+
+
 
 
                 if (minus.equals("minus")){
                     if(viewHolder.mProQuantity.getText().equals("0.25")){
-///asdasdasdad
+                        return;
+
                     }
                     else{
                         quan = (Double.parseDouble(viewHolder.mProQuantity.getText().toString()) - 0.25);
@@ -238,10 +258,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 }
 
                 viewHolder.mProQuantity.setText(""+quan);
+        cartList.get(pos).setP_quantity("" + quan);
+        preferenceList.get(pos).setP_quantity("" + quan);
                 double pricesum = Double.parseDouble(viewHolder.mProPrice.getText().toString());
 
+                 if(getadded ==  0.0){
+                     getadded = (quan*pricesum)- Double.parseDouble(viewHolder.mProPrice.getText().toString());
+                 }
                 viewHolder.mProTotal.setText(""+quan*pricesum);
-        }
+
     }
 
 
