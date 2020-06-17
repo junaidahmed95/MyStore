@@ -543,7 +543,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    if (hasImage.equals("0")) {
+                                    if (bitmap!=null) {
                                         params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
                                     }
 
@@ -886,30 +886,33 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                final Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    SetMap(location.getLatitude(), location.getLongitude());
+        if(!flag){
+            if (checkPermissions()) {
+                if (isLocationEnabled()) {
+                    mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                            new OnCompleteListener<Location>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Location> task) {
+                                    final Location location = task.getResult();
+                                    if (location == null) {
+                                        requestNewLocationData();
+                                    } else {
+                                        SetMap(location.getLatitude(), location.getLongitude());
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                } else {
+                    Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
             } else {
-                Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                requestPermissions();
             }
-        } else {
-            requestPermissions();
         }
+
     }
 
     private void SetMap(final double latitude, final double longitude) {

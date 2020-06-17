@@ -310,8 +310,8 @@ public class SubCatActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-            if (helpingMethods.GetCartTotal(store_ID) > 0) {
-                mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(store_ID) + "/-");
+            if (helpingMethods.newone(store_ID) > 0) {
+                mtotalAmount.setText("Rs." + helpingMethods.newone(store_ID) + "/-");
                 mtotalAmount.setVisibility(View.VISIBLE);
             } else {
                 mtotalAmount.setVisibility(View.GONE);

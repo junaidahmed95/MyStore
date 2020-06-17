@@ -74,14 +74,14 @@ public class CartActivity extends AppCompatActivity {
 
         GetCartData();
 
-        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(store_ID));
+        mTxtView_TotalPrice.setText("" + helpingMethods.newone(store_ID));
 
         cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity",ownerName);
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(store_ID) + "/-");
+        mtotalAmount.setText("Rs." + helpingMethods.newone(store_ID) + "/-");
 
 
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +103,6 @@ public class CartActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(CartActivity.this, "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
                         }
-
                     } else {
                         Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }

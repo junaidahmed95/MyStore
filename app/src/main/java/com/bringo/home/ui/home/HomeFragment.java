@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +90,7 @@ public class HomeFragment extends Fragment {
 
 
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback locationCallback;
     int PERMISSION_ID = 44;
     private RecyclerView grd_str;
     private String test;
@@ -95,7 +98,7 @@ public class HomeFragment extends Fragment {
     private StoresAdapter allStoreAdapter;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
-  SwipeRefreshLayout pullToRefresh;
+    SwipeRefreshLayout pullToRefresh;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -106,7 +109,7 @@ public class HomeFragment extends Fragment {
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = root.findViewById(R.id.retryBtn);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -148,6 +151,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
         mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
@@ -182,6 +186,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+
+
         return root;
     }
 
@@ -207,8 +214,10 @@ public class HomeFragment extends Fragment {
 
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.NETWORK_PROVIDER
+
         );
     }
 
@@ -217,6 +226,8 @@ public class HomeFragment extends Fragment {
         super.onResume();
         mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
+
+        //streamLocation();
     }
 
     @SuppressLint("MissingPermission")
@@ -247,13 +258,14 @@ public class HomeFragment extends Fragment {
     //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
-    private void GetNearByStores(double latitude, double longitude) {
-request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+    private void GetNearByStores(final double latitude, final double longitude) {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
-  
+
             @Override
             public void onResponse(JSONArray response) {
 
+                Log.d("getlatlng",latitude+" "+longitude);
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
@@ -273,6 +285,7 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                             String distance = jsonObject.getString("distance");
                             String store_image = jsonObject.getString("thumbnail");
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
+                            Log.d("distance",distance+" "+storename);
 
 
                         } catch (JSONException e) {
@@ -284,10 +297,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                     }
                     allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
                     grd_str.setAdapter(allStoreAdapter);
+                    mcdv_dialog.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.GONE);
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
                     mBtnViewAll.setVisibility(View.VISIBLE);
+
                 }
 
 
@@ -311,11 +327,40 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
         requestQueue.add(request);
 
     }
-
+    @SuppressLint("MissingPermission")
+    private void streamLocation(){
+        LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Toast.makeText(getActivity(), "Location Changed"+location.getLatitude(), Toast.LENGTH_SHORT).show();
+                grd_str.setVisibility(View.GONE);
+                mcdv_dialog.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.VISIBLE);
+                mLastLocation = location;
+                GetNearByStores(location.getLatitude(), location.getLongitude());
+            }
+            @Override
+            public void onProviderDisabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onProviderEnabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+            @Override
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         new OnCompleteListener<Location>() {
                             @Override
@@ -332,6 +377,9 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                             }
                         }
                 );
+
+
+
             } else {
                 Toast.makeText(getContext(), "Turn on location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -354,9 +402,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
         Dexter.withActivity(getActivity())
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
+
+
                         getLastLocation();
+
                     }
 
                     @Override

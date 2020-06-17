@@ -148,7 +148,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     MainsetupBadge();
                     int total = helpingMethods.GetCartTotal(storeID) + Integer.parseInt(pPrice);
-                    helpingMethods.SaveCartTotal(total, storeID);
+                    helpingMethods.SaveCartTotal(String.valueOf(total), storeID);
                     if (helpingMethods.GetStoreID() == null) {
                         helpingMethods.SaveStoreData(storeID, getIntent().getStringExtra("oName"), getIntent().getStringExtra("oImage"), getIntent().getStringExtra("oID"));
                     }
@@ -181,7 +181,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     helpingMethods.SaveCartCount(finalCount, storeID);
                     MainsetupBadge();
                     int total = helpingMethods.GetCartTotal(storeID) - Integer.parseInt(pPrice);
-                    helpingMethods.SaveCartTotal(total, storeID);
+                    helpingMethods.SaveCartTotal(String.valueOf(total), storeID);
                     int a = mycheckList.indexOf(spID);
                     mycheckList.remove(a);
                     SaveCheckData();

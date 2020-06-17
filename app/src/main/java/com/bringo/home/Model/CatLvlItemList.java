@@ -2,7 +2,7 @@ package com.bringo.home.Model;
 
 public class CatLvlItemList {
 
-    private String simplePID,desc,p_name,p_price,storeId,p_quantity = "1",actual_price,catName,productid,cat_id;
+    private String simplePID,desc,p_name,p_price,storeId,p_quantity = "1",actual_price,catName,productid,cat_id, ownerid,ownername,ownerimage;
     int pos;
     private boolean isClicked = false;
 
@@ -71,6 +71,49 @@ public class CatLvlItemList {
         this.p_img = p_img;
         this.storeId = storeId;
         this.cat_id = cat_id;
+    }
+
+
+    public String getOwnerid() {
+        return ownerid;
+    }
+
+    public void setOwnerid(String ownerid) {
+        this.ownerid = ownerid;
+    }
+
+    public String getOwnername() {
+        return ownername;
+    }
+
+    public void setOwnername(String ownername) {
+        this.ownername = ownername;
+    }
+
+    public String getOwnerimage() {
+        return ownerimage;
+    }
+
+    public void setOwnerimage(String ownerimage) {
+        this.ownerimage = ownerimage;
+    }
+
+    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId, String catName, String simplePID, String actual_price, String desc, String cat_id, String ownerid, String ownername, String ownerimage) {
+        this.p_name = p_name;
+        this.desc=desc;
+        this.actual_price=actual_price;
+        this.catName = catName;
+        this.p_price = p_price;
+        this.simplePID=simplePID;
+        this.productid = productid;
+        this.p_img = p_img;
+        this.storeId = storeId;
+        this.cat_id = cat_id;
+        this.ownerid = ownerid;
+        this.ownerimage = ownerimage;
+        this.ownername = ownername;
+
+
     }
 
 

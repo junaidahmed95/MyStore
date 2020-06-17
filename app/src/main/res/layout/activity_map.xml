@@ -21,7 +21,7 @@
         tools:context="com.res.chhaatt.MapsActivity" />
 
     <RelativeLayout
-
+android:visibility="gone"
         android:id="@+id/relLayout1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -90,6 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/submitmap"
             android:layout_alignParentEnd="true"
+            android:visibility="gone"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="20dp"
             android:layout_marginEnd="16dp"

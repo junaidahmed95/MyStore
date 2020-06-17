@@ -255,8 +255,8 @@ public class StoreInfoActivity extends AppCompatActivity {
         super.onResume();
         MainBadge();
 
-                if(helpingMethods.GetCartTotal(stID)>0){
-                    mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(stID)+"/-");
+                if(helpingMethods.newone(stID)>0){
+                    mtotalAmount.setText("Rs."+helpingMethods.newone(stID)+"/-");
                     mtotalAmount.setVisibility(View.VISIBLE);
                 }else {
                     mtotalAmount.setVisibility(View.GONE);

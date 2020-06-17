@@ -149,6 +149,7 @@
                 android:textColor="@color/white"
                 android:visibility="gone" />
 
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

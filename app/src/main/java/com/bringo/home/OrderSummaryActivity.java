@@ -373,7 +373,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
 
                                                         helpingMethods.SaveCartCount(0, store_ID);
-                                                        helpingMethods.SaveCartTotal(0, store_ID);
+                                                        helpingMethods.SaveCartTotal("0", store_ID);
                                                         helpingMethods.SaveStoreData(null, null, null, null);
                                                         mycheckList.clear();
                                                         SaveCheckData();
@@ -594,7 +594,6 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                         protected Map<String, String> getParams() {
 
                                             HashMap<String, String> hashMap = new HashMap<>();
-
                                             hashMap.put("address", muserName.getText().toString().trim());
                                             hashMap.put("cs_id", custID);
                                             hashMap.put("user_id", FirebaseAuth.getInstance().getUid());

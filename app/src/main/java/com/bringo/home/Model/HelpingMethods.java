@@ -35,6 +35,11 @@ public class HelpingMethods {
         String sid = sharedPreferences.getString("email", null);
         return sid;
     }
+    public double getdiff() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+      String sid = sharedPreferences.getString("sid", null);
+        return Double.parseDouble(sid);
+    }
 
     public String GetUPhone() {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
@@ -79,6 +84,13 @@ public class HelpingMethods {
         editor.apply();
     }
 
+    public void SaveDiff(Double sid){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Diff", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sid", String.valueOf(sid));
+        editor.apply();
+    }
+
     public String GetStoreID() {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
         String sid = sharedPreferences.getString("sid", null);
@@ -105,15 +117,20 @@ public class HelpingMethods {
 
     public int GetCartTotal(String Dbname) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
-        int sid = sharedPreferences.getInt("amount", 0);
+        int sid = Integer.parseInt(sharedPreferences.getString("amount", "0"));
+        return sid;
+    }
+    public double newone(String Dbname) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
+        double sid = Double.parseDouble(sharedPreferences.getString("amount", "0"));
         return sid;
     }
 
 
-    public void SaveCartTotal(int total,String Dbname){
+    public void  SaveCartTotal(String total,String Dbname){
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("amount",total);
+        editor.putString("amount",total);
         editor.apply();
     }
 
