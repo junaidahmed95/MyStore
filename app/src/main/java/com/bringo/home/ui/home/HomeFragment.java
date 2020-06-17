@@ -29,7 +29,6 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -71,6 +70,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,8 +114,9 @@ public class HomeFragment extends Fragment {
 
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
-        grd_str.setLayoutManager(new GridLayoutManager(getContext(),2));
-
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        grd_str.setLayoutManager(layoutManager);
         nearesStoresList = new ArrayList<>();
 
 
@@ -227,6 +229,7 @@ public class HomeFragment extends Fragment {
         mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
 
+
         //streamLocation();
     }
 
@@ -259,35 +262,32 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
     private void GetNearByStores(final double latitude, final double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717", new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/find/nearest/stores?page=1&latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
 
             @Override
             public void onResponse(JSONArray response) {
-
-                Log.d("getlatlng",latitude+" "+longitude);
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
                     mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
-
                 } else {
+                    Log.d("getlatlng",latitude+" "+longitude);
                     nearesStoresList.clear();
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
-
                             String userID = jsonObject.getString("u_id");
                             String storename = jsonObject.getString("str_name");
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
-                            String distance = jsonObject.getString("distance");
+                            double distance1 = Double.parseDouble(jsonObject.getString("distance"));
                             String store_image = jsonObject.getString("thumbnail");
+                            NumberFormat formatter = new DecimalFormat("#0.00");
+                            String distance = formatter.format(distance1);
+                            Log.d("distance",formatter.format(distance1)+" "+storename);
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
-                            Log.d("distance",distance+" "+storename);
-
-
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
                             mloadingImage.setVisibility(View.GONE);
@@ -303,10 +303,7 @@ public class HomeFragment extends Fragment {
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
                     mBtnViewAll.setVisibility(View.VISIBLE);
-
                 }
-
-
             }
         }, new Response.ErrorListener() {
             @Override

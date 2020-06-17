@@ -125,8 +125,6 @@ public class HelpingMethods {
         double sid = Double.parseDouble(sharedPreferences.getString("amount", "0"));
         return sid;
     }
-
-
     public void  SaveCartTotal(String total,String Dbname){
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
