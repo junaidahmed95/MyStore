@@ -79,15 +79,16 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        if(displayAll){
-            return storeList.size();
-        }else {
-            if(storeList.size()>6){
-                return 6;
-            }else {
-                return storeList.size();
-            }
-        }
+        return storeList.size();
+//        if(displayAll){
+//            return storeList.size();
+//        }else {
+//            if(storeList.size()>6){
+//                return 6;
+//            }else {
+//                return storeList.size();
+//            }
+//        }
 
 
     }

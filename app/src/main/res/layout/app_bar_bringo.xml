@@ -7,9 +7,11 @@
     tools:context=".BringoActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
+
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -43,7 +45,6 @@
                 android:layout_height="wrap_content"/>
 
         </androidx.appcompat.widget.Toolbar>
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_bringo" />

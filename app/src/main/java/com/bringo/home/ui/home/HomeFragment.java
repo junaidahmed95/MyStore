@@ -29,6 +29,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -112,9 +113,8 @@ public class HomeFragment extends Fragment {
 
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        grd_str.setLayoutManager(layoutManager);
+        grd_str.setLayoutManager(new GridLayoutManager(getContext(),2));
+
         nearesStoresList = new ArrayList<>();
 
 
@@ -259,7 +259,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
     private void GetNearByStores(final double latitude, final double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717", new Response.Listener<JSONArray>() {
 
 
             @Override
