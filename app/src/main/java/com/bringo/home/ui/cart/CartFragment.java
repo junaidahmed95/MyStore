@@ -96,14 +96,14 @@ public class CartFragment extends Fragment {
 //            });
         }
 
-        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()));
+        mTxtView_Total.setText("" + helpingMethods.newone(helpingMethods.GetStoreID()));
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                     if (connectionDetector.isConnected()) {
-                        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) >= 300) {
+                        if (helpingMethods.newone(helpingMethods.GetStoreID()) >= 300) {
                             Intent sumInt = new Intent(getActivity(), OrderSummaryActivity.class);
                             sumInt.putExtra("from", "fragement");
                             sumInt.putExtra("totalP", mTxtView_Total.getText().toString());
@@ -133,7 +133,7 @@ public class CartFragment extends Fragment {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences(helpingMethods.GetStoreID()+""+helpingMethods.GetStoreName(), MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

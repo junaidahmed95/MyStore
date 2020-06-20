@@ -90,7 +90,7 @@ public class CartActivity extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
                     if (connectionDetector.isConnected()) {
-                        if (helpingMethods.GetCartTotal(store_ID) >= 300) {
+                        if (helpingMethods.newone(store_ID) >= 300) {
                             Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
                             sumInt.putExtra("from", "activity");
                             sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
@@ -212,7 +212,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences(store_ID+""+ownerName, MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(helpingMethods.GetStoreID()+""+helpingMethods.GetStoreName(), MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

@@ -40,6 +40,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.CategoryAdapter;
+import com.bringo.home.Adapter.MainCategoryAdapter;
 import com.bringo.home.Adapter.SliderAdapter;
 import com.bringo.home.Adapter.StoresAdapter;
 import com.bringo.home.GirdListView;
@@ -87,6 +89,7 @@ public class HomeFragment extends Fragment {
     private Location mLastLocation;
 
     public static String forWhat = "All";
+    private List<Category> catList;
     List<GirdListView> list;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
@@ -100,6 +103,7 @@ public class HomeFragment extends Fragment {
     private String test;
     private ProgressBar mloadingImage;
     private StoresAdapter allStoreAdapter;
+    private RecyclerView mmainCatrecyclerView;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
     SwipeRefreshLayout pullToRefresh;
@@ -116,7 +120,13 @@ public class HomeFragment extends Fragment {
 
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
-        grd_str.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
+        catList = new ArrayList<>();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
+        mmainCatrecyclerView.setLayoutManager(layoutManager);
+        GetCategories();
+        grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         nearesStoresList = new ArrayList<>();
 
 
@@ -187,8 +197,6 @@ public class HomeFragment extends Fragment {
                 getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
-
-
 
 
         return root;
@@ -262,7 +270,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
     private void GetNearByStores(final double latitude, final double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
 
             @Override
@@ -273,7 +281,7 @@ public class HomeFragment extends Fragment {
                     mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
                 } else {
-                    Log.d("getlatlng",latitude+" "+longitude);
+                    Log.d("getlatlng", latitude + " " + longitude);
                     nearesStoresList.clear();
                     for (int i = 0; i < response.length(); i++) {
                         try {
@@ -286,7 +294,7 @@ public class HomeFragment extends Fragment {
                             String store_image = jsonObject.getString("thumbnail");
                             NumberFormat formatter = new DecimalFormat("#0.00");
                             String distance = formatter.format(distance1);
-                            Log.d("distance",formatter.format(distance1)+" "+storename);
+                            Log.d("distance", formatter.format(distance1) + " " + storename);
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
@@ -302,7 +310,7 @@ public class HomeFragment extends Fragment {
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                   // mBtnViewAll.setVisibility(View.VISIBLE);
+                    // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
             }
         }, new Response.ErrorListener() {
@@ -327,13 +335,14 @@ public class HomeFragment extends Fragment {
         requestQueue.add(request);
 
     }
+
     @SuppressLint("MissingPermission")
-    private void streamLocation(){
-        LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+    private void streamLocation() {
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Toast.makeText(getActivity(), "Location Changed"+location.getLatitude(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Location Changed" + location.getLatitude(), Toast.LENGTH_SHORT).show();
                 grd_str.setVisibility(View.GONE);
                 mcdv_dialog.setVisibility(View.GONE);
                 mretryBtn.setVisibility(View.GONE);
@@ -341,14 +350,17 @@ public class HomeFragment extends Fragment {
                 mLastLocation = location;
                 GetNearByStores(location.getLatitude(), location.getLongitude());
             }
+
             @Override
             public void onProviderDisabled(String provider) {
                 // TODO Auto-generated method stub
             }
+
             @Override
             public void onProviderEnabled(String provider) {
                 // TODO Auto-generated method stub
             }
+
             @Override
             public void onStatusChanged(String provider, int status,
                                         Bundle extras) {
@@ -356,6 +368,7 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         if (checkPermissions()) {
@@ -377,7 +390,6 @@ public class HomeFragment extends Fragment {
                             }
                         }
                 );
-
 
 
             } else {
@@ -444,6 +456,65 @@ public class HomeFragment extends Fragment {
                 .check();
     }
 
+
+    private void GetCategories() {
+        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
+
+
+            @Override
+            public void onResponse(JSONArray response) {
+
+                JSONObject jsonObject = null;
+                if (response.isNull(0)) {
+                    mcdv_dialog.setVisibility(View.VISIBLE);
+                    mloadingImage.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.VISIBLE);
+
+                } else {
+                    catList.clear();
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            jsonObject = response.getJSONObject(i);
+
+                            String image = jsonObject.getString("thumbnail");
+                            String text = jsonObject.getString("m_name");
+                            catList.add(new Category(image, text));
+
+
+                        } catch (JSONException e) {
+                            grd_str.setVisibility(View.GONE);
+                            mloadingImage.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            mretryBtn.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
+                    mmainCatrecyclerView.setAdapter(allStoreAdapter);
+                    mmainCatrecyclerView.setVisibility(View.VISIBLE);
+                    allStoreAdapter.notifyDataSetChanged();
+                    mloadingImage.setVisibility(View.GONE);
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                grd_str.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.VISIBLE);
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+        requestQueue = Volley.newRequestQueue(getContext());
+        requestQueue.add(request);
+
+    }
 
 }
 
