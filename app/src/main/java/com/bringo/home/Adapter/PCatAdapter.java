@@ -49,6 +49,8 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import static com.bringo.home.SubCatActivity.setupBadge;
 
 public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
+    public PCatAdapter() {
+    }
 
     public void filterList(ArrayList<CatLvlItemList> filteredList) {
         subcatproLists = filteredList;
@@ -348,7 +350,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     }
 
 
-    private void GetCheckData() {
+    public void GetCheckData() {
         try {
             SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();

@@ -4,12 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class HelpingMethods {
 
     private Activity activity;
+    private List<String> mycheckList;
 
     public HelpingMethods(Activity activity) {
         this.activity = activity;
@@ -131,5 +141,7 @@ public class HelpingMethods {
         editor.putString("amount",total);
         editor.apply();
     }
+
+
 
 }

@@ -40,11 +40,11 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
     private boolean displayAll;
     private Activity activity;
 
-    public StoresAdapter(List<ShowStores> storeList, Context mcontext,boolean displayAll) {
+    public StoresAdapter(List<ShowStores> storeList, Context mcontext, boolean displayAll) {
         this.storeList = storeList;
-        this.displayAll=displayAll;
+        this.displayAll = displayAll;
         this.mcontext = mcontext;
-        activity = (Activity)mcontext;
+        activity = (Activity) mcontext;
     }
 
     @NonNull
@@ -57,7 +57,7 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.txt_storename.setText(storeList.get(position).getStore_name());
-        holder.txt_storedistance.setText(storeList.get(position).getDistance()+"Km");
+        holder.txt_storedistance.setText(storeList.get(position).getDistance() + "Km");
         Glide.with(mcontext).asBitmap().load(storeList.get(position).getStore_image()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(holder.mimg_store);
 
 
@@ -66,10 +66,10 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(mcontext, StoreInfoActivity.class);
                 intent.putExtra("storeid", storeList.get(position).getId());
-                intent.putExtra("stname",storeList.get(position).getStore_name());
-                intent.putExtra("ownerID",storeList.get(position).getUid());
-                intent.putExtra("address",storeList.get(position).getAddress());
-                intent.putExtra("ownerImage",storeList.get(position).getStore_image());
+                intent.putExtra("stname", storeList.get(position).getStore_name());
+                intent.putExtra("ownerID", storeList.get(position).getUid());
+                intent.putExtra("address", storeList.get(position).getAddress());
+                intent.putExtra("ownerImage", storeList.get(position).getStore_image());
                 mcontext.startActivity(intent);
                 activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
@@ -97,7 +97,7 @@ public class StoresAdapter extends RecyclerView.Adapter<StoresAdapter.ViewHolder
 
         private CardView storecardId;
         private ImageView mimg_store;
-        private TextView txt_storedistance,txt_storename;
+        private TextView txt_storedistance, txt_storename;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

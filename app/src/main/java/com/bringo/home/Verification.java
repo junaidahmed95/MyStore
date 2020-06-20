@@ -249,7 +249,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/privacy.policy"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bringo.biz/home/privacy"));
                 startActivity(browserIntent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }

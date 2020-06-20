@@ -29,10 +29,12 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -114,9 +116,7 @@ public class HomeFragment extends Fragment {
 
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        grd_str.setLayoutManager(layoutManager);
+        grd_str.setLayoutManager(new GridLayoutManager(getActivity(),2));
         nearesStoresList = new ArrayList<>();
 
 
@@ -262,7 +262,7 @@ public class HomeFragment extends Fragment {
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
     private void GetNearByStores(final double latitude, final double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/find/nearest/stores?page=1&latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
 
             @Override
@@ -302,7 +302,7 @@ public class HomeFragment extends Fragment {
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                    mBtnViewAll.setVisibility(View.VISIBLE);
+                   // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
             }
         }, new Response.ErrorListener() {
@@ -313,12 +313,15 @@ public class HomeFragment extends Fragment {
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue = Volley.newRequestQueue(getContext());
         requestQueue.add(request);

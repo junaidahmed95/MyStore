@@ -294,13 +294,15 @@ public class ProductDetailActivity extends AppCompatActivity {
             intent.putExtra("ownerID", ownerID);
             intent.putExtra("ownerImage", ownerImage);
             startActivity(intent);
-        } else {
+        }
+        else {
             Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
             intent.putExtra("storeid", storeID);
             intent.putExtra("catName", catName);
             intent.putExtra("stname", ownerName);
             intent.putExtra("ownerID", ownerID);
             intent.putExtra("ownerImage", ownerImage);
+
             startActivity(intent);
         }
 
