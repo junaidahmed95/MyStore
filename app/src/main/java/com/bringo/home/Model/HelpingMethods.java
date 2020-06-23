@@ -4,12 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class HelpingMethods {
 
     private Activity activity;
+    private List<String> mycheckList;
 
     public HelpingMethods(Activity activity) {
         this.activity = activity;
@@ -34,6 +44,11 @@ public class HelpingMethods {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
         String sid = sharedPreferences.getString("email", null);
         return sid;
+    }
+    public double getdiff() {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Profile", Context.MODE_PRIVATE);
+      String sid = sharedPreferences.getString("sid", null);
+        return Double.parseDouble(sid);
     }
 
     public String GetUPhone() {
@@ -79,6 +94,13 @@ public class HelpingMethods {
         editor.apply();
     }
 
+    public void SaveDiff(Double sid){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("Diff", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sid", String.valueOf(sid));
+        editor.apply();
+    }
+
     public String GetStoreID() {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("RecentStore", Context.MODE_PRIVATE);
         String sid = sharedPreferences.getString("sid", null);
@@ -105,16 +127,21 @@ public class HelpingMethods {
 
     public int GetCartTotal(String Dbname) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
-        int sid = sharedPreferences.getInt("amount", 0);
+        int sid = Integer.parseInt(sharedPreferences.getString("amount", "0"));
         return sid;
     }
-
-
-    public void SaveCartTotal(int total,String Dbname){
+    public double newone(String Dbname) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
+        double sid = Double.parseDouble(sharedPreferences.getString("amount", "0"));
+        return sid;
+    }
+    public void  SaveCartTotal(String total,String Dbname){
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("amount",total);
+        editor.putString("amount",total);
         editor.apply();
     }
+
+
 
 }

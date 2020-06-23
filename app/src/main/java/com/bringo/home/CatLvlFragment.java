@@ -37,6 +37,7 @@ public class CatLvlFragment extends Fragment {
     private RequestQueue requestQueue;
     private String mTitle;
     private RecyclerView mpRecyclerView;
+    private boolean checj = true;
     private String sID, ownerID, ownerImage, ownerName,catName;
 
     public CatLvlFragment(String sID, String ownerID, String ownerImage, String ownerName,String catName) {
@@ -64,15 +65,17 @@ public class CatLvlFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         try {
             mtabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
+
                     originalList.clear();
                     for (int i = 0; i < prolist.size(); i++) {
                         if (prolist.get(i).getCatName().equals(tab.getText())) {
-                            //mTitle, mprice,mimage,product_id,str_id,mCat,sim_id
-                            originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price(),prolist.get(i).getDesc()));
+                          originalList.add(prolist.get(i));
+                            //originalList.add(new CatLvlItemList(prolist.get(i).getP_name(), prolist.get(i).getP_price(),  prolist.get(i).getP_img(), prolist.get(i).getProductid(),prolist.get(i).getStoreId(),prolist.get(i).getCatName(),prolist.get(i).getSimplePID(),prolist.get(i).getP_price(),prolist.get(i).getDesc()));
                         }
                     }
                     PCatAdapter proAdapter = new PCatAdapter(originalList, getActivity(), sID,ownerID, ownerImage, ownerName,catName,false);

@@ -3,11 +3,20 @@ package com.bringo.home.Model;
 public class Category {
 
     private String catName;
-    private String catImage;
+    private String catImage,cat_id;
 
-    public Category(String catImage,String catName) {
+    public String getCat_id() {
+        return cat_id;
+    }
+
+    public void setCat_id(String cat_id) {
+        this.cat_id = cat_id;
+    }
+
+    public Category(String catImage, String catName, String cat_id) {
         this.catName = catName;
         this.catImage = catImage;
+        this.cat_id = cat_id;
     }
 
     public String getCatName() {

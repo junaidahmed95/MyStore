@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -162,8 +163,6 @@ public class StoreInfoActivity extends AppCompatActivity {
                 }
             }
         });
-
-
         mbtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,7 +185,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                         String catimage = jsonObject.getString("thumbnail");
                         if (!backupList.contains(jsonObject.getString("m_name"))) {
                             backupList.add(jsonObject.getString("m_name"));
-                            productList.add(new Category(catimage, catTitle));
+                            productList.add(new Category(catimage, catTitle,""));
                         }
 
 
@@ -194,7 +193,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                         mProgressDialog.cancel();
                         mretryBtn.setVisibility(View.VISIBLE);
                         Toast.makeText(StoreInfoActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Toast.makeText(StoreInfoActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+
                     }
                 }
 
@@ -214,16 +213,24 @@ public class StoreInfoActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 mProgressDialog.cancel();
                 mretryBtn.setVisibility(View.VISIBLE);
-                Toast.makeText(StoreInfoActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(StoreInfoActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(StoreInfoActivity.this, "" + error, Toast.LENGTH_SHORT).show();
 
 
             }
         });
-
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(request);
+
+
+
+
+
+
 
     }
 
@@ -255,8 +262,8 @@ public class StoreInfoActivity extends AppCompatActivity {
         super.onResume();
         MainBadge();
 
-                if(helpingMethods.GetCartTotal(stID)>0){
-                    mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(stID)+"/-");
+                if(helpingMethods.newone(stID)>0){
+                    mtotalAmount.setText("Rs."+helpingMethods.newone(stID)+"/-");
                     mtotalAmount.setVisibility(View.VISIBLE);
                 }else {
                     mtotalAmount.setVisibility(View.GONE);

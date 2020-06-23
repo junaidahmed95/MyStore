@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +29,19 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.CategoryAdapter;
+import com.bringo.home.Adapter.MainCategoryAdapter;
 import com.bringo.home.Adapter.SliderAdapter;
 import com.bringo.home.Adapter.StoresAdapter;
 import com.bringo.home.GirdListView;
@@ -68,6 +74,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +89,7 @@ public class HomeFragment extends Fragment {
     private Location mLastLocation;
 
     public static String forWhat = "All";
+    private List<Category> catList;
     List<GirdListView> list;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
@@ -88,14 +97,16 @@ public class HomeFragment extends Fragment {
 
 
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback locationCallback;
     int PERMISSION_ID = 44;
     private RecyclerView grd_str;
     private String test;
     private ProgressBar mloadingImage;
     private StoresAdapter allStoreAdapter;
+    private RecyclerView mmainCatrecyclerView;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
-  SwipeRefreshLayout pullToRefresh;
+    SwipeRefreshLayout pullToRefresh;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -106,12 +117,16 @@ public class HomeFragment extends Fragment {
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = root.findViewById(R.id.retryBtn);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
+        mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
+        catList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        grd_str.setLayoutManager(layoutManager);
+        mmainCatrecyclerView.setLayoutManager(layoutManager);
+        GetCategories();
+        grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         nearesStoresList = new ArrayList<>();
 
 
@@ -148,6 +163,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
         mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
@@ -182,6 +198,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
         return root;
     }
 
@@ -207,8 +224,10 @@ public class HomeFragment extends Fragment {
 
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.NETWORK_PROVIDER
+
         );
     }
 
@@ -217,6 +236,9 @@ public class HomeFragment extends Fragment {
         super.onResume();
         mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
+
+
+        //streamLocation();
     }
 
     @SuppressLint("MissingPermission")
@@ -246,35 +268,34 @@ public class HomeFragment extends Fragment {
     //https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717
     //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
-//
-    private void GetNearByStores(double latitude, double longitude) {
-request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
-  
+    private void GetNearByStores(final double latitude, final double longitude) {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
+
+
             @Override
             public void onResponse(JSONArray response) {
-
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
                     mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
-
                 } else {
+                    Log.d("getlatlng", latitude + " " + longitude);
                     nearesStoresList.clear();
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
-
                             String userID = jsonObject.getString("u_id");
                             String storename = jsonObject.getString("str_name");
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
-                            String distance = jsonObject.getString("distance");
+                            double distance1 = Double.parseDouble(jsonObject.getString("distance"));
                             String store_image = jsonObject.getString("thumbnail");
+                            NumberFormat formatter = new DecimalFormat("#0.00");
+                            String distance = formatter.format(distance1);
+                            Log.d("distance", formatter.format(distance1) + " " + storename);
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
-
-
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
                             mloadingImage.setVisibility(View.GONE);
@@ -284,13 +305,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                     }
                     allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
                     grd_str.setAdapter(allStoreAdapter);
+                    mcdv_dialog.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.GONE);
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                    mBtnViewAll.setVisibility(View.VISIBLE);
+                    // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
-
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -300,12 +321,15 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue = Volley.newRequestQueue(getContext());
         requestQueue.add(request);
@@ -313,9 +337,43 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
     }
 
     @SuppressLint("MissingPermission")
+    private void streamLocation() {
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Toast.makeText(getActivity(), "Location Changed" + location.getLatitude(), Toast.LENGTH_SHORT).show();
+                grd_str.setVisibility(View.GONE);
+                mcdv_dialog.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.VISIBLE);
+                mLastLocation = location;
+                GetNearByStores(location.getLatitude(), location.getLongitude());
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
     private void getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         new OnCompleteListener<Location>() {
                             @Override
@@ -332,6 +390,8 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                             }
                         }
                 );
+
+
             } else {
                 Toast.makeText(getContext(), "Turn on location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -354,9 +414,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
         Dexter.withActivity(getActivity())
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
+
+
                         getLastLocation();
+
                     }
 
                     @Override
@@ -392,6 +456,66 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                 .check();
     }
 
+
+    private void GetCategories() {
+        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
+
+
+            @Override
+            public void onResponse(JSONArray response) {
+
+                JSONObject jsonObject = null;
+                if (response.isNull(0)) {
+                    mcdv_dialog.setVisibility(View.VISIBLE);
+                    mloadingImage.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.VISIBLE);
+
+                } else {
+                    catList.clear();
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            jsonObject = response.getJSONObject(i);
+
+                            String image = jsonObject.getString("thumbnail");
+                            String text = jsonObject.getString("m_name");
+                            String cat_id = jsonObject.getString("id");
+                            catList.add(new Category(image, text,cat_id));
+
+
+                        } catch (JSONException e) {
+                            grd_str.setVisibility(View.GONE);
+                            mloadingImage.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            mretryBtn.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
+                    mmainCatrecyclerView.setAdapter(allStoreAdapter);
+                    mmainCatrecyclerView.setVisibility(View.VISIBLE);
+                    allStoreAdapter.notifyDataSetChanged();
+                    mloadingImage.setVisibility(View.GONE);
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                grd_str.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.VISIBLE);
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+        requestQueue = Volley.newRequestQueue(getContext());
+        requestQueue.add(request);
+
+    }
 
 }
 

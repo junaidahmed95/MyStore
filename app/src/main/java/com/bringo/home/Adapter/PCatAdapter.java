@@ -49,6 +49,8 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import static com.bringo.home.SubCatActivity.setupBadge;
 
 public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
+    public PCatAdapter() {
+    }
 
     public void filterList(ArrayList<CatLvlItemList> filteredList) {
         subcatproLists = filteredList;
@@ -142,7 +144,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                             ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.colorRed)));
                     myWishList.add(subcatproLists.get(position).getSimplePID());
                     SaveWishData();
-                    myFavList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc()));
+                    myFavList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc(),subcatproLists.get(position).getCat_id()));
                     SaveFavData();
                 }
             }
@@ -167,6 +169,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                 intent.putExtra("oID", ownerID);
                 intent.putExtra("name", subcatproLists.get(position).getP_name());
                 intent.putExtra("price", subcatproLists.get(position).getP_price());
+                intent.putExtra("cat_id", subcatproLists.get(position).getCat_id());
                 mContext.startActivity(intent);
                 ((Activity) mContext).overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 ((Activity) mContext).finish();
@@ -181,16 +184,10 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     holder.mbtn_remove_cart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) + 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
-                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total, subcatproLists.get(position).getStoreId());
-                    SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
-                    SubCatActivity.mtotalAmount.setVisibility(View.VISIBLE);
-                    if (isForSearch) {
-                        SearchsetupBadge();
-                    } else {
-                        setupBadge();
-                    }
-                    MainsetupBadge();
+                    double total = helpingMethods.newone(subcatproLists.get(position).getStoreId()) + Integer.parseInt(subcatproLists.get(position).getP_price());
+                    helpingMethods.SaveCartTotal(String.valueOf(total), subcatproLists.get(position).getStoreId());
+
+
                     if (helpingMethods.GetStoreID() != null) {
                         if (!helpingMethods.GetStoreID().equals(subcatproLists.get(position).getStoreId())) {
                             helpingMethods.SaveStoreData(subcatproLists.get(position).getStoreId(), ownerName, ownerImage, ownerID);
@@ -202,11 +199,18 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     } else {
                         helpingMethods.SaveStoreData(subcatproLists.get(position).getStoreId(), ownerName, ownerImage, ownerID);
                     }
-
+                    if (isForSearch) {
+                        SearchsetupBadge();
+                    } else {
+                        SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.newone(subcatproLists.get(position).getStoreId()) + "/-");
+                        SubCatActivity.mtotalAmount.setVisibility(View.VISIBLE);
+                        setupBadge();
+                    }
+                    MainsetupBadge();
                     mycheckList.add(subcatproLists.get(position).getSimplePID());
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc()));
+                    preferenceList.add(new CatLvlItemList(subcatproLists.get(position).getP_name(), subcatproLists.get(position).getP_price(), subcatproLists.get(position).getP_quantity(), subcatproLists.get(position).getP_img(), position, subcatproLists.get(position).getProductid(), subcatproLists.get(position).getStoreId(), subcatproLists.get(position).getActual_price(), subcatproLists.get(position).getSimplePID(),subcatproLists.get(position).getDesc(),subcatproLists.get(position).getCat_id()));
                     SaveCartData();
                     notifyDataSetChanged();
                 }
@@ -223,11 +227,12 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) - 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
                     int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
-                    helpingMethods.SaveCartTotal(total, subcatproLists.get(position).getStoreId());
-                    SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
+                    helpingMethods.SaveCartTotal(String.valueOf(total), subcatproLists.get(position).getStoreId());
+
                     if (isForSearch) {
                         SearchsetupBadge();
                     } else {
+                        SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
                         setupBadge();
                     }
                     MainsetupBadge();
@@ -345,7 +350,7 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
     }
 
 
-    private void GetCheckData() {
+    public void GetCheckData() {
         try {
             SharedPreferences sharedPreferences = mContext.getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();

@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -21,11 +22,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.PCatAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
@@ -93,6 +98,8 @@ public class SubCatActivity extends AppCompatActivity {
         ownerName = getIntent().getStringExtra("stname");
         ownerImage = getIntent().getStringExtra("ownerImage");
         ownerID = getIntent().getStringExtra("ownerID");
+
+
         list = new ArrayList<>();
         store = new ArrayList<>();
         storelist = new ArrayList<>();
@@ -248,6 +255,7 @@ public class SubCatActivity extends AppCompatActivity {
                             if (!dummyList.contains(jsonObject.getString("p_name"))) {
                                 dummyList.add(jsonObject.getString("p_name"));
                             }
+                            String cat_id = jsonObject.getString("cat_a_id");
                             String mCat = jsonObject.getString("p_name");
                             String str_id = jsonObject.getString("str_id");
                             String mTitle = jsonObject.getString("product_name");
@@ -256,14 +264,13 @@ public class SubCatActivity extends AppCompatActivity {
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
                             String desc = jsonObject.getString("product_unit");
-                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc));
+                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc,cat_id));
                         }
 
                     } catch (JSONException e) {
                         mloadingImage.setVisibility(View.GONE);
                         mretryBtn.setVisibility(View.VISIBLE);
                         Toast.makeText(SubCatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -290,22 +297,26 @@ public class SubCatActivity extends AppCompatActivity {
                 mloadingImage.setVisibility(View.GONE);
                 mretryBtn.setVisibility(View.VISIBLE);
                 Toast.makeText(SubCatActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
             }
         });
 
-
+        mrequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mrequestQueue = Volley.newRequestQueue(getApplicationContext());
         mrequestQueue.add(mrequest);
 
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
-            if (helpingMethods.GetCartTotal(store_ID) > 0) {
-                mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(store_ID) + "/-");
+            if (helpingMethods.newone(store_ID) > 0) {
+                mtotalAmount.setText("Rs." + helpingMethods.newone(store_ID) + "/-");
                 mtotalAmount.setVisibility(View.VISIBLE);
             } else {
                 mtotalAmount.setVisibility(View.GONE);
@@ -325,5 +336,6 @@ public class SubCatActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }
+
 
 }

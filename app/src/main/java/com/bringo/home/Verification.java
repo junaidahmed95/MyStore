@@ -249,7 +249,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/privacy.policy"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bringo.biz/home/privacy"));
                 startActivity(browserIntent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
@@ -413,9 +413,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
-                if (hasImage.equals("0") && bitmap == null) {
-                    helpingMethods.SnackBar("Select your image", v);
-                } else if (mmusername.getText().toString().trim().equals("")) {
+             if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);
                 } else if (moptionalPhoneLayout.getVisibility() == View.VISIBLE && moptional_number.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your phone number", v);
@@ -545,7 +543,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    if (hasImage.equals("0")) {
+                                    if (bitmap!=null) {
                                         params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
                                     }
 
@@ -571,6 +569,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                         mainObj.put("emailSubscriptionStatus", status1.getEmailSubscriptionStatus().toJSONObject());
                                         JSONObject jsonObject1 = mainObj.getJSONObject("subscriptionStatus");
                                         hashMap.put("play_id", String.valueOf(jsonObject1.get("userId")));
+
+
+                                        hashMap.put("role_id","3");
+
                                     } catch (Throwable t) {
                                         t.printStackTrace();
                                     }
@@ -641,6 +643,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+
 
         mbutton_verify = findViewById(R.id.button_verify);
 
@@ -888,30 +892,33 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                final Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    SetMap(location.getLatitude(), location.getLongitude());
+        if(!flag){
+            if (checkPermissions()) {
+                if (isLocationEnabled()) {
+                    mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                            new OnCompleteListener<Location>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Location> task) {
+                                    final Location location = task.getResult();
+                                    if (location == null) {
+                                        requestNewLocationData();
+                                    } else {
+                                        SetMap(location.getLatitude(), location.getLongitude());
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                } else {
+                    Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
             } else {
-                Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                requestPermissions();
             }
-        } else {
-            requestPermissions();
         }
+
     }
 
     private void SetMap(final double latitude, final double longitude) {

@@ -82,8 +82,8 @@ public class ViewAllStoresActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         BadgeCounter();
-        if(helpingMethods.GetCartTotal(helpingMethods.GetStoreID())>0){
-            mtotalAmount.setText("Rs."+helpingMethods.GetCartTotal(helpingMethods.GetStoreID())+"/-");
+        if(helpingMethods.newone(helpingMethods.GetStoreID())>0){
+            mtotalAmount.setText("Rs."+helpingMethods.newone(helpingMethods.GetStoreID())+"/-");
             mtotalAmount.setVisibility(View.VISIBLE);
         }else {
             mtotalAmount.setVisibility(View.GONE);
