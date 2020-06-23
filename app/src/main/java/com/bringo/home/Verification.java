@@ -569,6 +569,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                         mainObj.put("emailSubscriptionStatus", status1.getEmailSubscriptionStatus().toJSONObject());
                                         JSONObject jsonObject1 = mainObj.getJSONObject("subscriptionStatus");
                                         hashMap.put("play_id", String.valueOf(jsonObject1.get("userId")));
+
+
+                                        hashMap.put("role_id","3");
+
                                     } catch (Throwable t) {
                                         t.printStackTrace();
                                     }
@@ -639,6 +643,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+
 
         mbutton_verify = findViewById(R.id.button_verify);
 

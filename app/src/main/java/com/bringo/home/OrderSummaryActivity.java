@@ -1026,7 +1026,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                                             hashMap.put("sp_image[" + a + "]", preferenceList.get(a).getP_img());
                                             hashMap.put("act_prc[" + a + "]", preferenceList.get(a).getActual_price());
                                             hashMap.put("str_id", store_ID);
-                                            hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getDesc());
+                                            hashMap.put("sp_name[" + a + "]", preferenceList.get(a).getP_name());
 
                                             hashMap.put("user_id", FirebaseAuth.getInstance().getUid());
                                             hashMap.put("t_price", pTotalPrice);

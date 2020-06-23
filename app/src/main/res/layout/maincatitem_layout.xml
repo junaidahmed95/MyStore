@@ -10,6 +10,7 @@
 
 
     <LinearLayout
+        android:id="@+id/cat_layout"
         android:layout_width="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_height="wrap_content"

@@ -126,6 +126,13 @@ public class MainActivity extends AppCompatActivity {
         mUserImage = navHeaderView.findViewById(R.id.userImage);
         mUserName = navHeaderView.findViewById(R.id.userName);
 
+        mtotalAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OpencartActivity();
+            }
+        });
+
 
         msearchMul.setOnClickListener(new View.OnClickListener() {
             @Override

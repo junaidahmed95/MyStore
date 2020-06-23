@@ -163,8 +163,6 @@ public class StoreInfoActivity extends AppCompatActivity {
                 }
             }
         });
-
-
         mbtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,7 +185,7 @@ public class StoreInfoActivity extends AppCompatActivity {
                         String catimage = jsonObject.getString("thumbnail");
                         if (!backupList.contains(jsonObject.getString("m_name"))) {
                             backupList.add(jsonObject.getString("m_name"));
-                            productList.add(new Category(catimage, catTitle));
+                            productList.add(new Category(catimage, catTitle,""));
                         }
 
 

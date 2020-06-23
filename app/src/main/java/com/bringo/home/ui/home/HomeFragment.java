@@ -478,7 +478,8 @@ public class HomeFragment extends Fragment {
 
                             String image = jsonObject.getString("thumbnail");
                             String text = jsonObject.getString("m_name");
-                            catList.add(new Category(image, text));
+                            String cat_id = jsonObject.getString("id");
+                            catList.add(new Category(image, text,cat_id));
 
 
                         } catch (JSONException e) {
