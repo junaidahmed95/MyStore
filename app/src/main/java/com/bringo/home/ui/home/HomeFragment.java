@@ -19,8 +19,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,11 +48,19 @@ import com.bringo.home.Adapter.MainCategoryAdapter;
 import com.bringo.home.Adapter.SliderAdapter;
 import com.bringo.home.Adapter.StoresAdapter;
 import com.bringo.home.GirdListView;
+import com.bringo.home.MainCatActivity;
+import com.bringo.home.Model.Categories;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.Fruit;
+import com.bringo.home.Model.Listmmh;
+import com.bringo.home.Model.RetrofitClient;
 import com.bringo.home.Model.ShowStores;
+import com.bringo.home.Model.sample;
 import com.bringo.home.R;
 import com.bringo.home.ViewAllStoresActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,11 +84,16 @@ import com.smarteist.autoimageslider.SliderView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class HomeFragment extends Fragment {
 
@@ -99,14 +115,17 @@ public class HomeFragment extends Fragment {
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback locationCallback;
     int PERMISSION_ID = 44;
-    private RecyclerView grd_str;
+    private RecyclerView grd_str,hmmCatrecyclerView;
     private String test;
     private ProgressBar mloadingImage;
     private StoresAdapter allStoreAdapter;
     private RecyclerView mmainCatrecyclerView;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
-    SwipeRefreshLayout pullToRefresh;
+    private SwipeRefreshLayout pullToRefresh;
+    private TextView mcategory_name;
+    private ImageView mcategory_image;
+    private LinearLayout cat_layout;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -117,17 +136,30 @@ public class HomeFragment extends Fragment {
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = root.findViewById(R.id.retryBtn);
-
+        cat_layout = root.findViewById(R.id.cat_layout);
+        mcategory_name = root.findViewById(R.id.category_name);
+        mcategory_image = root.findViewById(R.id.category_image);
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
+       hmmCatrecyclerView = root.findViewById(R.id. hmmCatrecyclerView);
         mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
         catList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         mmainCatrecyclerView.setLayoutManager(layoutManager);
+
+        LinearLayoutManager layoutManage = new LinearLayoutManager(getActivity());
+        layoutManage.setOrientation(RecyclerView.HORIZONTAL);
+        hmmCatrecyclerView.setLayoutManager(layoutManage);
+
         GetCategories();
+        GetCat();
+        //Gethmm();
         grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         nearesStoresList = new ArrayList<>();
+
+
+
 
 
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -197,6 +229,17 @@ public class HomeFragment extends Fragment {
                 getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
+
+        cat_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), MainCatActivity.class);
+                intent.putExtra("cat_id",6);
+                getActivity().startActivity(intent);
+            }
+        });
+
+
 
 
         return root;
@@ -471,7 +514,7 @@ public class HomeFragment extends Fragment {
                     mretryBtn.setVisibility(View.VISIBLE);
 
                 } else {
-                    catList.clear();
+                    //catList.clear();
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
@@ -482,6 +525,8 @@ public class HomeFragment extends Fragment {
                             catList.add(new Category(image, text,cat_id));
 
 
+
+
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
                             mloadingImage.setVisibility(View.GONE);
@@ -489,8 +534,11 @@ public class HomeFragment extends Fragment {
                             mretryBtn.setVisibility(View.VISIBLE);
                         }
                     }
+                    Glide.with(getActivity()).asBitmap().load(catList.get(6).getCatImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mcategory_image);
+                    mcategory_name.setText(""+catList.get(6).getCatName());
                     MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
                     mmainCatrecyclerView.setAdapter(allStoreAdapter);
+                    hmmCatrecyclerView.setAdapter(allStoreAdapter);
                     mmainCatrecyclerView.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
@@ -515,6 +563,110 @@ public class HomeFragment extends Fragment {
         requestQueue = Volley.newRequestQueue(getContext());
         requestQueue.add(request);
 
+    }
+
+//    private void Gethmm() {
+//        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
+//
+//
+//            @Override
+//            public void onResponse(JSONArray response) {
+//
+//                JSONObject jsonObject = null;
+//                if (response.isNull(0)) {
+//                    mcdv_dialog.setVisibility(View.VISIBLE);
+//                    mloadingImage.setVisibility(View.GONE);
+//                    mretryBtn.setVisibility(View.VISIBLE);
+//
+//                } else {
+//                    catList.clear();
+//                    for (int i = 0; i < response.length(); i++) {
+//                        try {
+//                            jsonObject = response.getJSONObject(i);
+//
+//                            String image = jsonObject.getString("thumbnail");
+//                            String text = jsonObject.getString("m_name");
+//                            String cat_id = jsonObject.getString("id");
+//                            catList.add(new Category(image, text,cat_id));
+//
+//
+//                        } catch (JSONException e) {
+//                            grd_str.setVisibility(View.GONE);
+//                            mloadingImage.setVisibility(View.GONE);
+//                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                            mretryBtn.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+//                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
+//                   hmmCatrecyclerView.setAdapter(allStoreAdapter);
+//
+//                   hmmCatrecyclerView.setVisibility(View.VISIBLE);
+//                    allStoreAdapter.notifyDataSetChanged();
+//                    mloadingImage.setVisibility(View.GONE);
+//                }
+//
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                grd_str.setVisibility(View.GONE);
+//                mloadingImage.setVisibility(View.GONE);
+//                mretryBtn.setVisibility(View.VISIBLE);
+//                if (getActivity() != null) {
+//                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+//                }
+//
+//            }
+//        });
+//
+//
+//        requestQueue = Volley.newRequestQueue(getContext());
+//        requestQueue.add(request);
+//
+//    }
+
+    private void GetCat(){
+
+
+        Call<sample> done = RetrofitClient.getmInstance().getApi()
+                .editprice();
+        done.enqueue(new Callback<sample>() {
+            @Override
+            public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
+                Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<sample> call, Throwable t) {
+                Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+
+//        Call<List<sample>> call = RetrofitClient.getmInstance().
+//                getApi().editprice();
+//        call.enqueue(new Callback<List<sample>>() {
+//            @Override
+//            public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(getContext(), ""+response.body().toString(), Toast.LENGTH_SHORT).show();
+//                    ArrayList<Categories> maincat = response.body().getCategories();
+//                    ArrayList<Fruit> fruit = response.body().getFruits();
+//                    ArrayList<Listmmh> mmh = response.body().getMmh();
+//
+//                } else {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<sample> call, Throwable t) {
+//                Toast.makeText(getContext(), "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 }
