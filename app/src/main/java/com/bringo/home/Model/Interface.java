@@ -9,6 +9,7 @@ public interface Interface {
 
 
 
+    ////asdasdsadsadsdasdsd
     @GET("collection")
     Call<sample> editprice();
 }

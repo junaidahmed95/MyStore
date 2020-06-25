@@ -12,6 +12,7 @@ public class sample {
     @Expose
     private ArrayList<Categories> categories;
     //sdasdasd
+    ////asdasdsadsadsdasdsd////asdasdsadsadsdasdsd////asdasdsadsadsdasdsd
     public ArrayList<Categories> getCategories() {
         return categories;
     }

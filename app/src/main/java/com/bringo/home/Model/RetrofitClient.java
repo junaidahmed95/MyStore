@@ -12,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
     public static final String BASE_URL = "https://bringo.biz/api/";
     //sdasdasd
+    ////asdasdsadsadsdasdsd
 
     public  static RetrofitClient mInstance;
     private Retrofit retrofit;
