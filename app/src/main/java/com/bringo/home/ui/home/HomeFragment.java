@@ -97,10 +97,17 @@ import retrofit2.Callback;
 
 public class HomeFragment extends Fragment {
 
+
+    ArrayList<Categories> maincat;
+    ArrayList<Fruit> fruit ;
+    ArrayList<Listmmh> mmh;
+    ArrayList<Fruit> veg;
+
+
     private SliderView sliderView;
     private List<Category> productList;
     // ProgressBar mprogressbar;
-    private RecyclerView categoryRecyclerView;
+    private RecyclerView categoryRecyclerView,mfruitrecyclerView,vegrecyclerView;
     private ScrollView mScrollView;
     private Location mLastLocation;
 
@@ -143,6 +150,10 @@ public class HomeFragment extends Fragment {
         grd_str = root.findViewById(R.id.gd1);
        hmmCatrecyclerView = root.findViewById(R.id. hmmCatrecyclerView);
         mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
+        mfruitrecyclerView = root.findViewById(R.id.fruitrecyclerView);
+        vegrecyclerView= root.findViewById(R.id.vegrecyclerView);
+
+
         catList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
@@ -152,7 +163,15 @@ public class HomeFragment extends Fragment {
         layoutManage.setOrientation(RecyclerView.HORIZONTAL);
         hmmCatrecyclerView.setLayoutManager(layoutManage);
 
-        GetCategories();
+        LinearLayoutManager layoutManag = new LinearLayoutManager(getActivity());
+        layoutManag.setOrientation(RecyclerView.HORIZONTAL);
+        mfruitrecyclerView.setLayoutManager(layoutManag);
+
+        LinearLayoutManager layoutMana = new LinearLayoutManager(getActivity());
+        layoutMana.setOrientation(RecyclerView.HORIZONTAL);
+        vegrecyclerView.setLayoutManager(layoutMana);
+
+        //GetCategories();
         GetCat();
         //Gethmm();
         grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
@@ -230,14 +249,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        cat_layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MainCatActivity.class);
-                intent.putExtra("cat_id",6);
-                getActivity().startActivity(intent);
-            }
-        });
+
 
 
 
@@ -500,72 +512,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void GetCategories() {
-        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
-
-
-            @Override
-            public void onResponse(JSONArray response) {
-
-                JSONObject jsonObject = null;
-                if (response.isNull(0)) {
-                    mcdv_dialog.setVisibility(View.VISIBLE);
-                    mloadingImage.setVisibility(View.GONE);
-                    mretryBtn.setVisibility(View.VISIBLE);
-
-                } else {
-                    //catList.clear();
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            jsonObject = response.getJSONObject(i);
-
-                            String image = jsonObject.getString("thumbnail");
-                            String text = jsonObject.getString("m_name");
-                            String cat_id = jsonObject.getString("id");
-                            catList.add(new Category(image, text,cat_id));
-
-
-
-
-                        } catch (JSONException e) {
-                            grd_str.setVisibility(View.GONE);
-                            mloadingImage.setVisibility(View.GONE);
-                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            mretryBtn.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    Glide.with(getActivity()).asBitmap().load(catList.get(6).getCatImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mcategory_image);
-                    mcategory_name.setText(""+catList.get(6).getCatName());
-                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
-                    mmainCatrecyclerView.setAdapter(allStoreAdapter);
-                    hmmCatrecyclerView.setAdapter(allStoreAdapter);
-                    mmainCatrecyclerView.setVisibility(View.VISIBLE);
-                    allStoreAdapter.notifyDataSetChanged();
-                    mloadingImage.setVisibility(View.GONE);
-                }
-
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                grd_str.setVisibility(View.GONE);
-                mloadingImage.setVisibility(View.GONE);
-                mretryBtn.setVisibility(View.VISIBLE);
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-
-
-        requestQueue = Volley.newRequestQueue(getContext());
-        requestQueue.add(request);
-
-    }
-
-//    private void Gethmm() {
+//    //private void GetCategories() {
 //        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
 //
 //
@@ -579,7 +526,7 @@ public class HomeFragment extends Fragment {
 //                    mretryBtn.setVisibility(View.VISIBLE);
 //
 //                } else {
-//                    catList.clear();
+//                    //catList.clear();
 //                    for (int i = 0; i < response.length(); i++) {
 //                        try {
 //                            jsonObject = response.getJSONObject(i);
@@ -590,6 +537,8 @@ public class HomeFragment extends Fragment {
 //                            catList.add(new Category(image, text,cat_id));
 //
 //
+//
+//
 //                        } catch (JSONException e) {
 //                            grd_str.setVisibility(View.GONE);
 //                            mloadingImage.setVisibility(View.GONE);
@@ -597,10 +546,12 @@ public class HomeFragment extends Fragment {
 //                            mretryBtn.setVisibility(View.VISIBLE);
 //                        }
 //                    }
+//                    Glide.with(getActivity()).asBitmap().load(catList.get(6).getCatImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mcategory_image);
+//                    mcategory_name.setText(""+catList.get(6).getCatName());
 //                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
-//                   hmmCatrecyclerView.setAdapter(allStoreAdapter);
-//
-//                   hmmCatrecyclerView.setVisibility(View.VISIBLE);
+//                    mmainCatrecyclerView.setAdapter(allStoreAdapter);
+//                    hmmCatrecyclerView.setAdapter(allStoreAdapter);
+//                    mmainCatrecyclerView.setVisibility(View.VISIBLE);
 //                    allStoreAdapter.notifyDataSetChanged();
 //                    mloadingImage.setVisibility(View.GONE);
 //                }
@@ -625,20 +576,41 @@ public class HomeFragment extends Fragment {
 //        requestQueue.add(request);
 //
 //    }
-
     private void GetCat(){
-
-
         Call<sample> done = RetrofitClient.getmInstance().getApi()
                 .editprice();
         done.enqueue(new Callback<sample>() {
             @Override
             public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
-                Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+
+            maincat = response.body().getCategories();
+            fruit = response.body().getFruits();
+            mmh = response.body().getMmh();
+                veg = response.body().getVegetables();
+
+                MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"1");
+                mmainCatrecyclerView.setAdapter(allStoreAdapter);
+                MainCategoryAdapter allStoreAdapter1 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"2");
+                hmmCatrecyclerView.setAdapter(allStoreAdapter1);
+                MainCategoryAdapter allStoreAdapter2 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"3");
+                mfruitrecyclerView.setAdapter(allStoreAdapter2);
+                MainCategoryAdapter allStoreAdapter3 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"4");
+                vegrecyclerView.setAdapter(allStoreAdapter3);
+                mmainCatrecyclerView.setVisibility(View.VISIBLE);
+                allStoreAdapter.notifyDataSetChanged();
+                mloadingImage.setVisibility(View.GONE);
+
             }
 
             @Override
             public void onFailure(Call<sample> call, Throwable t) {
+                grd_str.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.VISIBLE);
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "no" , Toast.LENGTH_SHORT).show();
+                }
+
                 Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
 
             }

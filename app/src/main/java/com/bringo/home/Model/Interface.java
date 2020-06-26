@@ -10,6 +10,6 @@ public interface Interface {
 
 
     ////asdasdsadsadsdasdsd
-    @GET("collection")
+    @GET("main_catogory/collection")
     Call<sample> editprice();
 }

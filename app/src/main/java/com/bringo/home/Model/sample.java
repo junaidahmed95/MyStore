@@ -20,18 +20,17 @@ public class sample {
     public void setCategories(ArrayList<Categories> categories) {
         this.categories = categories;
     }
-
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
     @SerializedName("mmh_store")
     @Expose
-    private ArrayList<Listmmh> mmh;
+    private ArrayList<Listmmh> mmh_store;
 
     public ArrayList<Listmmh> getMmh() {
-        return mmh;
+        return mmh_store;
     }
 
     public void setMmh(ArrayList<Listmmh> mmh) {
-        this.mmh = mmh;
+        this.mmh_store = mmh;
     }
 
 
