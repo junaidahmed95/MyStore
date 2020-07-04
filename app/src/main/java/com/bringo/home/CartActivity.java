@@ -74,14 +74,14 @@ public class CartActivity extends AppCompatActivity {
 
         GetCartData();
 
-        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(store_ID));
+        mTxtView_TotalPrice.setText("" + helpingMethods.newone(store_ID));
 
-        cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity");
+        cartAdapter = new CartAdapter(preferenceList, CartActivity.this, "activity",ownerName);
         mCartRecyclerView.setAdapter(cartAdapter);
         cartAdapter.notifyDataSetChanged();
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+        mtotalAmount.setText("Rs." + helpingMethods.newone(store_ID) + "/-");
 
 
         mcheckBtn.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +90,7 @@ public class CartActivity extends AppCompatActivity {
                 if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
                     ConnectionDetector connectionDetector = new ConnectionDetector(CartActivity.this);
                     if (connectionDetector.isConnected()) {
-                        if (helpingMethods.GetCartTotal(store_ID) >= 300) {
+                        if (helpingMethods.newone(store_ID) >= 300) {
                             Intent sumInt = new Intent(CartActivity.this, OrderSummaryActivity.class);
                             sumInt.putExtra("from", "activity");
                             sumInt.putExtra("totalP", mTxtView_TotalPrice.getText().toString());
@@ -103,7 +103,6 @@ public class CartActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(CartActivity.this, "You order total price must be 300 or more", Toast.LENGTH_LONG).show();
                         }
-
                     } else {
                         Toast.makeText(CartActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
@@ -213,7 +212,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(helpingMethods.GetStoreID()+""+helpingMethods.GetStoreName(), MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {

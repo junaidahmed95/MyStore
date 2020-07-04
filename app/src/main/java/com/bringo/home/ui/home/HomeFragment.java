@@ -8,17 +8,22 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,22 +32,35 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.CategoryAdapter;
+import com.bringo.home.Adapter.MainCategoryAdapter;
 import com.bringo.home.Adapter.SliderAdapter;
 import com.bringo.home.Adapter.StoresAdapter;
 import com.bringo.home.GirdListView;
+import com.bringo.home.MainCatActivity;
+import com.bringo.home.Model.Categories;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.Fruit;
+import com.bringo.home.Model.Listmmh;
+import com.bringo.home.Model.RetrofitClient;
 import com.bringo.home.Model.ShowStores;
+import com.bringo.home.Model.sample;
 import com.bringo.home.R;
 import com.bringo.home.ViewAllStoresActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -66,19 +84,35 @@ import com.smarteist.autoimageslider.SliderView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+
 public class HomeFragment extends Fragment {
+
+
+    ArrayList<Categories> maincat;
+    ArrayList<Fruit> fruit ;
+    ArrayList<Listmmh> mmh;
+    ArrayList<Fruit> veg;
+
 
     private SliderView sliderView;
     private List<Category> productList;
     // ProgressBar mprogressbar;
-    private RecyclerView categoryRecyclerView;
+    private RecyclerView categoryRecyclerView,mfruitrecyclerView,vegrecyclerView;
     private ScrollView mScrollView;
+    private Location mLastLocation;
 
     public static String forWhat = "All";
+    private List<Category> catList;
     List<GirdListView> list;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
@@ -86,29 +120,75 @@ public class HomeFragment extends Fragment {
 
 
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback locationCallback;
     int PERMISSION_ID = 44;
-    private RecyclerView grd_str;
+    private RecyclerView grd_str,hmmCatrecyclerView;
     private String test;
     private ProgressBar mloadingImage;
     private StoresAdapter allStoreAdapter;
+    private RecyclerView mmainCatrecyclerView;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
+    private SwipeRefreshLayout pullToRefresh;
+    private TextView mcategory_name;
+    private ImageView mcategory_image;
+    private LinearLayout cat_layout;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        pullToRefresh = root.findViewById(R.id.pullToRefresh);
         mloadingImage = root.findViewById(R.id.spin_kit);
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = root.findViewById(R.id.retryBtn);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        cat_layout = root.findViewById(R.id.cat_layout);
+        mcategory_name = root.findViewById(R.id.category_name);
+        mcategory_image = root.findViewById(R.id.category_image);
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
+       hmmCatrecyclerView = root.findViewById(R.id. hmmCatrecyclerView);
+        mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
+        mfruitrecyclerView = root.findViewById(R.id.fruitrecyclerView);
+        vegrecyclerView= root.findViewById(R.id.vegrecyclerView);
+
+
+        catList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        grd_str.setLayoutManager(layoutManager);
+        mmainCatrecyclerView.setLayoutManager(layoutManager);
+
+        LinearLayoutManager layoutManage = new LinearLayoutManager(getActivity());
+        layoutManage.setOrientation(RecyclerView.HORIZONTAL);
+        hmmCatrecyclerView.setLayoutManager(layoutManage);
+
+        LinearLayoutManager layoutManag = new LinearLayoutManager(getActivity());
+        layoutManag.setOrientation(RecyclerView.HORIZONTAL);
+        mfruitrecyclerView.setLayoutManager(layoutManag);
+
+        LinearLayoutManager layoutMana = new LinearLayoutManager(getActivity());
+        layoutMana.setOrientation(RecyclerView.HORIZONTAL);
+        vegrecyclerView.setLayoutManager(layoutMana);
+
+        //GetCategories();
+        GetCat();
+        //Gethmm();
+        grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         nearesStoresList = new ArrayList<>();
+
+
+
+
+
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
@@ -134,6 +214,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
         mcdv_dialog = root.findViewById(R.id.cdv_dialog);
         sliderView = root.findViewById(R.id.imageSlider);
@@ -168,6 +249,11 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+
+
+
+
         return root;
     }
 
@@ -193,8 +279,10 @@ public class HomeFragment extends Fragment {
 
     private boolean isLocationEnabled() {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.NETWORK_PROVIDER
+
         );
     }
 
@@ -203,6 +291,9 @@ public class HomeFragment extends Fragment {
         super.onResume();
         mretryBtn.setVisibility(View.GONE);
         CheckLocationPermission();
+
+
+        //streamLocation();
     }
 
     @SuppressLint("MissingPermission")
@@ -224,40 +315,42 @@ public class HomeFragment extends Fragment {
     private LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
+            mLastLocation = locationResult.getLastLocation();
             GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
     };
 
-    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.846498&longitude=67.035172";
+    //https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717
+    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
     //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
-//
-    private void GetNearByStores(double latitude, double longitude) {
-request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude), new Response.Listener<JSONArray>() {
+
+    private void GetNearByStores(final double latitude, final double longitude) {
+        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
+
+
             @Override
             public void onResponse(JSONArray response) {
-
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
                     mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
-
                 } else {
+                    Log.d("getlatlng", latitude + " " + longitude);
                     nearesStoresList.clear();
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             jsonObject = response.getJSONObject(i);
-
                             String userID = jsonObject.getString("u_id");
                             String storename = jsonObject.getString("str_name");
                             String storeaddr = jsonObject.getString("address");
                             String store_id = jsonObject.getString("id");
-                            String distance = jsonObject.getString("distance");
+                            double distance1 = Double.parseDouble(jsonObject.getString("distance"));
                             String store_image = jsonObject.getString("thumbnail");
+                            NumberFormat formatter = new DecimalFormat("#0.00");
+                            String distance = formatter.format(distance1);
+                            Log.d("distance", formatter.format(distance1) + " " + storename);
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
-
-
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
                             mloadingImage.setVisibility(View.GONE);
@@ -267,13 +360,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                     }
                     allStoreAdapter = new StoresAdapter(nearesStoresList, getActivity(), false);
                     grd_str.setAdapter(allStoreAdapter);
+                    mcdv_dialog.setVisibility(View.GONE);
+                    mretryBtn.setVisibility(View.GONE);
                     grd_str.setVisibility(View.VISIBLE);
                     allStoreAdapter.notifyDataSetChanged();
                     mloadingImage.setVisibility(View.GONE);
-                    mBtnViewAll.setVisibility(View.VISIBLE);
+                    // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
-
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -283,12 +376,15 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue = Volley.newRequestQueue(getContext());
         requestQueue.add(request);
@@ -296,9 +392,43 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
     }
 
     @SuppressLint("MissingPermission")
+    private void streamLocation() {
+        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Toast.makeText(getActivity(), "Location Changed" + location.getLatitude(), Toast.LENGTH_SHORT).show();
+                grd_str.setVisibility(View.GONE);
+                mcdv_dialog.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.VISIBLE);
+                mLastLocation = location;
+                GetNearByStores(location.getLatitude(), location.getLongitude());
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
     private void getLastLocation() {
         if (checkPermissions()) {
             if (isLocationEnabled()) {
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
                 mFusedLocationClient.getLastLocation().addOnCompleteListener(
                         new OnCompleteListener<Location>() {
                             @Override
@@ -308,12 +438,15 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                                 if (location == null) {
                                     requestNewLocationData();
                                 } else {
+                                    mLastLocation = location;
                                     GetNearByStores(location.getLatitude(), location.getLongitude());
 
                                 }
                             }
                         }
                 );
+
+
             } else {
                 Toast.makeText(getContext(), "Turn on location", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -336,9 +469,13 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
         Dexter.withActivity(getActivity())
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
+                    @SuppressLint("MissingPermission")
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
+
+
                         getLastLocation();
+
                     }
 
                     @Override
@@ -374,6 +511,135 @@ request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?latitu
                 .check();
     }
 
+
+//    //private void GetCategories() {
+//        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
+//
+//
+//            @Override
+//            public void onResponse(JSONArray response) {
+//
+//                JSONObject jsonObject = null;
+//                if (response.isNull(0)) {
+//                    mcdv_dialog.setVisibility(View.VISIBLE);
+//                    mloadingImage.setVisibility(View.GONE);
+//                    mretryBtn.setVisibility(View.VISIBLE);
+//
+//                } else {
+//                    //catList.clear();
+//                    for (int i = 0; i < response.length(); i++) {
+//                        try {
+//                            jsonObject = response.getJSONObject(i);
+//
+//                            String image = jsonObject.getString("thumbnail");
+//                            String text = jsonObject.getString("m_name");
+//                            String cat_id = jsonObject.getString("id");
+//                            catList.add(new Category(image, text,cat_id));
+//
+//
+//
+//
+//                        } catch (JSONException e) {
+//                            grd_str.setVisibility(View.GONE);
+//                            mloadingImage.setVisibility(View.GONE);
+//                            Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                            mretryBtn.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+//                    Glide.with(getActivity()).asBitmap().load(catList.get(6).getCatImage()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mcategory_image);
+//                    mcategory_name.setText(""+catList.get(6).getCatName());
+//                    MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(catList, getActivity());
+//                    mmainCatrecyclerView.setAdapter(allStoreAdapter);
+//                    hmmCatrecyclerView.setAdapter(allStoreAdapter);
+//                    mmainCatrecyclerView.setVisibility(View.VISIBLE);
+//                    allStoreAdapter.notifyDataSetChanged();
+//                    mloadingImage.setVisibility(View.GONE);
+//                }
+//
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                grd_str.setVisibility(View.GONE);
+//                mloadingImage.setVisibility(View.GONE);
+//                mretryBtn.setVisibility(View.VISIBLE);
+//                if (getActivity() != null) {
+//                    Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+//                }
+//
+//            }
+//        });
+//
+//
+//        requestQueue = Volley.newRequestQueue(getContext());
+//        requestQueue.add(request);
+//
+//    }
+    private void GetCat(){
+        Call<sample> done = RetrofitClient.getmInstance().getApi()
+                .editprice();
+        done.enqueue(new Callback<sample>() {
+            @Override
+            public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
+
+            maincat = response.body().getCategories();
+            fruit = response.body().getFruits();
+            mmh = response.body().getMmh();
+                veg = response.body().getVegetables();
+
+                MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"1");
+                mmainCatrecyclerView.setAdapter(allStoreAdapter);
+                MainCategoryAdapter allStoreAdapter1 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"2");
+                hmmCatrecyclerView.setAdapter(allStoreAdapter1);
+                MainCategoryAdapter allStoreAdapter2 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"3");
+                mfruitrecyclerView.setAdapter(allStoreAdapter2);
+                MainCategoryAdapter allStoreAdapter3 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"4");
+                vegrecyclerView.setAdapter(allStoreAdapter3);
+                mmainCatrecyclerView.setVisibility(View.VISIBLE);
+                allStoreAdapter.notifyDataSetChanged();
+                mloadingImage.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onFailure(Call<sample> call, Throwable t) {
+                grd_str.setVisibility(View.GONE);
+                mloadingImage.setVisibility(View.GONE);
+                mretryBtn.setVisibility(View.VISIBLE);
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "no" , Toast.LENGTH_SHORT).show();
+                }
+
+                Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+
+//        Call<List<sample>> call = RetrofitClient.getmInstance().
+//                getApi().editprice();
+//        call.enqueue(new Callback<List<sample>>() {
+//            @Override
+//            public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(getContext(), ""+response.body().toString(), Toast.LENGTH_SHORT).show();
+//                    ArrayList<Categories> maincat = response.body().getCategories();
+//                    ArrayList<Fruit> fruit = response.body().getFruits();
+//                    ArrayList<Listmmh> mmh = response.body().getMmh();
+//
+//                } else {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<sample> call, Throwable t) {
+//                Toast.makeText(getContext(), "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+    }
 
 }
 

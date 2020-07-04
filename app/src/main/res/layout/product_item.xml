@@ -38,11 +38,26 @@
                 android:layout_height="80dp"
                 android:layout_centerHorizontal="true" />
 
+
+            <TextView
+                android:id="@+id/product_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/product_image"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:textColor="@color/black"/>
+
             <TextView
                 android:id="@+id/product_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/product_image"
+                android:layout_below="@+id/product_desc"
                 android:layout_marginLeft="3dp"
                 android:layout_marginTop="1dp"
                 android:layout_marginRight="3dp"
@@ -50,27 +65,15 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="@color/primaryTextColor"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/product_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/product_title"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="1dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:singleLine="true"
                 android:textColor="@color/secondaryTextColor" />
+
+
 
             <RelativeLayout
                 android:id="@+id/priceLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/product_desc"
+                android:layout_below="@+id/product_title"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="4dp">

@@ -49,7 +49,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button mremoveToCart, maddToCart, mcheckout;
     private HelpingMethods helpingMethods;
     private int position;
-    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage, mdesc;
+    private String pID, pImage, pPrice, pName, StID, catName, ownerName, ownerID, ownerImage, mdesc,cat_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +84,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         ownerImage = getIntent().getStringExtra("oImage");
         StID = getIntent().getStringExtra("StID");
         catName = getIntent().getStringExtra("catName");
+        cat_id = getIntent().getStringExtra("cat_id");
+
 
         Glide.with(this).asBitmap().load(pImage).apply(new RequestOptions().placeholder(R.drawable.placeholder)).into(mpImage);
         GetCartData();
@@ -146,7 +148,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     MainsetupBadge();
                     int total = helpingMethods.GetCartTotal(storeID) + Integer.parseInt(pPrice);
-                    helpingMethods.SaveCartTotal(total, storeID);
+                    helpingMethods.SaveCartTotal(String.valueOf(total), storeID);
                     if (helpingMethods.GetStoreID() == null) {
                         helpingMethods.SaveStoreData(storeID, getIntent().getStringExtra("oName"), getIntent().getStringExtra("oImage"), getIntent().getStringExtra("oID"));
                     }
@@ -162,7 +164,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     mycheckList.add(spID);
                     SaveCheckData();
                     //String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price
-                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID));
+                    preferenceList.add(new CatLvlItemList(pName, pPrice, "1", pImage, position, pID, storeID, pPrice, spID,getIntent().getStringExtra("desc"),cat_id));
                     SaveCartData();
                 }
 
@@ -179,7 +181,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     helpingMethods.SaveCartCount(finalCount, storeID);
                     MainsetupBadge();
                     int total = helpingMethods.GetCartTotal(storeID) - Integer.parseInt(pPrice);
-                    helpingMethods.SaveCartTotal(total, storeID);
+                    helpingMethods.SaveCartTotal(String.valueOf(total), storeID);
                     int a = mycheckList.indexOf(spID);
                     mycheckList.remove(a);
                     SaveCheckData();
@@ -206,7 +208,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void SaveCheckData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(mycheckList);
@@ -217,7 +219,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void GetCheckData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Checkcart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+"Checkcart", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("checklist", null);
             Type type = new TypeToken<ArrayList<String>>() {
@@ -244,7 +246,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void SaveCartData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(preferenceList);
@@ -255,7 +257,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void GetCartData() {
         try {
-            SharedPreferences sharedPreferences = getSharedPreferences("Mycart", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(subcatproLists.get(0).getStoreId()+""+ownerName, MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cartlist", null);
             Type type = new TypeToken<ArrayList<CatLvlItemList>>() {
@@ -292,13 +294,15 @@ public class ProductDetailActivity extends AppCompatActivity {
             intent.putExtra("ownerID", ownerID);
             intent.putExtra("ownerImage", ownerImage);
             startActivity(intent);
-        } else {
+        }
+        else {
             Intent intent = new Intent(ProductDetailActivity.this, SubCatActivity.class);
             intent.putExtra("storeid", storeID);
             intent.putExtra("catName", catName);
             intent.putExtra("stname", ownerName);
             intent.putExtra("ownerID", ownerID);
             intent.putExtra("ownerImage", ownerImage);
+
             startActivity(intent);
         }
 
