@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.bringo.home.Adapter.PCatAdapter;
+import com.bringo.home.Adapter.SearchProductAdapter;
 import com.bringo.home.Model.CatLvlItemList;
+import com.bringo.home.Model.helpinginterface;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import static com.bringo.home.SubCatActivity.prolist;
  * A simple {@link Fragment} subclass.
  */
 
-public class CatLvlFragment extends Fragment {
+public class CatLvlFragment extends Fragment implements helpinginterface {
 
 
     private String JSON_URL = "";
@@ -47,6 +49,12 @@ public class CatLvlFragment extends Fragment {
         this.ownerID = ownerID;
         this.ownerName = ownerName;
         this.ownerImage = ownerImage;
+    }
+    public CatLvlFragment(List<CatLvlItemList> originalList) {
+
+        this.originalList = originalList;
+
+        // Required empty public constructor
     }
 
 
@@ -98,6 +106,17 @@ public class CatLvlFragment extends Fragment {
             //Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+
+    }
+
+
+
+    @Override
+    public void get(List<CatLvlItemList> list) {
+
+        SearchProductAdapter searchjAdapter = new SearchProductAdapter(list,getActivity());
+        mpRecyclerView.setAdapter(searchjAdapter);
+        searchjAdapter.notifyDataSetChanged();
 
     }
 }

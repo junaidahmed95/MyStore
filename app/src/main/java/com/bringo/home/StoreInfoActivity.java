@@ -28,6 +28,7 @@ import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
@@ -46,10 +47,11 @@ public class StoreInfoActivity extends AppCompatActivity {
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     private HelpingMethods helpingMethods;
-    private TextView mstName, mstAddress,mtotalAmount;;
+    private TextView mstName, mstAddress, mtotalAmount;
+    ;
     private Button mretryBtn;
     private TextView textCartItemCount;
-    private ProgressDialog mProgressDialog;
+
     private List<String> backupList;
     private List<Category> productList;
     ProgressBar mprogressbar;
@@ -63,15 +65,17 @@ public class StoreInfoActivity extends AppCompatActivity {
     public static List<String> checklist = new ArrayList<>();
     private ImageView mbasketImageView;
 
+    private ShimmerFrameLayout mshimmer_cat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_info);
+        mshimmer_cat = findViewById(R.id.shimmer_cat);
+        mshimmer_cat.startShimmerAnimation();
 
-        mProgressDialog = new ProgressDialog(StoreInfoActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+
+
         mbtn_search = findViewById(R.id.btnSearch);
         stID = getIntent().getStringExtra("storeid");
         ownerName = getIntent().getStringExtra("stname");
@@ -82,22 +86,22 @@ public class StoreInfoActivity extends AppCompatActivity {
         mtotalAmount = findViewById(R.id.totalAmount);
         textCartItemCount = findViewById(R.id.cart_badge);
         mbasketImageView = findViewById(R.id.basketImageView);
+
         mbasketImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                    if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
-                        Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
-                        intent.putExtra("StID",stID);
-                        intent.putExtra("catName", "");
-                        intent.putExtra("for", "finish");
-                        intent.putExtra("stname", ownerName);
-                        intent.putExtra("ownerID", helpingMethods.GetStoreUID());
-                        intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                    }
-
+                if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) > 0) {
+                    Intent intent = new Intent(StoreInfoActivity.this, CartActivity.class);
+                    intent.putExtra("StID", stID);
+                    intent.putExtra("catName", "");
+                    intent.putExtra("for", "finish");
+                    intent.putExtra("stname", ownerName);
+                    intent.putExtra("ownerID", helpingMethods.GetStoreUID());
+                    intent.putExtra("ownerImage", helpingMethods.GetStoreImage());
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
 
 
             }
@@ -108,7 +112,6 @@ public class StoreInfoActivity extends AppCompatActivity {
         mstName = findViewById(R.id.stName);
         mstAddress = findViewById(R.id.stAddress);
         mretryBtn = findViewById(R.id.retryBtn);
-
 
 
         //Glide.with(getApplicationContext()).asBitmap().load(ownerImage).apply(new RequestOptions().placeholder(R.drawable.store_background)).into(mstImage);
@@ -134,6 +137,8 @@ public class StoreInfoActivity extends AppCompatActivity {
                 intent.putExtra("stID", stID);
                 intent.putExtra("catName", "");
                 intent.putExtra("stname", ownerName);
+                intent.putExtra("search", "single");
+
                 intent.putExtra("ownerID", ownerID);
                 intent.putExtra("ownerImage", ownerImage);
                 startActivity(intent);
@@ -145,8 +150,9 @@ public class StoreInfoActivity extends AppCompatActivity {
         if (connectionDetector.isConnected()) {
             parseJSON();
         } else {
-            mProgressDialog.cancel();
+
             mretryBtn.setVisibility(View.VISIBLE);
+            mshimmer_cat.setVisibility(View.VISIBLE);
             Toast.makeText(StoreInfoActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
         }
 
@@ -155,7 +161,7 @@ public class StoreInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(StoreInfoActivity.this);
                 if (connectionDetector.isConnected()) {
-                    mProgressDialog.show();
+
                     mretryBtn.setVisibility(View.GONE);
                     parseJSON();
                 } else {
@@ -185,12 +191,12 @@ public class StoreInfoActivity extends AppCompatActivity {
                         String catimage = jsonObject.getString("thumbnail");
                         if (!backupList.contains(jsonObject.getString("m_name"))) {
                             backupList.add(jsonObject.getString("m_name"));
-                            productList.add(new Category(catimage, catTitle,""));
+                            productList.add(new Category(catimage, catTitle, ""));
                         }
 
 
                     } catch (JSONException e) {
-                        mProgressDialog.cancel();
+
                         mretryBtn.setVisibility(View.VISIBLE);
                         Toast.makeText(StoreInfoActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
 
@@ -200,18 +206,21 @@ public class StoreInfoActivity extends AppCompatActivity {
 
                 CategoryAdapter categoryAdapter = new CategoryAdapter(productList, StoreInfoActivity.this, stID, ownerID, ownerImage, ownerName);
                 categoryRecyclerView.setAdapter(categoryAdapter);
+                mshimmer_cat.stopShimmerAnimation();
+                mshimmer_cat.setVisibility(View.GONE);
+               categoryRecyclerView.setVisibility(View.VISIBLE);
                 categoryAdapter.notifyDataSetChanged();
                 if (productList.size() == 0) {
                     Toast.makeText(StoreInfoActivity.this, "This store does not have any category yet!", Toast.LENGTH_LONG).show();
                 }
-                mProgressDialog.cancel();
+
                 categoryRecyclerView.setVisibility(View.VISIBLE);
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mProgressDialog.cancel();
+
                 mretryBtn.setVisibility(View.VISIBLE);
                 Toast.makeText(StoreInfoActivity.this, "" + error, Toast.LENGTH_SHORT).show();
 
@@ -227,11 +236,6 @@ public class StoreInfoActivity extends AppCompatActivity {
         requestQueue.add(request);
 
 
-
-
-
-
-
     }
 
     @Override
@@ -241,18 +245,18 @@ public class StoreInfoActivity extends AppCompatActivity {
     }
 
     private void MainBadge() {
-                if (helpingMethods.GetCartCount(stID) == 0) {
-                    if (textCartItemCount.getVisibility() != View.GONE) {
-                        textCartItemCount.setVisibility(View.GONE);
-                    }
-                } else {
-                    textCartItemCount.setText("" + helpingMethods.GetCartCount(stID));
-                    //textCartItemCount.setText(""+2);
-                    if (textCartItemCount.getVisibility() != View.VISIBLE) {
-                        textCartItemCount.setVisibility(View.VISIBLE);
-                    }
+        if (helpingMethods.GetCartCount(stID) == 0) {
+            if (textCartItemCount.getVisibility() != View.GONE) {
+                textCartItemCount.setVisibility(View.GONE);
+            }
+        } else {
+            textCartItemCount.setText("" + helpingMethods.GetCartCount(stID));
+            //textCartItemCount.setText(""+2);
+            if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                textCartItemCount.setVisibility(View.VISIBLE);
+            }
 
-                }
+        }
 
 
     }
@@ -262,13 +266,12 @@ public class StoreInfoActivity extends AppCompatActivity {
         super.onResume();
         MainBadge();
 
-                if(helpingMethods.newone(stID)>0){
-                    mtotalAmount.setText("Rs."+helpingMethods.newone(stID)+"/-");
-                    mtotalAmount.setVisibility(View.VISIBLE);
-                }else {
-                    mtotalAmount.setVisibility(View.GONE);
-                }
-
+        if (helpingMethods.newone(stID) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.newone(stID) + "/-");
+            mtotalAmount.setVisibility(View.VISIBLE);
+        } else {
+            mtotalAmount.setVisibility(View.GONE);
+        }
 
 
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {

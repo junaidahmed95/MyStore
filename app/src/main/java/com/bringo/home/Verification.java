@@ -312,7 +312,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
 //                if (currentAccessToken == null) {
-//                    mAuth.signOut();
+//                    mAuth.signOut();re
 //                }
             }
         };
@@ -760,6 +760,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             public void onError(FacebookException error) {
                 mProgressDialog.cancel();
                 Toast.makeText(Verification.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("junaid",""+error.getMessage()+"adeel"+FirebaseAuth.getInstance().getCurrentUser());
             }
         });
     }
@@ -1241,6 +1242,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     mProgressDialog.cancel();
                     Toast.makeText(Verification.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    //Log.d("junaid",""+task.getException().getMessage()+"adeel"+FirebaseAuth.getInstance().getUid());
                 }
             }
         });

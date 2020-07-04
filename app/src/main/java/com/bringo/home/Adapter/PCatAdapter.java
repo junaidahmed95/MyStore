@@ -226,13 +226,13 @@ public class PCatAdapter extends RecyclerView.Adapter<PCatAdapter.ViewHolder> {
                     holder.mbtn_add_cart.setVisibility(View.VISIBLE);
                     int finalCount = helpingMethods.GetCartCount(subcatproLists.get(position).getStoreId()) - 1;
                     helpingMethods.SaveCartCount(finalCount, subcatproLists.get(position).getStoreId());
-                    int total = helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
+                    double total = helpingMethods.newone(subcatproLists.get(position).getStoreId()) - Integer.parseInt(subcatproLists.get(position).getP_price());
                     helpingMethods.SaveCartTotal(String.valueOf(total), subcatproLists.get(position).getStoreId());
 
                     if (isForSearch) {
                         SearchsetupBadge();
                     } else {
-                        SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(subcatproLists.get(position).getStoreId()) + "/-");
+                        SubCatActivity.mtotalAmount.setText("Rs." + helpingMethods.newone(subcatproLists.get(position).getStoreId()) + "/-");
                         setupBadge();
                     }
                     MainsetupBadge();

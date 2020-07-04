@@ -83,26 +83,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
-        msearchMul= findViewById(R.id.searchMul);
+        msearchMul = findViewById(R.id.searchMul);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
 
 
-        checkrateListener = new ValueEventListener() {
+        checkrateListener = new ValueEventListener() {//9
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        storeID = snapshot.getKey();
-                        if (snapshot.child("st_name").exists()) {
-                            storeName = snapshot.child("st_name").getValue().toString();
-                        }
-
-                        break;
-                    }
+                    storeID = dataSnapshot.getKey().toString();
+                    storeName = dataSnapshot.child("st_name").getValue().toString();
                     showRatingDialog();
 
                 }
@@ -137,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
         msearchMul.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,SearchActivity.class);
-                intent.putExtra("search","mulstore");
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                intent.putExtra("search", "mulstore");
                 startActivity(intent);
             }
         });

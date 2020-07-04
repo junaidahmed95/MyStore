@@ -20,6 +20,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -30,6 +31,7 @@ import com.bringo.home.Adapter.SearchProductAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
@@ -51,9 +53,9 @@ public class SearchActivity extends AppCompatActivity {
     private static HelpingMethods helpingMethods;
     private SearchProductAdapter searchjAdapter;
     private Boolean IsAdded = false;
-    private ProgressDialog mProgressDialog;
+    //
 
-
+    private ShimmerFrameLayout mshimmer_search;
     EditText meditText;
 
     private JsonArrayRequest request;
@@ -65,16 +67,17 @@ public class SearchActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private String ownerID, ownerImage, ownerName, cat_Name, search;
     private static String store_ID;
-    private String getid="";
+    private String getid = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+
+        mshimmer_search = findViewById(R.id.shimmer_search);
+        mshimmer_search.startShimmerAnimation();
+
+
         store_ID = getIntent().getStringExtra("stID");
         cat_Name = getIntent().getStringExtra("catName");
         ownerName = getIntent().getStringExtra("stname");
@@ -96,15 +99,59 @@ public class SearchActivity extends AppCompatActivity {
         ConnectionDetector connectionDetector = new ConnectionDetector(this);
 
 
-
         search = getIntent().getStringExtra("search");
-        if (search!=null) {
+
+
+        if (search.equals("mulstore")) {
             if (connectionDetector.isConnected()) {
                 seach();
             } else {
                 Toast.makeText(this, "Check your internet and retry again.", Toast.LENGTH_SHORT).show();
             }
-        }else{
+        } else if (search.equals("cat")) {
+            if (connectionDetector.isConnected()) {
+                searchjAdapter = new SearchProductAdapter(SubCatActivity.prolist, SearchActivity.this);
+                mRecyclerView.setAdapter(searchjAdapter);
+                mshimmer_search.stopShimmerAnimation();
+                mshimmer_search.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+
+                searchjAdapter.notifyDataSetChanged();
+
+                meditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (!s.toString().trim().equals("")) {
+                            filter(s.toString());
+                        } else {
+                            searchjAdapter = new SearchProductAdapter(SubCatActivity.prolist, SearchActivity.this);
+                            mRecyclerView.setAdapter(searchjAdapter);
+                            searchjAdapter.notifyDataSetChanged();
+
+                        }
+
+
+                    }
+                });
+                if (!meditText.getText().toString().equals("")) {
+                    filter(meditText.getText().toString());
+                }
+            } else {
+                Toast.makeText(this, "Check your internet and retry again.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (search.equals("single")) {
             if (connectionDetector.isConnected()) {
                 createExampleList();
             } else {
@@ -119,14 +166,23 @@ public class SearchActivity extends AppCompatActivity {
     private void filter(String text) {
         ArrayList<CatLvlItemList> filteredList = new ArrayList<>();
 
-        for (CatLvlItemList item : prolist) {
-            if (item.getDesc().toString().toLowerCase().contains(text.toLowerCase()) || item.getCatName().toString().toLowerCase().contains(text.toLowerCase())) {
-                filteredList.add(item);
+        if (search.equals("cat")) {
+            for (CatLvlItemList item : SubCatActivity.prolist) {
+                if (item.getDesc().toString().toLowerCase().contains(text.toLowerCase()) || item.getCatName().toString().toLowerCase().contains(text.toLowerCase()) ||item.getP_price().toString().toLowerCase().contains(text.toLowerCase())) {
+                    filteredList.add(item);
+                }
+            }
+        } else {
+            for (CatLvlItemList item : prolist) {
+                if (item.getDesc().toString().toLowerCase().contains(text.toLowerCase()) || item.getCatName().toString().toLowerCase().contains(text.toLowerCase()) ||item.getP_price().toString().toLowerCase().contains(text.toLowerCase())) {
+                    filteredList.add(item);
+                }
             }
         }
-        if (search!=null) {
+
+        if (search.equals("mulstore") || search.equals("cat")) {
             searchjAdapter.filterList(filteredList);
-        }else {
+        } else if (search.equals("single")) {
             pCatAdapter.filterList(filteredList);
         }
 
@@ -163,8 +219,11 @@ public class SearchActivity extends AppCompatActivity {
                 }
                 pCatAdapter = new PCatAdapter(prolist, SearchActivity.this, store_ID, ownerID, ownerImage, ownerName, cat_Name, true);
                 mRecyclerView.setAdapter(pCatAdapter);
+                mshimmer_search.stopShimmerAnimation();
+                mshimmer_search.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
                 pCatAdapter.notifyDataSetChanged();
-                mProgressDialog.cancel();
+
                 meditText.setText(getIntent().getStringExtra("value"));
                 meditText.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -201,13 +260,16 @@ public class SearchActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mProgressDialog.cancel();
+
                 Toast.makeText(SearchActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
 
-
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(request);
 
@@ -225,14 +287,14 @@ public class SearchActivity extends AppCompatActivity {
     }
 
 
-    private void seach(){
+    private void seach() {
 
 
-        for(int i =0; i< nearesStoresList.size();i++){
-            getid +="str_id[]="+ nearesStoresList.get(i).getId()+"&";
+        for (int i = 0; i < nearesStoresList.size(); i++) {
+            getid += "str_id[]=" + nearesStoresList.get(i).getId() + "&";
         }
 
-        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/api/search/store/products?"+getid+"search="+meditText.getText().toString(), new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/api/search/store/products?" + getid + "search=" + meditText.getText().toString(), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -254,7 +316,7 @@ public class SearchActivity extends AppCompatActivity {
                         String ownerName = jsonObject.getString("str_name");
                         String ownerImage = jsonObject.getString("str_image");
 
-                        prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc, cat_id,ownerID,ownerName,ownerImage));
+                        prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc, cat_id, ownerID, ownerName, ownerImage));
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -262,8 +324,11 @@ public class SearchActivity extends AppCompatActivity {
                 }
                 searchjAdapter = new SearchProductAdapter(prolist, SearchActivity.this);
                 mRecyclerView.setAdapter(searchjAdapter);
+                mshimmer_search.stopShimmerAnimation();
+                mshimmer_search.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
                 searchjAdapter.notifyDataSetChanged();
-                mProgressDialog.cancel();
+
                 meditText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -299,7 +364,7 @@ public class SearchActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                mProgressDialog.cancel();
+
                 Toast.makeText(SearchActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
             }
@@ -356,7 +421,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public static void SearchsetupBadge() {
-        if(helpingMethods.GetStoreID()!=null){
+        if (helpingMethods.GetStoreID() != null) {
             if (helpingMethods.GetCartCount(helpingMethods.GetStoreID()) == 0) {
                 if (textCartItemCount.getVisibility() != View.GONE) {
                     textCartItemCount.setVisibility(View.GONE);

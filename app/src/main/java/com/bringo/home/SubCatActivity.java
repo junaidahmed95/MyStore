@@ -3,12 +3,16 @@ package com.bringo.home;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,10 +35,12 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bringo.home.Adapter.PCatAdapter;
+import com.bringo.home.Adapter.SearchProductAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.ShowStores;
+import com.bringo.home.Model.helpinginterface;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -68,6 +74,7 @@ public class SubCatActivity extends AppCompatActivity {
     public static List<CatLvlItemList> list, real;
     private List<String> store;
     public static List<ShowStores> storelist;
+    Button meditText;
 
     public static TabLayout mtabs;
     private ViewPager mviewpager;
@@ -79,7 +86,9 @@ public class SubCatActivity extends AppCompatActivity {
     public static FloatingActionButton mfbcart;
     int no_of_categories = -1;
     private String cat_Name, store_ID, ownerID, ownerImage, ownerName;
+    private String search;
 
+    private ImageView msearchMul;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +99,7 @@ public class SubCatActivity extends AppCompatActivity {
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = findViewById(R.id.retryBtn);
-
+        msearchMul = findViewById(R.id.searchMul);
         mtotalAmount = findViewById(R.id.totalAmount);
         cat_Name = getIntent().getStringExtra("catName");
         checkSID = getIntent().getStringExtra("storeid");
@@ -98,6 +107,7 @@ public class SubCatActivity extends AppCompatActivity {
         ownerName = getIntent().getStringExtra("stname");
         ownerImage = getIntent().getStringExtra("ownerImage");
         ownerID = getIntent().getStringExtra("ownerID");
+        meditText = findViewById(R.id.edittext);
 
 
         list = new ArrayList<>();
@@ -114,6 +124,7 @@ public class SubCatActivity extends AppCompatActivity {
 
         mtabs = findViewById(R.id.tabs);
         mviewpager = findViewById(R.id.viewpager);
+        search = getIntent().getStringExtra("search");
 
 
         ConnectionDetector connectionDetector = new ConnectionDetector(SubCatActivity.this);
@@ -138,6 +149,25 @@ public class SubCatActivity extends AppCompatActivity {
                 }
             }
         });
+
+//        msearchMul.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+        meditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SubCatActivity.this, SearchActivity.class);
+                intent.putExtra("search", "cat");
+                startActivity(intent);
+
+            }
+        });
+
+
 
     }
 
@@ -200,6 +230,8 @@ public class SubCatActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
 
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -336,6 +368,8 @@ public class SubCatActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }
+
+
 
 
 }

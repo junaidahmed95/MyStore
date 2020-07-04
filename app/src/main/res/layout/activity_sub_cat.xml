@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#D6D6D6"
     android:layout_height="match_parent"
+    android:background="#D6D6D6"
     tools:context=".MainActivity">
 
 
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
                 android:minHeight="?attr/actionBarSize"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <TextView
                     android:id="@+id/totalAmount"
@@ -45,9 +45,35 @@
                     android:textStyle="bold"
                     android:visibility="gone" />
 
+                <ImageView
+                    android:id="@+id/searchMul"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="8dp"
+                    android:padding="8dp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_search_black_24dp" />
+
             </androidx.appcompat.widget.Toolbar>
 
         </FrameLayout>
+
+        <Button
+            android:id="@+id/edittext"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"
+            android:paddingLeft="10dp"
+            android:background="@drawable/searchshape"
+            android:drawableLeft="@drawable/ic_search"
+            android:ellipsize="end"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:text="Search product by name,price,description "
+            android:maxLines="1"
+            android:paddingRight="8dp"
+            android:singleLine="true" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
@@ -61,30 +87,28 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-
     <include
         android:id="@+id/content_main"
         layout="@layout/bar" />
-
 
 
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/spin_kit"
         style="@style/SpinKitView.Large.CubeGrid"
         android:layout_width="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         app:SpinKit_Color="@color/colorAccent" />
 
     <Button
         android:id="@+id/retryBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:background="@drawable/btn_shape"
         android:text="Retry"
         android:textAllCaps="false"
-        android:layout_centerInParent="true"
         android:textColor="@color/white"
         android:visibility="gone" />
 

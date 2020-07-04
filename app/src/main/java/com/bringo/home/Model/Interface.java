@@ -12,4 +12,9 @@ public interface Interface {
     ////asdasdsadsadsdasdsd
     @GET("main_catogory/collection")
     Call<sample> editprice();
+
+
+    @GET("featured/stores")
+    Call<List<FeaturedStoreList>> featuredlist();
+
 }

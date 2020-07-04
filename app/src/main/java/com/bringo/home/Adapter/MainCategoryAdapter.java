@@ -20,6 +20,7 @@ import com.bringo.home.Model.Fruit;
 import com.bringo.home.Model.Listmmh;
 import com.bringo.home.R;
 import com.bringo.home.StoreInfoActivity;
+import com.bringo.home.SubCatActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.squareup.picasso.Picasso;
@@ -49,10 +50,8 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
         }
         else if(sa.equals("2")){
             this.listmmhList = Listmmh;
-        } else if(sa.equals("3")){
+        } else if(sa.equals("3")) {
             this.fruitList = fruitList;
-        }else if(sa.equals("4")){
-            this.veglist = veglist;
         }
 
 
@@ -73,13 +72,13 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
 
         if(val.equals("1")){
             holder.mtxt.setText(list1.get(position).getM_name());
-            //Picasso.get().load("http://bringo.biz/public/img/cat_a/electronic3.jpg").into(holder.mimg);
             Glide.with(mcontext).asBitmap().load(list1.get(position).getThumbnail()).apply(new RequestOptions().placeholder(R.drawable.placeholder)).dontAnimate().into(holder.mimg);
             holder.mcat_layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mcontext, MainCatActivity.class);
                     intent.putExtra("cat_id",list1.get(position).getId());
+                    intent.putExtra("store_name", list1.get(position).getM_name());
                     mcontext.startActivity(intent);
                 }
             });
@@ -98,18 +97,19 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
             holder.mcat_layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mcontext, StoreInfoActivity.class);
+                    Intent intent = new Intent(mcontext, SubCatActivity.class);
                     intent.putExtra("storeid", listmmhList.get(position).getStr_id());
-                    intent.putExtra("stname", listmmhList.get(position).getStr_name());
-                    intent.putExtra("ownerID", listmmhList.get(position).getU_id());
-                    //intent.putExtra("address", storeList.get(position).getAddress());
-                   // intent.putExtra("ownerImage", listmmhList.get(position).getStor e_image());
+                    intent.putExtra("catName", listmmhList.get(position).getM_name());
+                    intent.putExtra("stname",listmmhList.get(position).getStr_name());
+                    intent.putExtra("ownerID",listmmhList.get(position).getU_id());
+                    intent.putExtra("ownerImage",listmmhList.get(position).getThumbnail());
                     mcontext.startActivity(intent);
-                   // activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//                    activity.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
                 }
             });
-//                }
-//            });
+
+
         }else if (val.equals("3")){
             holder.mtxt.setText(fruitList.get(position).getTitle());
             //Picasso.get().load("http://bringo.biz/public/img/cat_a/electronic3.jpg").into(holder.mimg);
@@ -119,6 +119,7 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
                 public void onClick(View v) {
                     Intent intent = new Intent(mcontext, MainCatActivity.class);
                     intent.putExtra("cat_id",fruitList.get(position).getCat_a());
+                    intent.putExtra("store_name",fruitList.get(position).getTitle());
                     mcontext.startActivity(intent);
                 }
             });
@@ -131,6 +132,7 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
                 public void onClick(View v) {
                     Intent intent = new Intent(mcontext, MainCatActivity.class);
                     intent.putExtra("cat_id",veglist.get(position).getCat_a());
+                    intent.putExtra("store_name",veglist.get(position).getTitle());
                     mcontext.startActivity(intent);
                 }
             });
@@ -148,8 +150,6 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
            return listmmhList.size();
        }else if (val.equals("3")){
            return fruitList.size();
-       }else if (val.equals("4")){
-           return veglist.size();
        } else {
            return 0;
        }

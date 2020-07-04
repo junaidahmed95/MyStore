@@ -44,6 +44,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.bringo.home.Adapter.CategoryAdapter;
+import com.bringo.home.Adapter.FeaturedStoreAdapter;
 import com.bringo.home.Adapter.MainCategoryAdapter;
 import com.bringo.home.Adapter.SliderAdapter;
 import com.bringo.home.Adapter.StoresAdapter;
@@ -52,15 +53,18 @@ import com.bringo.home.MainCatActivity;
 import com.bringo.home.Model.Categories;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
+import com.bringo.home.Model.FeaturedStoreList;
 import com.bringo.home.Model.Fruit;
 import com.bringo.home.Model.Listmmh;
 import com.bringo.home.Model.RetrofitClient;
 import com.bringo.home.Model.ShowStores;
 import com.bringo.home.Model.sample;
 import com.bringo.home.R;
+import com.bringo.home.StoreInfoActivity;
 import com.bringo.home.ViewAllStoresActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -99,15 +103,16 @@ public class HomeFragment extends Fragment {
 
 
     ArrayList<Categories> maincat;
-    ArrayList<Fruit> fruit ;
+    ArrayList<FeaturedStoreList> featuredStoreLists;
+    ArrayList<Fruit> fruit;
     ArrayList<Listmmh> mmh;
     ArrayList<Fruit> veg;
 
-
+    private ShimmerFrameLayout mshimmer_cat_container, mshimmer_featuredstore, mshimmer_fruit, mshimmer_mmh, mshimmer_nearbystore;
     private SliderView sliderView;
     private List<Category> productList;
     // ProgressBar mprogressbar;
-    private RecyclerView categoryRecyclerView,mfruitrecyclerView,vegrecyclerView;
+    private RecyclerView categoryRecyclerView, mfruitrecyclerView, vegrecyclerView, mre_FeaturedStore;
     private ScrollView mScrollView;
     private Location mLastLocation;
 
@@ -116,42 +121,60 @@ public class HomeFragment extends Fragment {
     List<GirdListView> list;
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
-    private CardView mcdv_dialog;
+    private CardView mcdv_dialog, mcard_newway;
 
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback locationCallback;
     int PERMISSION_ID = 44;
-    private RecyclerView grd_str,hmmCatrecyclerView;
+    private RecyclerView grd_str, hmmCatrecyclerView;
     private String test;
-    private ProgressBar mloadingImage;
+
     private StoresAdapter allStoreAdapter;
     private RecyclerView mmainCatrecyclerView;
     public static List<ShowStores> nearesStoresList;
     private Button mretryBtn, mBtnViewAll;
     private SwipeRefreshLayout pullToRefresh;
-    private TextView mcategory_name;
-    private ImageView mcategory_image;
+    private TextView mcategory_name, mstore_name;
+    private ImageView mcategory_image, mimg_newway;
     private LinearLayout cat_layout;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+        mshimmer_cat_container = root.findViewById(R.id.shimmer_cat_container);
+        mshimmer_cat_container.startShimmerAnimation();
+
+        mshimmer_featuredstore = root.findViewById(R.id.shimmer_featuredstore);
+        mshimmer_featuredstore.startShimmerAnimation();
+
+        mshimmer_fruit = root.findViewById(R.id.shimmer_fruit);
+        mshimmer_fruit.startShimmerAnimation();
+
+        mshimmer_mmh = root.findViewById(R.id.shimmer_mmh);
+        mshimmer_mmh.startShimmerAnimation();
+
+        mshimmer_nearbystore = root.findViewById(R.id.shimmer_nearbystore);
+        mshimmer_nearbystore.startShimmerAnimation();
+
         pullToRefresh = root.findViewById(R.id.pullToRefresh);
-        mloadingImage = root.findViewById(R.id.spin_kit);
-        Sprite doubleBounce = new CubeGrid();
-        mloadingImage.setIndeterminateDrawable(doubleBounce);
+
+        /// Sprite doubleBounce = new CubeGrid();
+
         mretryBtn = root.findViewById(R.id.retryBtn);
         cat_layout = root.findViewById(R.id.cat_layout);
         mcategory_name = root.findViewById(R.id.category_name);
         mcategory_image = root.findViewById(R.id.category_image);
+        mstore_name = root.findViewById(R.id.store_name);
+        mcard_newway = root.findViewById(R.id.card_newway);
+        mimg_newway = root.findViewById(R.id.img_newway);
         mBtnViewAll = root.findViewById(R.id.btnViewAll);
         grd_str = root.findViewById(R.id.gd1);
-       hmmCatrecyclerView = root.findViewById(R.id. hmmCatrecyclerView);
+        hmmCatrecyclerView = root.findViewById(R.id.hmmCatrecyclerView);
         mmainCatrecyclerView = root.findViewById(R.id.mainCatrecyclerView);
         mfruitrecyclerView = root.findViewById(R.id.fruitrecyclerView);
-        vegrecyclerView= root.findViewById(R.id.vegrecyclerView);
+        mre_FeaturedStore = root.findViewById(R.id.re_FeaturedStore);
 
 
         catList = new ArrayList<>();
@@ -169,30 +192,29 @@ public class HomeFragment extends Fragment {
 
         LinearLayoutManager layoutMana = new LinearLayoutManager(getActivity());
         layoutMana.setOrientation(RecyclerView.HORIZONTAL);
-        vegrecyclerView.setLayoutManager(layoutMana);
+        mre_FeaturedStore.setLayoutManager(layoutMana);
 
-        //GetCategories();
+
         GetCat();
-        //Gethmm();
+        FeaturedStore();
+
         grd_str.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         nearesStoresList = new ArrayList<>();
-
-
-
 
 
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 GetNearByStores(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
+                GetCat();
+                FeaturedStore();
                 pullToRefresh.setRefreshing(false);
             }
         });
 
         ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
         if (connectionDetector.isConnected()) {
-            mloadingImage.setVisibility(View.VISIBLE);
+
             mretryBtn.setVisibility(View.GONE);
             CheckLocationPermission();
         } else {
@@ -204,7 +226,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
                 if (connectionDetector.isConnected()) {
-                    mloadingImage.setVisibility(View.VISIBLE);
+
                     mcdv_dialog.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.GONE);
                     CheckLocationPermission();
@@ -250,10 +272,6 @@ public class HomeFragment extends Fragment {
         });
 
 
-
-
-
-
         return root;
     }
 
@@ -271,7 +289,7 @@ public class HomeFragment extends Fragment {
         if (connectionDetector.isConnected()) {
             CheckLocationPermission();
         } else {
-            mloadingImage.setVisibility(View.GONE);
+
             mretryBtn.setVisibility(View.VISIBLE);
             Toast.makeText(getActivity(), "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
         }
@@ -333,7 +351,7 @@ public class HomeFragment extends Fragment {
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
-                    mloadingImage.setVisibility(View.GONE);
+
                     mretryBtn.setVisibility(View.VISIBLE);
                 } else {
                     Log.d("getlatlng", latitude + " " + longitude);
@@ -351,9 +369,11 @@ public class HomeFragment extends Fragment {
                             String distance = formatter.format(distance1);
                             Log.d("distance", formatter.format(distance1) + " " + storename);
                             nearesStoresList.add(new ShowStores(storename, store_id, userID, store_image, distance, storeaddr));
+
+
                         } catch (JSONException e) {
                             grd_str.setVisibility(View.GONE);
-                            mloadingImage.setVisibility(View.GONE);
+
                             Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
                         }
@@ -363,8 +383,11 @@ public class HomeFragment extends Fragment {
                     mcdv_dialog.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.GONE);
                     grd_str.setVisibility(View.VISIBLE);
+                    mshimmer_nearbystore.stopShimmerAnimation();
+                    mshimmer_nearbystore.setVisibility(View.GONE);
+
                     allStoreAdapter.notifyDataSetChanged();
-                    mloadingImage.setVisibility(View.GONE);
+
                     // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
             }
@@ -372,7 +395,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 grd_str.setVisibility(View.GONE);
-                mloadingImage.setVisibility(View.GONE);
+
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(), "" + error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -401,7 +424,7 @@ public class HomeFragment extends Fragment {
                 grd_str.setVisibility(View.GONE);
                 mcdv_dialog.setVisibility(View.GONE);
                 mretryBtn.setVisibility(View.GONE);
-                mloadingImage.setVisibility(View.VISIBLE);
+
                 mLastLocation = location;
                 GetNearByStores(location.getLatitude(), location.getLongitude());
             }
@@ -481,7 +504,7 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
                         if (response.isPermanentlyDenied()) {
-                            mloadingImage.setVisibility(View.GONE);
+
                             mretryBtn.setVisibility(View.VISIBLE);
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setTitle("Permission Denied")
@@ -497,7 +520,7 @@ public class HomeFragment extends Fragment {
                                     })
                                     .show();
                         } else {
-                            mloadingImage.setVisibility(View.GONE);
+
                             Toast.makeText(getContext(), "Permission Denied.", Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
                         }
@@ -512,7 +535,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-//    //private void GetCategories() {
+    //    //private void GetCategories() {
 //        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
 //
 //
@@ -576,39 +599,47 @@ public class HomeFragment extends Fragment {
 //        requestQueue.add(request);
 //
 //    }
-    private void GetCat(){
+    private void GetCat() {
         Call<sample> done = RetrofitClient.getmInstance().getApi()
                 .editprice();
         done.enqueue(new Callback<sample>() {
             @Override
             public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
 
-            maincat = response.body().getCategories();
-            fruit = response.body().getFruits();
-            mmh = response.body().getMmh();
-                veg = response.body().getVegetables();
+                maincat = response.body().getCategories();
+                fruit = response.body().getFruits();
+                mmh = response.body().getMmh();
 
-                MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"1");
+
+                MainCategoryAdapter allStoreAdapter = new MainCategoryAdapter(maincat, mmh, fruit, veg, getActivity(), "1");
                 mmainCatrecyclerView.setAdapter(allStoreAdapter);
-                MainCategoryAdapter allStoreAdapter1 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"2");
-                hmmCatrecyclerView.setAdapter(allStoreAdapter1);
-                MainCategoryAdapter allStoreAdapter2 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"3");
-                mfruitrecyclerView.setAdapter(allStoreAdapter2);
-                MainCategoryAdapter allStoreAdapter3 = new MainCategoryAdapter(maincat,mmh,fruit,veg, getActivity(),"4");
-                vegrecyclerView.setAdapter(allStoreAdapter3);
+                mshimmer_cat_container.stopShimmerAnimation();
+                mshimmer_cat_container.setVisibility(View.GONE);
                 mmainCatrecyclerView.setVisibility(View.VISIBLE);
+
+                MainCategoryAdapter allStoreAdapter1 = new MainCategoryAdapter(maincat, mmh, fruit, veg, getActivity(), "2");
+                hmmCatrecyclerView.setAdapter(allStoreAdapter1);
+                mshimmer_mmh.stopShimmerAnimation();
+                mshimmer_mmh.setVisibility(View.GONE);
+                hmmCatrecyclerView.setVisibility(View.VISIBLE);
+
+                MainCategoryAdapter allStoreAdapter2 = new MainCategoryAdapter(maincat, mmh, fruit, veg, getActivity(), "3");
+                mfruitrecyclerView.setAdapter(allStoreAdapter2);
+                mshimmer_fruit.stopShimmerAnimation();
+                mshimmer_fruit.setVisibility(View.GONE);
+                mfruitrecyclerView.setVisibility(View.VISIBLE);
                 allStoreAdapter.notifyDataSetChanged();
-                mloadingImage.setVisibility(View.GONE);
+
 
             }
 
             @Override
             public void onFailure(Call<sample> call, Throwable t) {
                 grd_str.setVisibility(View.GONE);
-                mloadingImage.setVisibility(View.GONE);
+
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "no" , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
                 }
 
                 Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
@@ -616,6 +647,63 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+//        Call<List<sample>> call = RetrofitClient.getmInstance().
+//                getApi().editprice();
+//        call.enqueue(new Callback<List<sample>>() {
+//            @Override
+//            public void onResponse(Call<sample> call, retrofit2.Response<sample> response) {
+//                if (response.isSuccessful()) {
+//                    Toast.makeText(getContext(), ""+response.body().toString(), Toast.LENGTH_SHORT).show();
+//                    ArrayList<Categories> maincat = response.body().getCategories();
+//                    ArrayList<Fruit> fruit = response.body().getFruits();
+//                    ArrayList<Listmmh> mmh = response.body().getMmh();
+//
+//                } else {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<sample> call, Throwable t) {
+//                Toast.makeText(getContext(), "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+    }
+
+    private void FeaturedStore() {
+        Call<List<FeaturedStoreList>> done = RetrofitClient.getmInstance().getApi()
+                .featuredlist();
+        done.enqueue(new Callback<List<FeaturedStoreList>>() {
+            @Override
+            public void onResponse(Call<List<FeaturedStoreList>> call, retrofit2.Response<List<FeaturedStoreList>> response) {
+
+
+                FeaturedStoreAdapter featuredStoreAdapter = new FeaturedStoreAdapter(getActivity(), response.body());
+                mre_FeaturedStore.setAdapter(featuredStoreAdapter);
+                mshimmer_featuredstore.stopShimmerAnimation();
+                mshimmer_featuredstore.setVisibility(View.GONE);
+                mre_FeaturedStore.setVisibility(View.VISIBLE);
+
+
+                featuredStoreAdapter.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<FeaturedStoreList>> call, Throwable t) {
+                grd_str.setVisibility(View.GONE);
+
+                mretryBtn.setVisibility(View.VISIBLE);
+                if (getActivity() != null) {
+                    Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
+                }
+
+                Toast.makeText(getActivity(), "no", Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
 
 //        Call<List<sample>> call = RetrofitClient.getmInstance().

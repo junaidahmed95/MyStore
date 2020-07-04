@@ -79,13 +79,30 @@ public class Listmmh {
     @Expose
     private String created_at;
 
-//    public Data getData() {
-////        return data;
-////    }
-////
-////    public void setData(Data data) {
-////        this.data = data;
-////    }
+    @SerializedName("address")
+    @Expose
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    @SerializedName("thumbnail")
+    @Expose
+    private String thumbnail;
+
 
     public String getM_name() {
         return m_name;

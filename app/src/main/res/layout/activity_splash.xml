@@ -29,6 +29,6 @@
         android:layout_marginBottom="50dp"
         android:textStyle="bold"
         android:textColor="@color/colorPrimary"
-        android:text="Version 1.4" />
+        android:text="Version 1.5" />
 
 </RelativeLayout>

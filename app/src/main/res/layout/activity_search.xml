@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+    xmlns:shimmer="http://schemas.android.com/tools"
     android:orientation="vertical"
     tools:context=".SearchActivity">
 
@@ -21,18 +21,53 @@
 
 
     <EditText
-        
+        android:inputType="text"
         android:id="@+id/edittext"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:paddingLeft="8dp"
-        android:hint="Search here"
-        android:background="@drawable/edittext2_shape"
-        android:drawableLeft="@drawable/ic_search"
+        android:ellipsize="end"
+        android:textAllCaps="false"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:hint="Search product by name,price,description "
+        android:background="@drawable/searchshape"
+        android:drawableLeft="@drawable/ic_search_black"
         android:layout_margin="16dp"/>
 
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        shimmer:duration="800">
+
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <include layout="@layout/productitem_placeholder" />
+            <include layout="@layout/productitem_placeholder" />
+            <include layout="@layout/productitem_placeholder" />
+            <include layout="@layout/productitem_placeholder" />
+
+
+
+
+
+
+
+
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <androidx.recyclerview.widget.RecyclerView
+        android:visibility="gone"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

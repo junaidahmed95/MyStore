@@ -25,6 +25,7 @@ import com.bringo.home.Adapter.StoresAdapter;
 import com.bringo.home.Model.Category;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.ShowStores;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,24 +44,29 @@ public class MainCatActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private RecyclerView mstore_catwise;
     private CardView mcdv_dialog;
-    private ProgressBar mloadingImage;
+
     private Button mretryBtn;
     private List<ShowStores> storesList;
     private String getid ="";
     private Toolbar toolbar;
+    ShimmerFrameLayout mshimmer_nearbystore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_cat);
 
+        mshimmer_nearbystore = findViewById(R.id.shimmer_nearbystore);
+        mshimmer_nearbystore.startShimmerAnimation();
+
+
         toolbar = findViewById(R.id.appBar);
-        toolbar.setTitle("Stores");
+        toolbar.setTitle("Stores"+" "+"("+getIntent().getStringExtra("store_name")+")");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mstore_catwise = findViewById(R.id.store_catwise);
-        mloadingImage = findViewById(R.id.spin_kit);
+
         mretryBtn = findViewById(R.id.retryBtn);
         mstore_catwise.setLayoutManager(new GridLayoutManager(this, 2));
         mcdv_dialog = findViewById(R.id.cdv_dialog);
@@ -68,11 +74,13 @@ public class MainCatActivity extends AppCompatActivity {
 
         ConnectionDetector connectionDetector = new ConnectionDetector(this);
         if (connectionDetector.isConnected()) {
-            mloadingImage.setVisibility(View.VISIBLE);
+
             mretryBtn.setVisibility(View.GONE);
             GetNearByStores();
 
         } else {
+            mretryBtn.setVisibility(View.VISIBLE);
+            mshimmer_nearbystore.setVisibility(View.GONE);
             Toast.makeText(this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
         }
 
@@ -84,11 +92,13 @@ public class MainCatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 ConnectionDetector connectionDetector = new ConnectionDetector(MainCatActivity.this);
                 if (connectionDetector.isConnected()) {
-                    mloadingImage.setVisibility(View.VISIBLE);
+                    mshimmer_nearbystore.setVisibility(View.VISIBLE);
                     mretryBtn.setVisibility(View.GONE);
                     GetNearByStores();
 
                 } else {
+                    mretryBtn.setVisibility(View.VISIBLE);
+                    mshimmer_nearbystore.setVisibility(View.GONE);
                     Toast.makeText(MainCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -115,7 +125,6 @@ public class MainCatActivity extends AppCompatActivity {
                 JSONObject jsonObject = null;
                 if (response.isNull(0)) {
                     mcdv_dialog.setVisibility(View.VISIBLE);
-                    mloadingImage.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.VISIBLE);
                 } else {
 
@@ -131,21 +140,26 @@ public class MainCatActivity extends AppCompatActivity {
 //                            NumberFormat formatter = new DecimalFormat("#0.00");
 //                            String distance = formatter.format(distance1);
                             //Log.d("distance", formatter.format(distance1) + " " + storename);
-                            storesList.add(new ShowStores(storename, store_id, userID, store_image, "", storeaddr));
+                            storesList.add(new ShowStores(storename, store_id, userID, store_image, nearesStoresList.get(i).getDistance(), storeaddr));
                         } catch (JSONException e) {
                             mstore_catwise.setVisibility(View.GONE);
-                            mloadingImage.setVisibility(View.GONE);
+
                             Toast.makeText(MainCatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                             mretryBtn.setVisibility(View.VISIBLE);
+                            mshimmer_nearbystore.setVisibility(View.GONE);
                         }
                     }
                     StoresAdapter  allStoreAdapter = new StoresAdapter(storesList, MainCatActivity.this, false);
                     mstore_catwise.setAdapter(allStoreAdapter);
+                    mshimmer_nearbystore.stopShimmerAnimation();
+                    mshimmer_nearbystore.setVisibility(View.GONE);
+                    mstore_catwise.setVisibility(View.VISIBLE);
+
                     mcdv_dialog.setVisibility(View.GONE);
                     mretryBtn.setVisibility(View.GONE);
-                    mstore_catwise.setVisibility(View.VISIBLE);
+
                     allStoreAdapter.notifyDataSetChanged();
-                    mloadingImage.setVisibility(View.GONE);
+
                     // mBtnViewAll.setVisibility(View.VISIBLE);
                 }
             }
@@ -153,7 +167,7 @@ public class MainCatActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mstore_catwise.setVisibility(View.GONE);
-                mloadingImage.setVisibility(View.GONE);
+
                 mretryBtn.setVisibility(View.VISIBLE);
                 if (getApplicationContext() != null) {
                     Toast.makeText(MainCatActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();

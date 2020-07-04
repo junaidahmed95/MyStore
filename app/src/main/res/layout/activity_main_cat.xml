@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:shimmer="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:id="@+id/main"
     tools:context=".MainCatActivity">
@@ -12,7 +13,33 @@
         android:id="@+id/appBar"/>
 
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_nearbystore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        shimmer:duration="800">
 
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <include layout="@layout/allstore_placeholder" />
+            <include layout="@layout/allstore_placeholder" />
+
+            <include layout="@layout/allstore_placeholder" />
+            <include layout="@layout/allstore_placeholder" />
+
+            <include layout="@layout/allstore_placeholder" />
+            <include layout="@layout/allstore_placeholder" />
+
+
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@+id/appBar"
@@ -58,16 +85,6 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
-    <com.github.ybq.android.spinkit.SpinKitView
-        android:layout_centerInParent="true"
-        android:id="@+id/spin_kit"
-        style="@style/SpinKitView.Large.CubeGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-
-        app:SpinKit_Color="@color/colorAccent" />
 
 
 

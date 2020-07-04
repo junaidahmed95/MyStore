@@ -976,7 +976,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
         StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                OrdrerID = response;
+                OrdrerID = response.substring(1, response.length()-1);
                 final HashMap<String, Object> hashMap = new HashMap<>();
                 hashMap.put("message", "new order");
                 hashMap.put("time", ServerValue.TIMESTAMP);

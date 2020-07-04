@@ -36,7 +36,7 @@ public class sample {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 
-    @SerializedName("fruits")
+    @SerializedName("FruitVeg")
     @Expose
     private ArrayList<Fruit> fruits;
 
@@ -50,20 +50,6 @@ public class sample {
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 
-    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 
-    @SerializedName("vegetables")
-    @Expose
-    private ArrayList<Fruit> vegetables;
-
-    public ArrayList<Fruit> getVegetables() {
-        return vegetables;
-    }
-
-    public void setVegetables(ArrayList<Fruit> fruits) {
-        this.vegetables = fruits;
-    }
-
-    //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -
 
 }
