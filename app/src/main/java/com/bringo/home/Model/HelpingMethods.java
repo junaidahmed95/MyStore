@@ -134,6 +134,7 @@ public class HelpingMethods {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
         double sid = Double.parseDouble(sharedPreferences.getString("amount", "0"));
         return sid;
+        //////////////////////////dfdsfdsfdsfdfsdfs
     }
     public void  SaveCartTotal(String total,String Dbname){
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Dbname, Context.MODE_PRIVATE);
