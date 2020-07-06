@@ -127,13 +127,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                     }
                     else{
                         calculate("minus", pos, viewHolder);
-                        int parseint = (int) getadded;
+                        double parseint = getadded;
                         total = helpingMethods.newone(cartList.get(pos).getStoreId()) - parseint;
                     }
 
                 }
                 else {
-
                     if (!viewHolder.mProQuantity.getText().toString().equals("1")) {
                         int q = Integer.parseInt(cartList.get(pos).getP_quantity());
                         q -= 1;
@@ -266,8 +265,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         cartList.get(pos).setP_quantity("" + quan);
         preferenceList.get(pos).setP_quantity("" + quan);
         double pricesum = Double.parseDouble(viewHolder.mProPrice.getText().toString());
-
-
 
 
 

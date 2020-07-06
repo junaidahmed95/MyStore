@@ -108,8 +108,6 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
 
                 }
             });
-
-
         }else if (val.equals("3")){
             holder.mtxt.setText(fruitList.get(position).getTitle());
             //Picasso.get().load("http://bringo.biz/public/img/cat_a/electronic3.jpg").into(holder.mimg);
@@ -137,8 +135,6 @@ public class MainCategoryAdapter extends RecyclerView.Adapter<MainCategoryAdapte
                 }
             });
         }
-
-
 
     }
 
