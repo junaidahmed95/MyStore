@@ -179,7 +179,7 @@ public class StoreInfoActivity extends AppCompatActivity {
     }
 
     private void parseJSON() {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/backend/api/get/stores/products?str_id=" + stID, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONObject jsonObject = null;

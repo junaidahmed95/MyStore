@@ -147,8 +147,8 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
     private EditText meditaddress;
     private JsonArrayRequest request, addressrequest;
     private RequestQueue requestQueue, addressrequestQueue;
-    private final String JSON_URL = " https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
-    private final String Get_URL = " https://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = " https://bringo.biz/backend/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = " https://bringo.biz/backend/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
     //private final String Get_URL = " @Junaid Ahmed https://bringo.biz/api/edit/customer/profile?id=4080&user_name=check" + FirebaseAuth.getInstance().getUid();
 
     private EditText muserName;
@@ -665,7 +665,7 @@ public class ProfileActivity extends AppCompatActivity implements OnMapReadyCall
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://bringo.biz/api/post/address";
+                                    String url = "https://bringo.biz/backend/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {

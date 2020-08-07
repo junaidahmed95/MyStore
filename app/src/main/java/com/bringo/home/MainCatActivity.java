@@ -117,7 +117,7 @@ public class MainCatActivity extends AppCompatActivity {
             getid +="str_id[]="+ nearesStoresList.get(i).getId()+"&";
         }
 
-        request = new JsonArrayRequest("https://bringo.biz/api/search/store/category?="+getid+"cat_id="+getIntent().getStringExtra("cat_id"), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/backend/api/search/store/category?="+getid+"cat_id="+getIntent().getStringExtra("cat_id"), new Response.Listener<JSONArray>() {
 
 
             @Override

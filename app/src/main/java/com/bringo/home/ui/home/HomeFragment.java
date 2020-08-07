@@ -338,12 +338,12 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    //https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717
-    //String url = "https://bringo.biz/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
-    //"https://bringo.biz/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
+    //https://bringo.biz/backend/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717
+    //String url = "https://bringo.biz/backend/api/get/nearest/stores?latitude=24.8147631&longitude=67.0698717";
+    //"https://bringo.biz/backend/api/get/nearest/stores?latitude="+String.valueOf(latitude)+"&longitude="+String.valueOf(longitude)
 
     private void GetNearByStores(final double latitude, final double longitude) {
-        request = new JsonArrayRequest("https://bringo.biz/api/get/nearest/stores?page=1&latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
+        request = new JsonArrayRequest("https://bringo.biz/backend/api/get/nearest/stores?page=1&latitude=" + String.valueOf(latitude) + "&longitude=" + String.valueOf(longitude), new Response.Listener<JSONArray>() {
 
 
             @Override
@@ -536,7 +536,7 @@ public class HomeFragment extends Fragment {
 
 
     //    //private void GetCategories() {
-//        request = new JsonArrayRequest("https://bringo.biz/api/maincat", new Response.Listener<JSONArray>() {
+//        request = new JsonArrayRequest("https://bringo.biz/backend/api/maincat", new Response.Listener<JSONArray>() {
 //
 //
 //            @Override

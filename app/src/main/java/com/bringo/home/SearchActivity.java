@@ -86,10 +86,11 @@ public class SearchActivity extends AppCompatActivity {
 
         meditText = findViewById(R.id.edittext);
         toolbar = findViewById(R.id.toolbar);
-        helpingMethods = new HelpingMethods(this);
         toolbar.setTitle("Search");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        helpingMethods = new HelpingMethods(this);
+
         mRecyclerView = findViewById(R.id.recyclerView);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(SearchActivity.this, 2));
@@ -192,7 +193,7 @@ public class SearchActivity extends AppCompatActivity {
     private void createExampleList() {
 
 
-        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/api/get/stores/products?str_id=" + getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/backend/api/get/stores/products?str_id=" + getIntent().getStringExtra("stID"), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 
@@ -294,7 +295,7 @@ public class SearchActivity extends AppCompatActivity {
             getid += "str_id[]=" + nearesStoresList.get(i).getId() + "&";
         }
 
-        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/api/search/store/products?" + getid + "search=" + meditText.getText().toString(), new Response.Listener<JSONArray>() {
+        JsonArrayRequest request = new JsonArrayRequest("https://bringo.biz/backend/api/search/store/products?" + getid + "search=" + meditText.getText().toString(), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
 

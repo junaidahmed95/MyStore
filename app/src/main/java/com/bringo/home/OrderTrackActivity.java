@@ -143,7 +143,7 @@ public class OrderTrackActivity extends AppCompatActivity {
 
         list = new ArrayList<>();
 
-        get_status = "https://bringo.biz/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
+        get_status = "https://bringo.biz/backend/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
 
         mtxt_ordertime =
 
@@ -245,7 +245,7 @@ public class OrderTrackActivity extends AppCompatActivity {
                 txt_total_qtys.setText("" + getIntent().getStringExtra("orderid"));
                 list.clear();
 
-                String url = "https://bringo.biz/api/get/stores/orders?str_id=" + getIntent().getStringExtra("storeid") + "&ord_id=" + getIntent().getStringExtra("orderid");
+                String url = "https://bringo.biz/backend/api/get/stores/orders?str_id=" + getIntent().getStringExtra("storeid") + "&ord_id=" + getIntent().getStringExtra("orderid");
                 RequestQueue requestQueue = Volley.newRequestQueue(OrderTrackActivity.this);
                 JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override

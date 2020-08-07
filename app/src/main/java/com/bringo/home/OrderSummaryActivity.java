@@ -130,7 +130,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     private EditText mtimeofdeli, mtxtDate;
     private String self_pick = "0";
     private LinearLayout mtimeLayout;
-    private final String JSON_URL = "https://bringo.biz/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://bringo.biz/backend/api/get/customer?u_id=" + FirebaseAuth.getInstance().getUid();
     private RecyclerView mAddressRecyclerView, msummaryRecyclerView;
     private static List<CatLvlItemList> orderSummaryList;
     private Button mconfirmorder_btn;
@@ -149,7 +149,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
     String OrdrerID;
     private String status = "";
     String dayString;
-    private final String Get_URL = "https://bringo.biz/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String Get_URL = "https://bringo.biz/backend/api/get/address?user_id=" + FirebaseAuth.getInstance().getUid();
     List<AddressClass> kuchbhe;
     private JsonArrayRequest request;
     private ProgressDialog progressDialog;
@@ -439,7 +439,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
                             if (detector.isConnected()) {
                                 if (!muserName.getText().toString().trim().equals("")) {
                                     mProgressDialog.show();
-                                    String url = "https://bringo.biz/api/post/address";
+                                    String url = "https://bringo.biz/backend/api/post/address";
                                     StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {
@@ -972,7 +972,7 @@ public class OrderSummaryActivity extends AppCompatActivity implements OnMapRead
 
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         final String id = reference.child("Chats").push().getKey();
-        String url = "https://bringo.biz/api/post/up_order";
+        String url = "https://bringo.biz/backend/api/post/up_order";
         StringRequest postdata = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

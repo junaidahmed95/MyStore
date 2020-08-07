@@ -273,7 +273,7 @@ public class SubCatActivity extends AppCompatActivity {
 
 
     private void GetStoreData() {
-        mJSON_URL = "https://bringo.biz/api/get/stores/products?str_id=" + store_ID;
+        mJSON_URL = "https://bringo.biz/backend/api/get/stores/products?str_id=" + store_ID;
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

@@ -43,7 +43,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class OrderHistoryFragment extends Fragment {
-    private final String JSON_URL = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    private final String JSON_URL = "https://bringo.biz/backend/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     private List<OrderHistory> historylist;
     private List<OrderHistory> products_list;
     private ProgressDialog mProgressDialog;
@@ -125,7 +125,7 @@ public class OrderHistoryFragment extends Fragment {
 
     private void parseJSON() {
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-        String url = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+        String url = "https://bringo.biz/backend/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override

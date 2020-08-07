@@ -249,7 +249,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bringo.biz/home/privacy"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/backend/home/privacy"));
                 startActivity(browserIntent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
@@ -426,7 +426,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (con.isConnected()) {
                     mProgressDialog.setMessage("Creating account...");
                     mProgressDialog.show();
-                    String url = "https://bringo.biz/api/reg";
+                    String url = "https://bringo.biz/backend/api/reg";
                     VolleyMultipartRequest multipartRequest = new
                             VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
                                 @Override
@@ -840,7 +840,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                            get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
                             ConnectionDetector detector = new ConnectionDetector(Verification.this);
                             if (detector.isConnected()) {
                                 parseJSON();
@@ -1237,7 +1237,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                    get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
                     parseJSON();
                 } else {
                     mProgressDialog.cancel();
@@ -1288,7 +1288,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
+                        get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
                         parseJSON();
                     } else {
                         mProgressDialog.cancel();
