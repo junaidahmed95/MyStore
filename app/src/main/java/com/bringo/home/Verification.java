@@ -117,10 +117,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.hbb20.CountryCodePicker;
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.kofigyan.stateprogressbar.StateProgressBar;
 
@@ -247,7 +249,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mbtnPrivacyPolicy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/privacy.policy"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bringo.biz/backend/home/privacy"));
                 startActivity(browserIntent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
@@ -310,7 +312,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
 //                if (currentAccessToken == null) {
-//                    mAuth.signOut();
+//                    mAuth.signOut();re
 //                }
             }
         };
@@ -361,10 +363,48 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
         mfbpic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galery = new Intent();
-                galery.setType("image/*");
-                galery.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galery, "Select image"), 102);
+                Dexter.withActivity(Verification.this)
+                        .withPermissions(
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                // check if all permissions are granted
+                                if (report.areAllPermissionsGranted()) {
+                                   showPictureDialog();
+                                }
+
+                                // check for permanent denial of any permission
+                                if (report.isAnyPermissionPermanentlyDenied()) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(Verification.this);
+                                    builder.setTitle("Need Permissions");
+                                    builder.setMessage("This app needs permission to use this feature. You can grant them in app settings.");
+                                    builder.setPositiveButton("GOTO SETTINGS", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                            openSettings();
+                                        }
+                                    });
+                                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                                    builder.show();// permission is denied permenantly, navigate user to app settings
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        })
+                        .onSameThread()
+                        .check();
             }
         });
 
@@ -373,9 +413,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 ConnectionDetector con = new ConnectionDetector(Verification.this);
-                if (hasImage.equals("0") && bitmap == null) {
-                    helpingMethods.SnackBar("Select your image", v);
-                } else if (mmusername.getText().toString().trim().equals("")) {
+             if (mmusername.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your name", v);
                 } else if (moptionalPhoneLayout.getVisibility() == View.VISIBLE && moptional_number.getText().toString().trim().equals("")) {
                     helpingMethods.SnackBar("Enter your phone number", v);
@@ -388,7 +426,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (con.isConnected()) {
                     mProgressDialog.setMessage("Creating account...");
                     mProgressDialog.show();
-                    String url = "https://bringo.biz/api/reg";
+                    String url = "https://bringo.biz/backend/api/reg";
                     VolleyMultipartRequest multipartRequest = new
                             VolleyMultipartRequest(Request.Method.POST, url, new Response.Listener<NetworkResponse>() {
                                 @Override
@@ -505,7 +543,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                 @Override
                                 protected Map<String, DataPart> getByteData() {
                                     Map<String, DataPart> params = new HashMap<>();
-                                    if (hasImage.equals("0")) {
+                                    if (bitmap!=null) {
                                         params.put("image[" + 0 + "]", new DataPart("profileimage.jpg", AppHelper.getFileDataFromDrawable(getBaseContext(), bitmap), "image/jpeg"));
                                     }
 
@@ -531,6 +569,10 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                                         mainObj.put("emailSubscriptionStatus", status1.getEmailSubscriptionStatus().toJSONObject());
                                         JSONObject jsonObject1 = mainObj.getJSONObject("subscriptionStatus");
                                         hashMap.put("play_id", String.valueOf(jsonObject1.get("userId")));
+
+
+                                        hashMap.put("role_id","3");
+
                                     } catch (Throwable t) {
                                         t.printStackTrace();
                                     }
@@ -601,6 +643,8 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+
 
         mbutton_verify = findViewById(R.id.button_verify);
 
@@ -716,6 +760,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             public void onError(FacebookException error) {
                 mProgressDialog.cancel();
                 Toast.makeText(Verification.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("junaid",""+error.getMessage()+"adeel"+FirebaseAuth.getInstance().getCurrentUser());
             }
         });
     }
@@ -730,15 +775,26 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             mProgressDialog.show();
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
-        } else if (requestCode == 102) {
-            imageuri = data.getData();
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
-                musercrimage.setImageBitmap(bitmap);
+        }
+        else if (requestCode == 102) {
+            if(data != null){
+                imageuri = data.getData();
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
+                    musercrimage.setImageBitmap(bitmap);
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+        }else if (requestCode == 101) {
+            if(data != null){
+                bitmap = (Bitmap) data.getExtras().get("data");
+                musercrimage.setImageBitmap(bitmap);
+            }
+
+
         }
     }
 
@@ -784,7 +840,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                            get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
                             ConnectionDetector detector = new ConnectionDetector(Verification.this);
                             if (detector.isConnected()) {
                                 parseJSON();
@@ -837,30 +893,33 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                final Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    SetMap(location.getLatitude(), location.getLongitude());
+        if(!flag){
+            if (checkPermissions()) {
+                if (isLocationEnabled()) {
+                    mFusedLocationClient.getLastLocation().addOnCompleteListener(
+                            new OnCompleteListener<Location>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Location> task) {
+                                    final Location location = task.getResult();
+                                    if (location == null) {
+                                        requestNewLocationData();
+                                    } else {
+                                        SetMap(location.getLatitude(), location.getLongitude());
+                                    }
                                 }
                             }
-                        }
-                );
+                    );
+                } else {
+                    Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                }
             } else {
-                Toast.makeText(Verification.this, "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                requestPermissions();
             }
-        } else {
-            requestPermissions();
         }
+
     }
 
     private void SetMap(final double latitude, final double longitude) {
@@ -1178,11 +1237,12 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    get_user = "https://bringo.biz/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
+                    get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + FirebaseAuth.getInstance().getUid();
                     parseJSON();
                 } else {
                     mProgressDialog.cancel();
                     Toast.makeText(Verification.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    //Log.d("junaid",""+task.getException().getMessage()+"adeel"+FirebaseAuth.getInstance().getUid());
                 }
             }
         });
@@ -1228,7 +1288,7 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        get_user = "https://bringo.biz/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
+                        get_user = "https://bringo.biz/backend/api/get/client/verified?mob=" + mAuth.getCurrentUser().getUid();
                         parseJSON();
                     } else {
                         mProgressDialog.cancel();
@@ -1274,4 +1334,43 @@ public class Verification extends AppCompatActivity implements OnMapReadyCallbac
             mAuth.removeAuthStateListener(authStateListener);
         }
     }
+
+    private void takePhotoFromCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, 101);
+    }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, 102);
+    }
+
+
+    private void showPictureDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {"Select photo from gallery", "Capture photo from camera"};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallary();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
+    }
+    private void openSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
+    }
+
 }

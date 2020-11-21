@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -48,8 +49,8 @@ import java.util.List;
  */
 public class OrderFragment extends Fragment {
 
-    String get_status = "https://bringo.biz/api/get/order/status?ord_id=9bGqUshRJrS8ZHPk";
-    private final String JSON_URL = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+    String get_status = "https://bringo.biz/backend/api/get/order/status?ord_id=9bGqUshRJrS8ZHPk";
+    private final String JSON_URL = "https://bringo.biz/backend/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
     List<OrderHistory> historylist;
     private Button mbtnSiglo, mbtnRetry;
     private TextView mnoOrder;
@@ -134,7 +135,7 @@ public class OrderFragment extends Fragment {
 
     private void parseJSON() {
         RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-        String url = "https://bringo.biz/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
+        String url = "https://bringo.biz/backend/api/get/order?user_id=" + FirebaseAuth.getInstance().getUid();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -188,6 +189,10 @@ public class OrderFragment extends Fragment {
         );
 
 
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);
     }
 

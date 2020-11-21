@@ -37,6 +37,7 @@
                 android:layout_height="45dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="16dp"
+                android:visibility="gone"
                 android:background="@drawable/btn_shape"
                 android:drawableLeft="@drawable/ic_action_phone"
                 android:drawableTint="@color/white"
@@ -50,6 +51,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
+                android:layout_marginTop="16dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"

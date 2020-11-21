@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0D2E4B33"
+    xmlns:shimmer="http://schemas.android.com/tools"
+    android:background="@color/white"
     android:fillViewport="true"
     tools:context=".StoreInfoActivity">
 
@@ -16,7 +17,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="270dp">
 
             <ImageView
                 android:id="@+id/stImageView"
@@ -33,8 +34,8 @@
 
                 <ImageButton
                     android:id="@+id/btnBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
@@ -163,6 +164,31 @@
 
 
         </RelativeLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_cat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            shimmer:duration="800">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include layout="@layout/category_placeholder"/>
+
+            <include layout="@layout/category_placeholder"/>
+
+            <include layout="@layout/category_placeholder"/>
+
+            <include layout="@layout/category_placeholder"/>
+
+
+        </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cat_recyclerView"

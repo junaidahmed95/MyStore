@@ -51,6 +51,8 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.bringo.home.ui.home.HomeFragment.nearesStoresList;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mUserName, mUserEmail;
     private LinearLayout minLayout, moutLayout;
     private String sName, sImage;
+    private ImageView msearchMul;
     public static TextView textCartItemCount;
     private CircleImageView mUserImage;
 
@@ -80,25 +83,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
+        msearchMul = findViewById(R.id.searchMul);
         setSupportActionBar(toolbar);
         drawer = findViewById(R.id.drawer_layout);
 
 
-        checkrateListener = new ValueEventListener() {
+        checkrateListener = new ValueEventListener() {//9
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        storeID = snapshot.getKey();
-                        if (snapshot.child("st_name").exists()) {
-                            storeName = snapshot.child("st_name").getValue().toString();
-                        }
-
-                        break;
-                    }
+                    storeID = dataSnapshot.getKey().toString();
+                    storeName = dataSnapshot.child("st_name").getValue().toString();
                     showRatingDialog();
 
                 }
@@ -121,6 +117,24 @@ public class MainActivity extends AppCompatActivity {
         mUserEmail = navHeaderView.findViewById(R.id.userEmail);
         mUserImage = navHeaderView.findViewById(R.id.userImage);
         mUserName = navHeaderView.findViewById(R.id.userName);
+
+        mtotalAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OpencartActivity();
+            }
+        });
+
+
+        msearchMul.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                intent.putExtra("search", "mulstore");
+                startActivity(intent);
+            }
+        });
+
         if (FirebaseAuth.getInstance().getUid() != null && helpingMethods.GetUName() != null) {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("token").setValue(FirebaseInstanceId.getInstance().getToken());
 
@@ -289,6 +303,8 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.bringo, menu);
 
         final MenuItem menuItem = menu.findItem(R.id.action_cart);
+
+
         View actionView = MenuItemCompat.getActionView(menuItem);
         textCartItemCount = actionView.findViewById(R.id.cart_badge);
 
@@ -347,8 +363,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void UpdatePrice() {
-        if (helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) > 0) {
-            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(helpingMethods.GetStoreID()) + "/-");
+        if (helpingMethods.newone(helpingMethods.GetStoreID()) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.newone(helpingMethods.GetStoreID()) + "/-");
             mtotalAmount.setVisibility(View.VISIBLE);
         } else {
             mtotalAmount.setVisibility(View.GONE);

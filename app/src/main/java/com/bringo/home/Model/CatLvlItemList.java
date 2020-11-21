@@ -2,17 +2,10 @@ package com.bringo.home.Model;
 
 public class CatLvlItemList {
 
-    private String simplePID,desc;
-    String p_name;
-    String p_price;
-    private String storeId;
-    String p_quantity = "1";
+    private String simplePID,desc,p_name,p_price,storeId,p_quantity = "1",actual_price,catName,productid,cat_id, ownerid,ownername,ownerimage;
     int pos;
     private boolean isClicked = false;
-    String actual_price;
-    String lol;
-    String catName;
-    String productid;
+
 
     public String getDesc() {
         return desc;
@@ -51,20 +44,23 @@ public class CatLvlItemList {
         this.p_img = p_img;
     }
 
-    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price,String simplePID) {
+    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img, int pos, String productid, String storeId,String actual_price,String simplePID,String desc,String cat_id) {
         this.p_name = p_name;
         this.simplePID=simplePID;
         this.actual_price=actual_price;
+        this.desc=desc;
         this.pos=pos;
         this.p_quantity = p_quantity;
         this.p_price = p_price;
         this.productid = productid;
         this.p_img = p_img;
         this.storeId = storeId;
+        this.cat_id = cat_id;
     }
 
 
-    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId,String catName,String simplePID,String actual_price,String desc) {
+
+    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId,String catName,String simplePID,String actual_price,String desc,String cat_id) {
         this.p_name = p_name;
         this.desc=desc;
         this.actual_price=actual_price;
@@ -74,24 +70,60 @@ public class CatLvlItemList {
         this.productid = productid;
         this.p_img = p_img;
         this.storeId = storeId;
+        this.cat_id = cat_id;
     }
 
 
-//    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img,String storeId) {
-//        this.p_name = p_name;
-//        this.p_price = p_price;
-//        this.storeId=storeId;
-//        this.p_quantity = p_quantity;
-//        this.p_img = p_img;
-//    }
-//
-//    public CatLvlItemList(String p_name, String p_price, String p_quantity, String p_img,String storeId) {
-//        this.p_name = p_name;
-//        this.p_price = p_price;
-//        this.storeId=storeId;
-//        this.p_quantity = p_quantity;
-//        this.p_img = p_img;
-//    }
+    public String getOwnerid() {
+        return ownerid;
+    }
+
+    public void setOwnerid(String ownerid) {
+        this.ownerid = ownerid;
+    }
+
+    public String getOwnername() {
+        return ownername;
+    }
+
+    public void setOwnername(String ownername) {
+        this.ownername = ownername;
+    }
+
+    public String getOwnerimage() {
+        return ownerimage;
+    }
+
+    public void setOwnerimage(String ownerimage) {
+        this.ownerimage = ownerimage;
+    }
+
+    public CatLvlItemList(String p_name, String p_price, String p_img, String productid, String storeId, String catName, String simplePID, String actual_price, String desc, String cat_id, String ownerid, String ownername, String ownerimage) {
+        this.p_name = p_name;
+        this.desc=desc;
+        this.actual_price=actual_price;
+        this.catName = catName;
+        this.p_price = p_price;
+        this.simplePID=simplePID;
+        this.productid = productid;
+        this.p_img = p_img;
+        this.storeId = storeId;
+        this.cat_id = cat_id;
+        this.ownerid = ownerid;
+        this.ownerimage = ownerimage;
+        this.ownername = ownername;
+
+
+    }
+
+
+    public String getCat_id() {
+        return cat_id;
+    }
+
+    public void setCat_id(String cat_id) {
+        this.cat_id = cat_id;
+    }
 
     public String getSimplePID() {
         return simplePID;

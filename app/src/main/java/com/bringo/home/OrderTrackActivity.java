@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -49,7 +50,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -58,7 +61,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class OrderTrackActivity extends AppCompatActivity {
 
     String get_status;
-    TextView mtxt_ordertime, mtxt_storename;
+    TextView mtxt_ordertime, mtxt_storename, mstepOneTextTime, mstepTwoTextTime, mstepThreeTextTime, mstepFourTextTime;
     CircleImageView mstoreimg;
     Button btnhis_detail;
     int position = 0;
@@ -70,24 +73,64 @@ public class OrderTrackActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     FloatingActionButton mstepOneFab, mstepTwoFab, mstepThreeFab, mstepFourFab;
     ProgressBar mstepTwoBar, mstepThreeBar, mstepFourBar;
+    private Toolbar mordertrack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_track);
         progressDialog = new ProgressDialog(OrderTrackActivity.this);
+
+        mordertrack = findViewById(R.id.trackorder);
+
+        mordertrack.setTitle("Your Order (" + getIntent().getStringExtra("orderid") + ")");
+        setSupportActionBar(mordertrack);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         progressDialog.setMessage("Please wait...");
         progressDialog.setCancelable(false);
 
+        mstepOneTextTime = findViewById(R.id.stepOneTextTime);
+        mstepTwoTextTime = findViewById(R.id.stepTwoTextTime);
+        mstepThreeTextTime = findViewById(R.id.stepThreeTextTime);
+        mstepFourTextTime = findViewById(R.id.stepFourTextTime);
 
         FirebaseDatabase.getInstance().getReference("Orders").child(FirebaseAuth.getInstance().getUid()).child(getIntent().getStringExtra("orderid")).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    mStatus = dataSnapshot.child("status").getValue().toString();
-                    GetStatus(mStatus);
-                } else {
-                    GetStatus("Deliverd");
+                    if (dataSnapshot.hasChild("status2")) {
+                        Date date = new Date(Long.parseLong(dataSnapshot.child("time2").getValue().toString()));
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(" hh:mm a  dd/MM/yyyy");
+                        String tim = dateFormat.format(date).toUpperCase();
+                        mStatus = dataSnapshot.child("status2").getValue().toString();
+                        mstepOneTextTime.setText(tim);
+                        GetStatus(mStatus);
+                    }
+                    if (dataSnapshot.hasChild("status3")) {
+                        Date date = new Date(Long.parseLong(dataSnapshot.child("time3").getValue().toString()));
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(" hh:mm a  dd/MM/yyyy");
+                        String tim = dateFormat.format(date).toUpperCase();
+                        mStatus = dataSnapshot.child("status3").getValue().toString();
+                        mstepTwoTextTime.setText(tim);
+                        GetStatus(mStatus);
+                    }
+                    if (dataSnapshot.hasChild("status4")) {
+                        Date date = new Date(Long.parseLong(dataSnapshot.child("time4").getValue().toString()));
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(" hh:mm a  dd/MM/yyyy");
+                        String tim = dateFormat.format(date).toUpperCase();
+                        mStatus = dataSnapshot.child("status4").getValue().toString();
+                        mstepThreeTextTime.setText(tim);
+                        GetStatus(mStatus);
+                    }
+                    if (dataSnapshot.hasChild("status5")) {
+                        Date date = new Date(Long.parseLong(dataSnapshot.child("time5").getValue().toString()));
+                        SimpleDateFormat dateFormat = new SimpleDateFormat(" hh:mm a  dd/MM/yyyy");
+                        String tim = dateFormat.format(date).toUpperCase();
+                        mStatus = dataSnapshot.child("status5").getValue().toString();
+                        mstepFourTextTime.setText(tim);
+                        GetStatus(mStatus);
+                    }
                 }
 
             }
@@ -100,7 +143,7 @@ public class OrderTrackActivity extends AppCompatActivity {
 
         list = new ArrayList<>();
 
-        get_status = "https://bringo.biz/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
+        get_status = "https://bringo.biz/backend/api/get/order/status?ord_id=" + getIntent().getStringExtra("orderid");
 
         mtxt_ordertime =
 
@@ -202,7 +245,7 @@ public class OrderTrackActivity extends AppCompatActivity {
                 txt_total_qtys.setText("" + getIntent().getStringExtra("orderid"));
                 list.clear();
 
-                String url = "https://bringo.biz/api/get/stores/orders?str_id=" + getIntent().getStringExtra("storeid") + "&ord_id=" + getIntent().getStringExtra("orderid");
+                String url = "https://bringo.biz/backend/api/get/stores/orders?str_id=" + getIntent().getStringExtra("storeid") + "&ord_id=" + getIntent().getStringExtra("orderid");
                 RequestQueue requestQueue = Volley.newRequestQueue(OrderTrackActivity.this);
                 JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
                     @Override
@@ -290,7 +333,7 @@ public class OrderTrackActivity extends AppCompatActivity {
             mstepThreeBar.setProgress(100);
             mstepThreeBar.getProgressDrawable().setColorFilter(
                     Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
-        } else if (status.equals("Deliverd")) {
+        } else if (status.equals("Delivered")) {
             mstepOneFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
             mstepTwoBar.setProgress(100);
             mstepTwoBar.getProgressDrawable().setColorFilter(
@@ -306,4 +349,21 @@ public class OrderTrackActivity extends AppCompatActivity {
             mstepFourFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+        }
+        return true;
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
+    }
+
 }

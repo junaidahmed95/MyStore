@@ -3,11 +3,16 @@ package com.bringo.home;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -21,15 +26,21 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bringo.home.Adapter.PCatAdapter;
+import com.bringo.home.Adapter.SearchProductAdapter;
 import com.bringo.home.Model.CatLvlItemList;
 import com.bringo.home.Model.ConnectionDetector;
 import com.bringo.home.Model.HelpingMethods;
 import com.bringo.home.Model.ShowStores;
+import com.bringo.home.Model.helpinginterface;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.CubeGrid;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,6 +74,7 @@ public class SubCatActivity extends AppCompatActivity {
     public static List<CatLvlItemList> list, real;
     private List<String> store;
     public static List<ShowStores> storelist;
+    Button meditText;
 
     public static TabLayout mtabs;
     private ViewPager mviewpager;
@@ -74,7 +86,9 @@ public class SubCatActivity extends AppCompatActivity {
     public static FloatingActionButton mfbcart;
     int no_of_categories = -1;
     private String cat_Name, store_ID, ownerID, ownerImage, ownerName;
+    private String search;
 
+    private ImageView msearchMul;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +99,7 @@ public class SubCatActivity extends AppCompatActivity {
         Sprite doubleBounce = new CubeGrid();
         mloadingImage.setIndeterminateDrawable(doubleBounce);
         mretryBtn = findViewById(R.id.retryBtn);
-
+        msearchMul = findViewById(R.id.searchMul);
         mtotalAmount = findViewById(R.id.totalAmount);
         cat_Name = getIntent().getStringExtra("catName");
         checkSID = getIntent().getStringExtra("storeid");
@@ -93,6 +107,9 @@ public class SubCatActivity extends AppCompatActivity {
         ownerName = getIntent().getStringExtra("stname");
         ownerImage = getIntent().getStringExtra("ownerImage");
         ownerID = getIntent().getStringExtra("ownerID");
+        meditText = findViewById(R.id.edittext);
+
+
         list = new ArrayList<>();
         store = new ArrayList<>();
         storelist = new ArrayList<>();
@@ -107,6 +124,7 @@ public class SubCatActivity extends AppCompatActivity {
 
         mtabs = findViewById(R.id.tabs);
         mviewpager = findViewById(R.id.viewpager);
+        search = getIntent().getStringExtra("search");
 
 
         ConnectionDetector connectionDetector = new ConnectionDetector(SubCatActivity.this);
@@ -131,6 +149,25 @@ public class SubCatActivity extends AppCompatActivity {
                 }
             }
         });
+
+//        msearchMul.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+        meditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SubCatActivity.this, SearchActivity.class);
+                intent.putExtra("search", "cat");
+                startActivity(intent);
+
+            }
+        });
+
+
 
     }
 
@@ -195,6 +232,8 @@ public class SubCatActivity extends AppCompatActivity {
     }
 
 
+
+
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
         Fragment fragment = null;
@@ -234,7 +273,7 @@ public class SubCatActivity extends AppCompatActivity {
 
 
     private void GetStoreData() {
-        mJSON_URL = "https://bringo.biz/api/get/stores/products?str_id=" + store_ID;
+        mJSON_URL = "https://bringo.biz/backend/api/get/stores/products?str_id=" + store_ID;
         mrequest = new JsonArrayRequest(mJSON_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -248,6 +287,7 @@ public class SubCatActivity extends AppCompatActivity {
                             if (!dummyList.contains(jsonObject.getString("p_name"))) {
                                 dummyList.add(jsonObject.getString("p_name"));
                             }
+                            String cat_id = jsonObject.getString("cat_a_id");
                             String mCat = jsonObject.getString("p_name");
                             String str_id = jsonObject.getString("str_id");
                             String mTitle = jsonObject.getString("product_name");
@@ -256,14 +296,13 @@ public class SubCatActivity extends AppCompatActivity {
                             String product_id = jsonObject.getString("p_id");
                             String sim_id = jsonObject.getString("id");
                             String desc = jsonObject.getString("product_unit");
-                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc));
+                            prolist.add(new CatLvlItemList(mTitle, mprice, mimage, product_id, str_id, mCat, sim_id, mprice, desc,cat_id));
                         }
 
                     } catch (JSONException e) {
                         mloadingImage.setVisibility(View.GONE);
                         mretryBtn.setVisibility(View.VISIBLE);
                         Toast.makeText(SubCatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -290,22 +329,26 @@ public class SubCatActivity extends AppCompatActivity {
                 mloadingImage.setVisibility(View.GONE);
                 mretryBtn.setVisibility(View.VISIBLE);
                 Toast.makeText(SubCatActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(SubCatActivity.this, "Check your inetrnet connection.", Toast.LENGTH_SHORT).show();
             }
         });
 
-
+        mrequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         mrequestQueue = Volley.newRequestQueue(getApplicationContext());
         mrequestQueue.add(mrequest);
 
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
-            if (helpingMethods.GetCartTotal(store_ID) > 0) {
-                mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(store_ID) + "/-");
+            if (helpingMethods.newone(store_ID) > 0) {
+                mtotalAmount.setText("Rs." + helpingMethods.newone(store_ID) + "/-");
                 mtotalAmount.setVisibility(View.VISIBLE);
             } else {
                 mtotalAmount.setVisibility(View.GONE);
@@ -325,5 +368,8 @@ public class SubCatActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference("Users").child("Customers").child(FirebaseAuth.getInstance().getUid()).child("status").setValue(ServerValue.TIMESTAMP);
         }
     }
+
+
+
 
 }

@@ -53,6 +53,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private boolean isUpdate;
     private HelpingMethods helpingMethods;
     private int mTotalPrice = 0;
+    double quan = 0.0 ,getadded = 0.0;
+    double total = 0;
 
     public CartAdapter(List<CatLvlItemList> cartList, Context mContext, String fromWhere,String ownerName) {
         this.cartList = cartList;
@@ -70,71 +72,94 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     public CartAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cart_item, viewGroup, false);
+
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final CartAdapter.ViewHolder viewHolder, final int pos) {
-        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getP_name(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
+        viewHolder.setData(cartList.get(pos).getP_img(), cartList.get(pos).getDesc(), cartList.get(pos).getP_price(), cartList.get(pos).getP_quantity(), cartList.get(pos).getActual_price());
 
 
         viewHolder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int q = Integer.parseInt(cartList.get(pos).getP_quantity());
-                q += 1;
-                viewHolder.mProQuantity.setText("" + q);
-                cartList.get(pos).setP_quantity("" + q);
-                preferenceList.get(pos).setP_quantity("" + q);
-                viewHolder.Mul();
+                if(cartList.get(pos).getCat_id().equals("10") || cartList.get(pos).getCat_id().equals("9") || cartList.get(pos).getCat_id().equals("11")) {
+
+                    calculate("plus", pos, viewHolder);
+                  //  int parseint = (int) getadded;
+
+                    total = helpingMethods.newone(cartList.get(pos).getStoreId()) +getadded;
+                }
+                else{
+                    int q = Integer.parseInt(cartList.get(pos).getP_quantity());
+                    q += 1;
+                    viewHolder.mProQuantity.setText("" + q);
+                    cartList.get(pos).setP_quantity("" + q);
+                    total = helpingMethods.newone(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
+                    preferenceList.get(pos).setP_quantity("" + q);
+                    viewHolder.Mul();
+                }
                 cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
                 preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
 
-                int total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + Integer.parseInt(cartList.get(pos).getP_price());
-                helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+
+                helpingMethods.SaveCartTotal(String.valueOf(total),cartList.get(pos).getStoreId());
                 if (fromWhere.equals("activity")) {
-                    mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    mTxtView_TotalPrice.setText("" + helpingMethods.newone(cartList.get(pos).getStoreId()) + "/-");
                     UpdateTotalPrice();
                 } else {
-                    mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                    mTxtView_Total.setText("" + helpingMethods.newone(cartList.get(pos).getStoreId()) + "/-");
                     UpdatePrice();
                 }
                 SaveCartData();
             }
 
         });
-
         viewHolder.mRemoveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!viewHolder.mProQuantity.getText().toString().equals("1")) {
-                    int q = Integer.parseInt(cartList.get(pos).getP_quantity());
-                    q -= 1;
-                    viewHolder.mProQuantity.setText("" + q);
-                    cartList.get(pos).setP_quantity("" + q);
-                    preferenceList.get(pos).setP_quantity("" + q);
-                    viewHolder.Mul();
-                    cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-                    preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
-                    int total = 0;
-                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getP_price())) {
-                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
-                    } else {
-                        total = Integer.parseInt(cartList.get(pos).getP_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
+
+                if(cartList.get(pos).getCat_id().equals("10") || cartList.get(pos).getCat_id().equals("9") || cartList.get(pos).getCat_id().equals("11")) {
+
+                    if(viewHolder.mProQuantity.getText().equals("0.25")){
+                        return;
+                    }
+                    else{
+                        calculate("minus", pos, viewHolder);
+                        double parseint = getadded;
+                        total = helpingMethods.newone(cartList.get(pos).getStoreId()) - parseint;
                     }
 
-
-                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
-                    if (fromWhere.equals("activity")) {
-                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-                        UpdateTotalPrice();
-                    } else {
-                        mTxtView_Total.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
-                        UpdatePrice();
-                    }
-
-                    SaveCartData();
                 }
+                else {
+                    if (!viewHolder.mProQuantity.getText().toString().equals("1")) {
+                        int q = Integer.parseInt(cartList.get(pos).getP_quantity());
+                        q -= 1;
+                        viewHolder.mProQuantity.setText("" + q);
+                        cartList.get(pos).setP_quantity("" + q);
+                        total = helpingMethods.newone(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getP_price());
+                        preferenceList.get(pos).setP_quantity("" + q);
+                        viewHolder.Mul();
+
+                    }else{
+                        return;
+                    }
+                }
+
+                cartList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+                preferenceList.get(pos).setActual_price(viewHolder.mProTotal.getText().toString());
+
+
+                helpingMethods.SaveCartTotal(String.valueOf(total),cartList.get(pos).getStoreId());
+                if (fromWhere.equals("activity")) {
+                    mTxtView_TotalPrice.setText("" + helpingMethods.newone(cartList.get(pos).getStoreId()) + "/-");
+                    UpdateTotalPrice();
+                } else {
+                    mTxtView_Total.setText("" + helpingMethods.newone(cartList.get(pos).getStoreId()) + "/-");
+                    UpdatePrice();
+                }
+                SaveCartData();
 
             }
         });
@@ -153,15 +178,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                                     helpingMethods.SaveCartCount(finalCount, cartList.get(pos).getStoreId());
                                     MainsetupBadge();
 
-                                    int total = 0;
-                                    if (helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) > Integer.parseInt(cartList.get(pos).getActual_price())) {
-                                        total = helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) - Integer.parseInt(cartList.get(pos).getActual_price());
-                                    } else {
-                                        total = Integer.parseInt(cartList.get(pos).getActual_price()) - helpingMethods.GetCartTotal(cartList.get(pos).getStoreId());
+                                    double total = 0;
+
+                                    double get =  Double.parseDouble(cartList.get(pos).getActual_price());
+                                    int getint = (int)get;
+
+                                    if (helpingMethods.newone(cartList.get(pos).getStoreId()) > get) {
+                                        total = helpingMethods.newone(cartList.get(pos).getStoreId()) -  (Double.parseDouble(cartList.get(pos).getActual_price()));
                                     }
-                                    helpingMethods.SaveCartTotal(total,cartList.get(pos).getStoreId());
+                                    else {
+                                        total = (Double.parseDouble(cartList.get(pos).getActual_price())) - helpingMethods.newone(cartList.get(pos).getStoreId());
+                                    }
+
+                                    helpingMethods.SaveCartTotal(String.valueOf(total),cartList.get(pos).getStoreId());
                                     if (fromWhere.equals("activity")) {
-                                        mTxtView_TotalPrice.setText("" + helpingMethods.GetCartTotal(cartList.get(pos).getStoreId()) + "/-");
+                                        mTxtView_TotalPrice.setText("" + helpingMethods.newone(cartList.get(pos).getStoreId()) + "/-");
                                         FCartsetupBadge();
                                         UpdateTotalPrice();
                                     } else {
@@ -209,6 +240,39 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
             }
         });
+
+    }
+    private void calculate(String minus, int pos, ViewHolder viewHolder) {
+
+
+
+
+        if (minus.equals("minus")){
+            if(viewHolder.mProQuantity.getText().equals("0.25")){
+                return;
+
+            }
+            else{
+                quan = (Double.parseDouble(viewHolder.mProQuantity.getText().toString()) - 0.25);
+            }
+
+        }
+        else{
+                quan = (Double.parseDouble(viewHolder.mProQuantity.getText().toString()) + 0.25);
+        }
+
+        viewHolder.mProQuantity.setText(""+quan);
+        cartList.get(pos).setP_quantity("" + quan);
+        preferenceList.get(pos).setP_quantity("" + quan);
+        double pricesum = Double.parseDouble(viewHolder.mProPrice.getText().toString());
+
+
+
+
+           // getadded = (quan*pricesum)- Double.parseDouble(viewHolder.mProPrice.getText().toString());
+            getadded = Double.parseDouble(cartList.get(pos).getP_price())/4;
+
+        viewHolder.mProTotal.setText(""+quan*pricesum);
 
     }
 
@@ -318,8 +382,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
     private void UpdateTotalPrice(){
-        if (helpingMethods.GetCartTotal(cartList.get(0).getStoreId()) > 0) {
-            mtotalAmount.setText("Rs." + helpingMethods.GetCartTotal(cartList.get(0).getStoreId()) + "/-");
+        if (helpingMethods.newone(cartList.get(0).getStoreId()) > 0) {
+            mtotalAmount.setText("Rs." + helpingMethods.newone(cartList.get(0).getStoreId()) + "/-");
             mtotalAmount.setVisibility(View.VISIBLE);
         } else {
             mtotalAmount.setVisibility(View.GONE);
@@ -327,5 +391,3 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     }
 
 }
-
-
